@@ -1,5 +1,6 @@
 package me.jerriidesu.musicbot;
 
+import me.jerriidesu.musicbot.audio.PlaylistManager;
 import me.jerriidesu.musicbot.commands.CommandListener;
 import me.jerriidesu.musicbot.tasks.CmdLineHandler;
 import org.apache.logging.log4j.LogManager;
@@ -18,6 +19,8 @@ public class MusicBot {
     private static final Logger logger = LogManager.getLogger(MusicBot.class);
     private static final BotConfig botConfig = new BotConfig(new File(".", "config/"));
     private static final ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(4);
+
+    private static PlaylistManager playlistManager = null;
 
     private DiscordApi discordApi;
     private Boolean isReady = false;
@@ -39,6 +42,10 @@ public class MusicBot {
         return logger;
     }
 
+    public static PlaylistManager getPlaylistManager() {
+        return playlistManager;
+    }
+
     protected void launch() {
         //report version
         logger.info("starting music-bot ({}) ...", botConfig.getBotVersion());
@@ -53,6 +60,8 @@ public class MusicBot {
                 .login().join();
 
         logger.info("discord login successful, continuing ... ");
+
+        playlistManager = new PlaylistManager(this);
 
         this.updatePresence();
         this.runTasks();

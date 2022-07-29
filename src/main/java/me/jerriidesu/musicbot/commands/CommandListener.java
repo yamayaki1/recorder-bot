@@ -6,6 +6,7 @@ import com.vdurmont.emoji.EmojiParser;
 import me.jerriidesu.musicbot.MusicBot;
 import me.jerriidesu.musicbot.commands.implementations.ConnectCommand;
 import me.jerriidesu.musicbot.commands.implementations.DisconnectCommand;
+import me.jerriidesu.musicbot.commands.implementations.PlayCommand;
 import me.jerriidesu.musicbot.utils.Reactions;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.event.message.MessageCreateEvent;
@@ -13,6 +14,7 @@ import org.javacord.api.listener.message.MessageCreateListener;
 
 import java.awt.Color;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 public class CommandListener implements MessageCreateListener {
 
@@ -21,7 +23,8 @@ public class CommandListener implements MessageCreateListener {
     public CommandListener() {
         registerCommands(
                 new ConnectCommand(),
-                new DisconnectCommand()
+                new DisconnectCommand(),
+                new PlayCommand()
         );
     }
 
@@ -52,7 +55,7 @@ public class CommandListener implements MessageCreateListener {
                     if(reaction.getEmoji().equalsEmoji(EmojiParser.parseToUnicode(Reactions.DISCARD))) {
                         message.delete();
                     }
-                }));
+                })).removeAfter(1, TimeUnit.MINUTES);
             });
         }
     }

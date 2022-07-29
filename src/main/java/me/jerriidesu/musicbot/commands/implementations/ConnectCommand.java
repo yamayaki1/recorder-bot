@@ -2,6 +2,7 @@ package me.jerriidesu.musicbot.commands.implementations;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import me.jerriidesu.musicbot.MusicBot;
 import me.jerriidesu.musicbot.commands.Command;
 import me.jerriidesu.musicbot.utils.Reactions;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
@@ -23,6 +24,7 @@ public class ConnectCommand implements Command {
 
     private void joinChannel(MessageCreateEvent event, ServerVoiceChannel serverVoiceChannel) {
         serverVoiceChannel.connect(false, true).thenAccept(audioConnection -> {
+            audioConnection.setAudioSource(MusicBot.getPlaylistManager().getAudioSource());
             Reactions.addSuccessfullReaction(event.getMessage());
         });
     }
