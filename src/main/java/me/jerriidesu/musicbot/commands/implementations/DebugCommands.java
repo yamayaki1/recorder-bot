@@ -5,6 +5,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import me.jerriidesu.musicbot.MusicBot;
 import me.jerriidesu.musicbot.commands.Command;
 import me.jerriidesu.musicbot.utils.Reactions;
+import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 public class DebugCommands implements Command {
@@ -39,6 +40,11 @@ public class DebugCommands implements Command {
                             context.getSource().getMessage().reply(MusicBot.getConfig().getBotVersion());
                             return 0;
                         })
+                ).then(LiteralArgumentBuilder.<MessageCreateEvent>literal("stop")
+                        .executes(context -> {
+                            System.exit(0);
+                            return 0;
+                        })
                 ).executes(context -> {
                     Reactions.addRefuseReaction(context.getSource().getMessage());
                     return 0;
@@ -47,10 +53,8 @@ public class DebugCommands implements Command {
     }
 
     public static void fixAudioSource(MessageCreateEvent context) {
-        context.getServer().ifPresent(server -> {
-            server.getAudioConnection().ifPresent(audioConnection -> {
-                audioConnection.setAudioSource(MusicBot.getPlaylistManager().getAudioSource());
-            });
+        context.getServer().flatMap(Server::getAudioConnection).ifPresent(audioConnection -> {
+            audioConnection.setAudioSource(MusicBot.getPlaylistManager().getAudioSource());
         });
     }
 }

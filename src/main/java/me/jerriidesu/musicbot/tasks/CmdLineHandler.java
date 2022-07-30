@@ -38,7 +38,7 @@ public record CmdLineHandler(MusicBot instance) implements Runnable {
                 threadSet.forEach(thread -> MusicBot.getLogger().info(threadToString(thread)));
             }
             case "reload" -> {
-                MusicBot.getLogger().info("reloading config...");
+                this.instance.registerCommands();
                 MusicBot.getConfig().reload();
                 this.instance.updatePresence();
             }

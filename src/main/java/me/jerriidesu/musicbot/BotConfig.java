@@ -41,6 +41,7 @@ public class BotConfig {
     }
 
     public void reload() {
+        MusicBot.getLogger().info("reloading config...");
         this.config = null;
 
         try {

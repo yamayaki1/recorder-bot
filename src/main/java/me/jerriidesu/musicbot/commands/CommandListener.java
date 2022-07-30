@@ -4,11 +4,14 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.vdurmont.emoji.EmojiParser;
 import me.jerriidesu.musicbot.MusicBot;
+import me.jerriidesu.musicbot.commands.implementations.ClearCommand;
 import me.jerriidesu.musicbot.commands.implementations.ConnectCommand;
 import me.jerriidesu.musicbot.commands.implementations.DebugCommands;
 import me.jerriidesu.musicbot.commands.implementations.DisconnectCommand;
 import me.jerriidesu.musicbot.commands.implementations.PlayCommand;
 import me.jerriidesu.musicbot.commands.implementations.PlaylistCommand;
+import me.jerriidesu.musicbot.commands.implementations.RepeatCommand;
+import me.jerriidesu.musicbot.commands.implementations.SkipCommand;
 import me.jerriidesu.musicbot.commands.implementations.VolumeCommand;
 import me.jerriidesu.musicbot.utils.Reactions;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -30,7 +33,10 @@ public class CommandListener implements MessageCreateListener {
                 new DisconnectCommand(),
                 new PlayCommand(),
                 new VolumeCommand(),
-                new PlaylistCommand()
+                new PlaylistCommand(),
+                new SkipCommand(),
+                new ClearCommand(),
+                new RepeatCommand()
         );
     }
 
@@ -51,8 +57,6 @@ public class CommandListener implements MessageCreateListener {
         try {
             this.commandDispatcher.execute(source.getMessageContent().substring(1), source);
         } catch (CommandSyntaxException e) {
-            Reactions.addFailureReaction(source.getMessage());
-
             source.getMessage().reply(
                     new EmbedBuilder().setColor(Color.RED).addField("Beim Ausführen des Befehls ist ein Fehler aufgetreten", e.getMessage(), false)
             ).thenAccept(message -> {

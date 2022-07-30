@@ -8,7 +8,6 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import me.jerriidesu.musicbot.MusicBot;
-import me.jerriidesu.musicbot.audio.messages.PlayerResponse;
 import me.jerriidesu.musicbot.audio.source.LavaPlayerAudioSource;
 
 import java.util.ArrayList;
@@ -18,12 +17,14 @@ import java.util.function.Consumer;
 public class PlaylistManager extends AudioEventAdapter {
 
     private final LavaPlayerAudioSource audioSource;
-    private final MusicBot botInstance;
-
     private final List<AudioTrack> trackList = new ArrayList<>();
 
+    private final MusicBot bot;
+
+    private boolean repeat = false;
+
     public PlaylistManager(MusicBot bot) {
-        this.botInstance = bot;
+        this.bot = bot;
         this.audioSource = new LavaPlayerAudioSource(bot.getAPI());
         this.audioSource.getAudioPlayer().addListener(this);
     }
@@ -33,46 +34,74 @@ public class PlaylistManager extends AudioEventAdapter {
     }
 
     public List<AudioTrack> getTrackList() {
-        return this.trackList;
+        return new ArrayList<>(this.trackList);
     }
 
-    public void addItems(String song, Consumer<PlayerResponse> consumer) {
+    public void addItems(String song, Consumer<Boolean> consumer) {
         this.audioSource.getPlayerManager().loadItem(song, new AudioLoadResultHandler() {
 
             @Override
             public void trackLoaded(AudioTrack track) {
                 trackList.add(track);
-                consumer.accept(new PlayerResponse(true, "Titel "+track.getInfo().title+" hinzugefügt."));
+                consumer.accept(true);
                 startPlaying();
             }
 
             @Override
             public void playlistLoaded(AudioPlaylist playlist) {
                 trackList.addAll(playlist.getTracks());
-                consumer.accept(new PlayerResponse(true, "Playlist "+playlist.getName()+" mit "+playlist.getTracks().size()+" Titel(n) hinzugefügt"));
+                consumer.accept(true);
                 startPlaying();
             }
 
             @Override
             public void noMatches() {
-                consumer.accept(new PlayerResponse(false, "Kein Song gefunden."));
+                MusicBot.getLogger().error("[playlist-manager] no matches");
+                consumer.accept(false);
             }
 
             @Override
             public void loadFailed(FriendlyException exception) {
-                consumer.accept(new PlayerResponse(false, exception.getMessage()));
+                MusicBot.getLogger().error("[playlist-manager] {}", exception.getMessage());
+                consumer.accept(false);
             }
         });
     }
 
+    public void skipTrack(int count) {
+        this.audioSource.getAudioPlayer().stopTrack();
+        this.startPlaying();
+    }
+
+    public boolean toggleRepeat() {
+        this.repeat = !this.repeat;
+        return repeat;
+    }
+
+    public void clearTrackList() {
+        this.trackList.clear();
+    }
+
     public void startPlaying() {
-        if(audioSource.getAudioPlayer().isPaused()) {
-            audioSource.getAudioPlayer().setPaused(false);
+        if(this.audioSource.getAudioPlayer().isPaused()) {
+            this.audioSource.getAudioPlayer().setPaused(false);
         }
 
-        if(this.audioSource.hasFinished()) {
-            this.audioSource.getAudioPlayer().playTrack(trackList.get(0));
+        if(this.audioSource.hasFinished() && this.trackList.size() != 0) {
+            if(this.repeat) {
+                AudioTrack oldTrack = this.trackList.get(0);
+                this.trackList.add(oldTrack.makeClone());
+            }
+
+            this.audioSource.getAudioPlayer().playTrack(this.trackList.get(0));
+            this.trackList.remove(0);
         }
+
+        this.bot.getAPI().getServers().forEach(server -> {
+            server.getAudioConnection().ifPresent(audioConnection -> {
+                audioConnection.setAudioSource(MusicBot.getPlaylistManager().getAudioSource());
+            });
+        });
     }
 
     @Override
@@ -92,8 +121,6 @@ public class PlaylistManager extends AudioEventAdapter {
 
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-        trackList.remove(0);
-
         if(trackList.size() == 0) {
             return;
         }

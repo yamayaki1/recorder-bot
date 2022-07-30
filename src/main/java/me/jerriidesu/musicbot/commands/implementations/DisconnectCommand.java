@@ -14,7 +14,7 @@ public class DisconnectCommand implements Command {
             context.getSource().getServer().ifPresent(server -> {
                 server.getAudioConnection().ifPresentOrElse(audioConnection -> {
                     this.disconnectChannel(context.getSource(), audioConnection);
-                }, () -> this.sendError(context.getSource()));
+                }, () -> Reactions.addFailureReaction(context.getSource().getMessage()));
             });
             return 0;
         }));
@@ -24,9 +24,5 @@ public class DisconnectCommand implements Command {
         audioConnection.close().thenRun(() -> {
             Reactions.addSuccessfullReaction(event.getMessage());
         });
-    }
-
-    private void sendError(MessageCreateEvent event) {
-        Reactions.addFailureReaction(event.getMessage());
     }
 }

@@ -26,11 +26,13 @@ public class LavaPlayerAudioSource extends AudioSourceBase {
 
         AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
         playerManager.registerSourceManager(new YoutubeAudioSourceManager());
+
         playerManager.getConfiguration().setOpusEncodingQuality(AudioConfiguration.OPUS_QUALITY_MAX);
         playerManager.getConfiguration().setResamplingQuality(AudioConfiguration.ResamplingQuality.HIGH);
 
         this.playerManager = playerManager;
         this.audioPlayer = playerManager.createPlayer();
+        this.audioPlayer.setVolume(50);
     }
 
     public AudioPlayerManager getPlayerManager() {

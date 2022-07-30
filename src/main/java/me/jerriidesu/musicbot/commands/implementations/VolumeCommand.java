@@ -13,18 +13,34 @@ public class VolumeCommand implements Command {
     @Override
     public void registerBrigadier(CommandDispatcher<MessageCreateEvent> dispatcher) {
         dispatcher.register(LiteralArgumentBuilder.<MessageCreateEvent>literal("volume")
-                .then(RequiredArgumentBuilder.<MessageCreateEvent, Integer>argument("vol", IntegerArgumentType.integer(0, 100)).executes(context -> {
-                    MusicBot.getPlaylistManager().getAudioSource().getAudioPlayer().setVolume(IntegerArgumentType.getInteger(context, "vol"));
-                    Reactions.addSuccessfullReaction(context.getSource().getMessage());
+                .then(RequiredArgumentBuilder.<MessageCreateEvent, Integer>argument("vol", IntegerArgumentType.integer(0, 50)).executes(context -> {
+                    int volume = IntegerArgumentType.getInteger(context, "vol");
+                    setVolume(context.getSource(), volume);
                     return 0;
                 })).executes(context -> {
-                    this.sendRefused(context.getSource());
+                    Reactions.addRefuseReaction(context.getSource().getMessage());
+                    return 0;
+                })
+        );
+
+        dispatcher.register(LiteralArgumentBuilder.<MessageCreateEvent>literal("volume_allow_ear_rape")
+                .then(RequiredArgumentBuilder.<MessageCreateEvent, Integer>argument("vol", IntegerArgumentType.integer(0)).executes(context -> {
+                    int volume = IntegerArgumentType.getInteger(context, "vol");
+                    setVolume(context.getSource(), Math.min(volume, 150));
+                    return 0;
+                })).executes(context -> {
+                    Reactions.addRefuseReaction(context.getSource().getMessage());
                     return 0;
                 })
         );
     }
 
-    private void sendRefused(MessageCreateEvent source) {
-        Reactions.addRefuseReaction(source.getMessage());
+    private void setVolume(MessageCreateEvent context, int volume) {
+        MusicBot.getPlaylistManager()
+                .getAudioSource()
+                .getAudioPlayer()
+                .setVolume(volume);
+
+        Reactions.addSuccessfullReaction(context.getMessage());
     }
 }

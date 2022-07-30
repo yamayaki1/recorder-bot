@@ -25,6 +25,8 @@ public class MusicBot {
     private DiscordApi discordApi;
     private Boolean isReady = false;
 
+    private CommandListener commandListener = null;
+
     public static void main(String[] args) {
         MusicBot bot = new MusicBot();
         bot.launch();
@@ -56,13 +58,13 @@ public class MusicBot {
         discordApi = new DiscordApiBuilder()
                 .setToken(botConfig.get().getBot().getToken())
                 .setIntents(Intent.GUILD_MESSAGE_REACTIONS, Intent.GUILD_MESSAGES, Intent.GUILD_VOICE_STATES)
-                .addListener(new CommandListener())
                 .login().join();
 
         logger.info("discord login successful, continuing ... ");
 
         playlistManager = new PlaylistManager(this);
 
+        this.registerCommands();
         this.updatePresence();
         this.runTasks();
 
@@ -73,6 +75,17 @@ public class MusicBot {
         logger.info("starting tasks and commandline listener ...");
 
         scheduledThreadPool.scheduleAtFixedRate(new CmdLineHandler(this), 0, 1, TimeUnit.SECONDS);
+    }
+
+    public void registerCommands() {
+        //remove old listener if one is existing
+        if(this.commandListener != null) {
+            this.discordApi.removeListener(this.commandListener);
+            this.commandListener = null;
+        }
+
+        this.commandListener = new CommandListener();
+        this.discordApi.addListener(this.commandListener);
     }
 
     public void updatePresence() {
