@@ -23,7 +23,7 @@ public class ConnectCommand implements Command {
     }
 
     private void joinChannel(MessageCreateEvent event, ServerVoiceChannel serverVoiceChannel) {
-        serverVoiceChannel.connect(false, true).thenAccept(audioConnection -> {
+        serverVoiceChannel.connect(false, false).thenAccept(audioConnection -> {
             audioConnection.setAudioSource(MusicBot.getPlaylistManager().getAudioSource());
             Reactions.addSuccessfullReaction(event.getMessage());
         });

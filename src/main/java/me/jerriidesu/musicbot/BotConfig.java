@@ -2,7 +2,6 @@ package me.jerriidesu.musicbot;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -19,7 +18,7 @@ public class BotConfig {
     private JsonConfig config;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public BotConfig(@NotNull File file) {
+    public BotConfig(File file) {
         if (!file.exists()) {
             file.mkdirs();
         }

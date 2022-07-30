@@ -5,8 +5,11 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.vdurmont.emoji.EmojiParser;
 import me.jerriidesu.musicbot.MusicBot;
 import me.jerriidesu.musicbot.commands.implementations.ConnectCommand;
+import me.jerriidesu.musicbot.commands.implementations.DebugCommands;
 import me.jerriidesu.musicbot.commands.implementations.DisconnectCommand;
 import me.jerriidesu.musicbot.commands.implementations.PlayCommand;
+import me.jerriidesu.musicbot.commands.implementations.PlaylistCommand;
+import me.jerriidesu.musicbot.commands.implementations.VolumeCommand;
 import me.jerriidesu.musicbot.utils.Reactions;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.event.message.MessageCreateEvent;
@@ -22,9 +25,12 @@ public class CommandListener implements MessageCreateListener {
 
     public CommandListener() {
         registerCommands(
+                new DebugCommands(),
                 new ConnectCommand(),
                 new DisconnectCommand(),
-                new PlayCommand()
+                new PlayCommand(),
+                new VolumeCommand(),
+                new PlaylistCommand()
         );
     }
 

@@ -1,11 +1,9 @@
 package me.jerriidesu.musicbot.audio.source;
 
+import com.sedmelluq.discord.lavaplayer.player.AudioConfiguration;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
 import org.javacord.api.DiscordApi;
@@ -28,16 +26,19 @@ public class LavaPlayerAudioSource extends AudioSourceBase {
 
         AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
         playerManager.registerSourceManager(new YoutubeAudioSourceManager());
-        playerManager.registerSourceManager(new HttpAudioSourceManager());
-        playerManager.registerSourceManager(new LocalAudioSourceManager());
-        playerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
+        playerManager.getConfiguration().setOpusEncodingQuality(AudioConfiguration.OPUS_QUALITY_MAX);
+        playerManager.getConfiguration().setResamplingQuality(AudioConfiguration.ResamplingQuality.HIGH);
 
         this.playerManager = playerManager;
         this.audioPlayer = playerManager.createPlayer();
     }
 
     public AudioPlayerManager getPlayerManager() {
-        return playerManager;
+        return this.playerManager;
+    }
+
+    public AudioPlayer getAudioPlayer() {
+        return this.audioPlayer;
     }
 
     @Override
@@ -51,7 +52,8 @@ public class LavaPlayerAudioSource extends AudioSourceBase {
 
     @Override
     public boolean hasFinished() {
-        return this.audioPlayer.getPlayingTrack().getPosition() >= this.audioPlayer.getPlayingTrack().getDuration();
+        return this.audioPlayer.getPlayingTrack() == null
+                || this.audioPlayer.getPlayingTrack().getPosition() >= this.audioPlayer.getPlayingTrack().getDuration();
     }
 
     @Override
