@@ -9,23 +9,24 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import me.jerriidesu.musicbot.MusicBot;
 import me.jerriidesu.musicbot.audio.source.LavaPlayerAudioSource;
+import org.javacord.api.entity.server.Server;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class PlaylistManager extends AudioEventAdapter {
+public class TrackManager extends AudioEventAdapter {
+
+    private final Server server;
 
     private final LavaPlayerAudioSource audioSource;
     private final List<AudioTrack> trackList = new ArrayList<>();
 
-    private final MusicBot bot;
-
     private boolean repeat = false;
 
-    public PlaylistManager(MusicBot bot) {
-        this.bot = bot;
-        this.audioSource = new LavaPlayerAudioSource(bot.getAPI());
+    public TrackManager(Server server) {
+        this.server = server;
+        this.audioSource = new LavaPlayerAudioSource(server.getApi());
         this.audioSource.getAudioPlayer().addListener(this);
     }
 
@@ -68,7 +69,7 @@ public class PlaylistManager extends AudioEventAdapter {
         });
     }
 
-    public void skipTrack(int count) {
+    public void skipTracks(int count) {
         this.audioSource.getAudioPlayer().stopTrack();
         this.startPlaying();
     }
@@ -97,11 +98,7 @@ public class PlaylistManager extends AudioEventAdapter {
             this.trackList.remove(0);
         }
 
-        this.bot.getAPI().getServers().forEach(server -> {
-            server.getAudioConnection().ifPresent(audioConnection -> {
-                audioConnection.setAudioSource(MusicBot.getPlaylistManager().getAudioSource());
-            });
-        });
+        this.fixAudioSource();
     }
 
     @Override
@@ -138,5 +135,14 @@ public class PlaylistManager extends AudioEventAdapter {
     @Override
     public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
         // Audio track has been unable to provide us any audio, might want to just start a new track
+    }
+
+    public void fixAudioSource() {
+        this.server.getAudioConnection().ifPresent(audioConnection -> {
+            audioConnection.setAudioSource(this.audioSource);
+        });
+    }
+
+    public void close() {
     }
 }

@@ -2,27 +2,25 @@ package me.jerriidesu.musicbot.commands.implementations;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import me.jerriidesu.musicbot.MusicBot;
 import me.jerriidesu.musicbot.commands.Command;
+import me.jerriidesu.musicbot.utils.Either;
 import me.jerriidesu.musicbot.utils.Reactions;
-import org.javacord.api.audio.AudioConnection;
+import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 public class DisconnectCommand implements Command {
     @Override
-    public void registerBrigadier(CommandDispatcher<MessageCreateEvent> dispatcher) {
-        dispatcher.register(LiteralArgumentBuilder.<MessageCreateEvent>literal("disconnect").executes(context -> {
-            context.getSource().getServer().ifPresent(server -> {
-                server.getAudioConnection().ifPresentOrElse(audioConnection -> {
-                    this.disconnectChannel(context.getSource(), audioConnection);
-                }, () -> Reactions.addFailureReaction(context.getSource().getMessage()));
-            });
-            return 0;
-        }));
-    }
+    public void registerBrigadier(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher) {
+        dispatcher.register(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("disconnect").executes(context -> {
+            //execute
+            context.getSource().getRight().getAudioConnection().ifPresentOrElse(audioConnection -> {
+                MusicBot.getAudioManager().removeTrackManager(context.getSource().getRight());
+                audioConnection.close();
+                Reactions.addSuccessfullReaction(context.getSource().getLeft().getMessage());
+            }, () -> Reactions.addFailureReaction(context.getSource().getLeft().getMessage()));
 
-    private void disconnectChannel(MessageCreateEvent event, AudioConnection audioConnection) {
-        audioConnection.close().thenRun(() -> {
-            Reactions.addSuccessfullReaction(event.getMessage());
-        });
+            return 1;
+        }));
     }
 }

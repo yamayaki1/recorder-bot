@@ -4,14 +4,22 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import me.jerriidesu.musicbot.MusicBot;
 import me.jerriidesu.musicbot.commands.Command;
+import me.jerriidesu.musicbot.utils.Either;
+import me.jerriidesu.musicbot.utils.Reactions;
+import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 public class ClearCommand implements Command {
     @Override
-    public void registerBrigadier(CommandDispatcher<MessageCreateEvent> dispatcher) {
-        dispatcher.register(LiteralArgumentBuilder.<MessageCreateEvent>literal("clear")
+    public void registerBrigadier(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher) {
+        dispatcher.register(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("clear")
                 .executes(context -> {
-                    MusicBot.getPlaylistManager().clearTrackList();
+                    //execute
+                    MusicBot.getAudioManager()
+                            .getTrackManager(context.getSource().getRight())
+                            .clearTrackList();
+
+                    Reactions.addSuccessfullReaction(context.getSource().getLeft().getMessage());
                     return 1;
                 })
         );

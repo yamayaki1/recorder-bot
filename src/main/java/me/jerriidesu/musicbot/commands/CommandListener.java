@@ -13,8 +13,10 @@ import me.jerriidesu.musicbot.commands.implementations.PlaylistCommand;
 import me.jerriidesu.musicbot.commands.implementations.RepeatCommand;
 import me.jerriidesu.musicbot.commands.implementations.SkipCommand;
 import me.jerriidesu.musicbot.commands.implementations.VolumeCommand;
+import me.jerriidesu.musicbot.utils.Either;
 import me.jerriidesu.musicbot.utils.Reactions;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
 
@@ -24,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 public class CommandListener implements MessageCreateListener {
 
-    private final CommandDispatcher<MessageCreateEvent> commandDispatcher = new CommandDispatcher<>();
+    private final CommandDispatcher<Either<MessageCreateEvent, Server>> commandDispatcher = new CommandDispatcher<>();
 
     public CommandListener() {
         registerCommands(
@@ -55,7 +57,10 @@ public class CommandListener implements MessageCreateListener {
         }
 
         try {
-            this.commandDispatcher.execute(source.getMessageContent().substring(1), source);
+            this.commandDispatcher.execute(
+                    source.getMessageContent().substring(1),
+                    new Either<>(source, source.getServer().orElse(null))
+            );
         } catch (CommandSyntaxException e) {
             source.getMessage().reply(
                     new EmbedBuilder().setColor(Color.RED).addField("Beim Ausführen des Befehls ist ein Fehler aufgetreten", e.getMessage(), false)

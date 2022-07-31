@@ -1,6 +1,6 @@
 package me.jerriidesu.musicbot;
 
-import me.jerriidesu.musicbot.audio.PlaylistManager;
+import me.jerriidesu.musicbot.audio.ServerManager;
 import me.jerriidesu.musicbot.commands.CommandListener;
 import me.jerriidesu.musicbot.tasks.CmdLineHandler;
 import org.apache.logging.log4j.LogManager;
@@ -20,11 +20,9 @@ public class MusicBot {
     private static final BotConfig botConfig = new BotConfig(new File(".", "config/"));
     private static final ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(4);
 
-    private static PlaylistManager playlistManager = null;
+    private static ServerManager serverManager = null;
 
     private DiscordApi discordApi;
-    private Boolean isReady = false;
-
     private CommandListener commandListener = null;
 
     public static void main(String[] args) {
@@ -44,8 +42,8 @@ public class MusicBot {
         return logger;
     }
 
-    public static PlaylistManager getPlaylistManager() {
-        return playlistManager;
+    public static ServerManager getAudioManager() {
+        return serverManager;
     }
 
     protected void launch() {
@@ -62,13 +60,11 @@ public class MusicBot {
 
         logger.info("discord login successful, continuing ... ");
 
-        playlistManager = new PlaylistManager(this);
+        serverManager = new ServerManager(this);
 
         this.registerCommands();
         this.updatePresence();
         this.runTasks();
-
-        this.isReady = true;
     }
 
     protected void runTasks() {
@@ -90,10 +86,6 @@ public class MusicBot {
 
     public void updatePresence() {
         discordApi.updateStatus(UserStatus.fromString(botConfig.get().getBot().getStatus()));
-    }
-
-    public Boolean isReady() {
-        return this.isReady;
     }
 
     public DiscordApi getAPI() {

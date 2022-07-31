@@ -6,36 +6,40 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import me.jerriidesu.musicbot.MusicBot;
 import me.jerriidesu.musicbot.commands.Command;
+import me.jerriidesu.musicbot.utils.Either;
 import me.jerriidesu.musicbot.utils.Reactions;
+import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 public class PlayCommand implements Command {
     @Override
-    public void registerBrigadier(CommandDispatcher<MessageCreateEvent> dispatcher) {
-        dispatcher.register(LiteralArgumentBuilder.<MessageCreateEvent>literal("play")
-                .then(RequiredArgumentBuilder.<MessageCreateEvent, String>argument("song", StringArgumentType.greedyString()).executes(context -> {
-                    context.getSource().getServer().ifPresent(server -> {
+    public void registerBrigadier(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher) {
+        dispatcher.register(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("play")
+                .then(RequiredArgumentBuilder.<Either<MessageCreateEvent, Server>, String>argument("song", StringArgumentType.greedyString()).executes(context -> {
+                    //execute
+                    context.getSource().getLeft().getServer().ifPresent(server -> {
                         server.getAudioConnection().ifPresentOrElse(audioConnection -> {
                             addSong(context.getSource(), StringArgumentType.getString(context, "song"));
-                        }, () -> Reactions.addRefuseReaction(context.getSource().getMessage()));
+                        }, () -> Reactions.addRefuseReaction(context.getSource().getLeft().getMessage()));
                     });
 
                     return 0;
                 })).executes(context -> {
-                    Reactions.addRefuseReaction(context.getSource().getMessage());
+                    //execute
+                    Reactions.addRefuseReaction(context.getSource().getLeft().getMessage());
                     return 0;
                 })
         );
     }
 
-    private void addSong(MessageCreateEvent source, String song) {
-        MusicBot.getPlaylistManager().addItems(song, playerResponse -> {
-            source.getMessage().removeEmbed();
+    private void addSong(Either<MessageCreateEvent, Server> context, String song) {
+        MusicBot.getAudioManager().getTrackManager(context.getRight()).addItems(song, playerResponse -> {
+            context.getLeft().getMessage().removeEmbed();
 
             if(playerResponse) {
-                Reactions.addSuccessfullReaction(source.getMessage());
+                Reactions.addSuccessfullReaction(context.getLeft().getMessage());
             } else {
-                Reactions.addFailureReaction(source.getMessage());
+                Reactions.addFailureReaction(context.getLeft().getMessage());
             }
         });
     }

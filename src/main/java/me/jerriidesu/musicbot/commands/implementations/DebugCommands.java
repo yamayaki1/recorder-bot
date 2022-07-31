@@ -4,57 +4,76 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import me.jerriidesu.musicbot.MusicBot;
 import me.jerriidesu.musicbot.commands.Command;
+import me.jerriidesu.musicbot.utils.Either;
 import me.jerriidesu.musicbot.utils.Reactions;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 public class DebugCommands implements Command {
     @Override
-    public void registerBrigadier(CommandDispatcher<MessageCreateEvent> dispatcher) {
-        dispatcher.register(LiteralArgumentBuilder.<MessageCreateEvent>literal("debug")
-                .then(LiteralArgumentBuilder.<MessageCreateEvent>literal("isplaying")
+    public void registerBrigadier(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher) {
+        dispatcher.register(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("debug")
+                .then(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("isplaying")
                         .executes(context -> {
-                            context.getSource().getMessage().reply(String.valueOf(!MusicBot.getPlaylistManager().getAudioSource().hasFinished()));
+                            //execute
+                            context.getSource().getLeft().getMessage().reply(
+                                    String.valueOf(!MusicBot.getAudioManager()
+                                            .getTrackManager(context.getSource().getRight())
+                                            .getAudioSource()
+                                            .hasFinished()
+                                    )
+                            );
                             return 0;
                         })
                 )
-                .then(LiteralArgumentBuilder.<MessageCreateEvent>literal("current")
+                .then(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("current")
                         .executes(context -> {
-                            context.getSource().getMessage().reply(MusicBot.getPlaylistManager().getAudioSource().getAudioPlayer().getPlayingTrack().getInfo().title);
+                            //execute
+                            context.getSource().getLeft().getMessage().reply(
+                                    MusicBot.getAudioManager()
+                                            .getTrackManager(context.getSource().getRight())
+                                            .getAudioSource()
+                                            .getAudioPlayer()
+                                            .getPlayingTrack()
+                                            .getInfo().title
+                            );
                             return 0;
                         })
                 )
-                .then(LiteralArgumentBuilder.<MessageCreateEvent>literal("position")
+                .then(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("position")
                         .executes(context -> {
-                            context.getSource().getMessage().reply(String.valueOf(MusicBot.getPlaylistManager().getAudioSource().getAudioPlayer().getPlayingTrack().getPosition()));
+                            //execute
+                            context.getSource().getLeft().getMessage().reply(
+                                    String.valueOf(MusicBot.getAudioManager()
+                                            .getTrackManager(context.getSource().getRight())
+                                            .getAudioSource()
+                                            .getAudioPlayer()
+                                            .getPlayingTrack()
+                                            .getPosition()
+                                    )
+                            );
                             return 0;
                         })
                 )
-                .then(LiteralArgumentBuilder.<MessageCreateEvent>literal("fix")
+                .then(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("fix")
                         .executes(context -> {
-                            fixAudioSource(context.getSource());
+                            //execute
+                            MusicBot.getAudioManager()
+                                    .getTrackManager(context.getSource().getRight())
+                                    .fixAudioSource();
                             return 0;
                         })
-                ).then(LiteralArgumentBuilder.<MessageCreateEvent>literal("version")
+                ).then(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("version")
                         .executes(context -> {
-                            context.getSource().getMessage().reply(MusicBot.getConfig().getBotVersion());
-                            return 0;
-                        })
-                ).then(LiteralArgumentBuilder.<MessageCreateEvent>literal("stop")
-                        .executes(context -> {
-                            System.exit(0);
+                            context.getSource().getLeft().getMessage().reply(
+                                    MusicBot.getConfig().getBotVersion()
+                            );
                             return 0;
                         })
                 ).executes(context -> {
-                    Reactions.addRefuseReaction(context.getSource().getMessage());
+                    Reactions.addRefuseReaction(context.getSource().getLeft().getMessage());
                     return 0;
                 })
         );
-    }
-
-    public static void fixAudioSource(MessageCreateEvent context) {
-        context.getServer().flatMap(Server::getAudioConnection).ifPresent(audioConnection -> {
-            audioConnection.setAudioSource(MusicBot.getPlaylistManager().getAudioSource());
-        });
     }
 }
