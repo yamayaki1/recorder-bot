@@ -8,7 +8,6 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import me.jerriidesu.musicbot.audio.TrackManager;
 
 public class AudioEventHandler extends AudioEventAdapter {
-
     private final TrackManager trackManager;
 
     public AudioEventHandler(TrackManager trackManager) {
@@ -19,14 +18,14 @@ public class AudioEventHandler extends AudioEventAdapter {
      * @param player Audio player
      */
     public void onPlayerPause(AudioPlayer player) {
-        // Adapter dummy method
+        this.trackManager.paused = false;
     }
 
     /**
      * @param player Audio player
      */
     public void onPlayerResume(AudioPlayer player) {
-        // Adapter dummy method
+        this.trackManager.paused = true;
     }
 
     /**
@@ -48,7 +47,7 @@ public class AudioEventHandler extends AudioEventAdapter {
         }
 
         if (endReason.mayStartNext) {
-            this.trackManager.startPlaying();
+            this.trackManager.startTrackIfIdle();
         }
     }
 

@@ -9,7 +9,6 @@ import org.javacord.api.audio.AudioSource;
 import org.javacord.api.audio.AudioSourceBase;
 
 public class LavaAudioSource extends AudioSourceBase {
-
     private final TrackManager trackManager;
 
     private final AudioPlayerManager playerManager;

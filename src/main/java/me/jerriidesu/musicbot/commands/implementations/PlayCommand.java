@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import me.jerriidesu.musicbot.MusicBot;
+import me.jerriidesu.musicbot.audio.TrackManager;
 import me.jerriidesu.musicbot.commands.Command;
 import me.jerriidesu.musicbot.utils.Either;
 import me.jerriidesu.musicbot.utils.Reactions;
@@ -21,11 +22,21 @@ public class PlayCommand implements Command {
                         addSong(context.getSource(), StringArgumentType.getString(context, "song"));
                     }, () -> Reactions.addRefuseReaction(context.getSource().getLeft().getMessage()));
 
-                    return 0;
+                    return 1;
                 })).executes(context -> {
                     //execute
-                    Reactions.addRefuseReaction(context.getSource().getLeft().getMessage());
-                    return 0;
+                    TrackManager trackManager = MusicBot
+                            .getAudioManager()
+                            .getTrackManager(context.getSource().getRight());
+
+                    if (trackManager.paused) {
+                        trackManager.resumeTrack();
+                        Reactions.addRefuseReaction(context.getSource().getLeft().getMessage());
+                    } else {
+                        Reactions.addRefuseReaction(context.getSource().getLeft().getMessage());
+                    }
+
+                    return 1;
                 })
         );
     }

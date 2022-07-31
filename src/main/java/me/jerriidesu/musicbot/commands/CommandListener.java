@@ -8,9 +8,11 @@ import me.jerriidesu.musicbot.commands.implementations.ClearCommand;
 import me.jerriidesu.musicbot.commands.implementations.ConnectCommand;
 import me.jerriidesu.musicbot.commands.implementations.DebugCommands;
 import me.jerriidesu.musicbot.commands.implementations.DisconnectCommand;
+import me.jerriidesu.musicbot.commands.implementations.PauseCommand;
 import me.jerriidesu.musicbot.commands.implementations.PlayCommand;
 import me.jerriidesu.musicbot.commands.implementations.PlaylistCommand;
 import me.jerriidesu.musicbot.commands.implementations.RepeatCommand;
+import me.jerriidesu.musicbot.commands.implementations.ResumeCommand;
 import me.jerriidesu.musicbot.commands.implementations.SkipCommand;
 import me.jerriidesu.musicbot.commands.implementations.VolumeCommand;
 import me.jerriidesu.musicbot.utils.Either;
@@ -25,7 +27,6 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 public class CommandListener implements MessageCreateListener {
-
     private final CommandDispatcher<Either<MessageCreateEvent, Server>> commandDispatcher = new CommandDispatcher<>();
 
     public CommandListener() {
@@ -38,7 +39,9 @@ public class CommandListener implements MessageCreateListener {
                 new PlaylistCommand(),
                 new SkipCommand(),
                 new ClearCommand(),
-                new RepeatCommand()
+                new RepeatCommand(),
+                new PauseCommand(),
+                new ResumeCommand()
         );
     }
 

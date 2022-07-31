@@ -23,7 +23,7 @@ public class DebugCommands implements Command {
                                             .hasFinished()
                                     )
                             );
-                            return 0;
+                            return 1;
                         })
                 )
                 .then(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("current")
@@ -37,7 +37,7 @@ public class DebugCommands implements Command {
                                             .getPlayingTrack()
                                             .getInfo().title
                             );
-                            return 0;
+                            return 1;
                         })
                 )
                 .then(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("position")
@@ -52,7 +52,7 @@ public class DebugCommands implements Command {
                                             .getPosition()
                                     )
                             );
-                            return 0;
+                            return 1;
                         })
                 )
                 .then(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("fix")
@@ -61,18 +61,18 @@ public class DebugCommands implements Command {
                             MusicBot.getAudioManager()
                                     .getTrackManager(context.getSource().getRight())
                                     .fixAudioSource();
-                            return 0;
+                            return 1;
                         })
                 ).then(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("version")
                         .executes(context -> {
                             context.getSource().getLeft().getMessage().reply(
                                     MusicBot.getConfig().getBotVersion()
                             );
-                            return 0;
+                            return 1;
                         })
                 ).executes(context -> {
                     Reactions.addRefuseReaction(context.getSource().getLeft().getMessage());
-                    return 0;
+                    return 1;
                 })
         );
     }

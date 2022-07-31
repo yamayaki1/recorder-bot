@@ -10,7 +10,6 @@ import me.jerriidesu.musicbot.audio.TrackManager;
 import java.util.function.Consumer;
 
 public class LoadResultHandler implements AudioLoadResultHandler {
-
     private final TrackManager trackManager;
     private final Consumer<Boolean> consumer;
 

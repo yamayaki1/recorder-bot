@@ -6,7 +6,6 @@ import org.javacord.api.entity.server.Server;
 import java.util.HashMap;
 
 public class ServerManager {
-
     private final MusicBot bot;
     private final HashMap<Server, TrackManager> serverMap = new HashMap<>();
 

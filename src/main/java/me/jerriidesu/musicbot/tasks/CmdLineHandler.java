@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.util.Set;
 
 public record CmdLineHandler(MusicBot instance) implements Runnable {
-
     public static final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
     @Override

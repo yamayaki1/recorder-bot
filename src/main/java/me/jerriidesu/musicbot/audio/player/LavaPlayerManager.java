@@ -8,7 +8,6 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import me.jerriidesu.musicbot.audio.TrackManager;
 
 public class LavaPlayerManager {
-
     public static AudioPlayerManager getPlayerManager() {
         AudioPlayerManager audioPlayerManager = new DefaultAudioPlayerManager();
         AudioSourceManagers.registerRemoteSources(audioPlayerManager);

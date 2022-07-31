@@ -5,7 +5,6 @@ import me.jerriidesu.musicbot.MusicBot;
 import org.javacord.api.entity.message.Message;
 
 public class Reactions {
-
     public static String DISCARD = ":fire_extinguisher:";
 
     public static void addTrashReaction(Message message) {

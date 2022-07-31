@@ -12,13 +12,13 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class TrackManager {
-
     private final Server server;
     private final AudioEventHandler eventHandler;
 
     private final LavaAudioSource audioSource;
     private final List<AudioTrack> trackList = new ArrayList<>();
 
+    public boolean paused = false;
     public String lastError = "";
 
     private boolean repeat = false;
@@ -36,12 +36,13 @@ public class TrackManager {
 
     public void addTrack(AudioTrack track) {
         this.trackList.add(track);
+        this.startTrackIfIdle();
     }
 
     public void skipTrack(int count) {
         for (int i = 0; i < count; i++) {
             this.audioSource.getAudioPlayer().stopTrack();
-            this.startPlaying();
+            this.startTrackIfIdle();
         }
     }
 
@@ -58,9 +59,9 @@ public class TrackManager {
         return repeat;
     }
 
-    public void startPlaying() {
-        if (this.audioSource.getAudioPlayer().isPaused()) {
-            this.audioSource.getAudioPlayer().setPaused(false);
+    public void startTrackIfIdle() {
+        if (this.paused) {
+            this.resumeTrack();
         }
 
         if (this.audioSource.hasFinished() && this.trackList.size() != 0) {
@@ -74,6 +75,16 @@ public class TrackManager {
         }
 
         this.fixAudioSource();
+    }
+
+    public void pauseTrack() {
+        this.audioSource.getAudioPlayer()
+                .setPaused(true);
+    }
+
+    public void resumeTrack() {
+        this.audioSource.getAudioPlayer()
+                .setPaused(false);
     }
 
     public void fixAudioSource() {

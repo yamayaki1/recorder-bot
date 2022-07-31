@@ -6,26 +6,17 @@ import me.jerriidesu.musicbot.MusicBot;
 import me.jerriidesu.musicbot.commands.Command;
 import me.jerriidesu.musicbot.utils.Either;
 import me.jerriidesu.musicbot.utils.Reactions;
-import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
 
-public class RepeatCommand implements Command {
+public class ResumeCommand implements Command {
     @Override
     public void registerBrigadier(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher) {
-        dispatcher.register(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("repeat").executes(context -> {
+        dispatcher.register(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("resume").executes(context -> {
             //execute
-            boolean repeat = MusicBot.getAudioManager()
+            MusicBot.getAudioManager()
                     .getTrackManager(context.getSource().getRight())
-                    .toggleRepeat();
-
-            if (repeat) {
-                context.getSource().getLeft()
-                        .getMessage().reply(new EmbedBuilder().setDescription("Wiederholen eingeschaltet."));
-            } else {
-                context.getSource().getLeft()
-                        .getMessage().reply(new EmbedBuilder().setDescription("Wiederholen ausgeschaltet."));
-            }
+                    .resumeTrack();
 
             Reactions.addSuccessfulReaction(context.getSource().getLeft().getMessage());
             return 1;

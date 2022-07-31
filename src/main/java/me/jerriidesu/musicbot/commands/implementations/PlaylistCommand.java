@@ -23,14 +23,18 @@ public class PlaylistCommand implements Command {
                     .getTrackManager(context.getSource().getRight())
                     .getTracks();
 
-            int index = 0;
-            for (AudioTrack track : tracks) {
-                index++;
-                embedBuilder.addField(index + ". " + track.getInfo().title, track.getInfo().author);
+            if (tracks.size() > 0) {
+                int index = 0;
+                for (AudioTrack track : tracks) {
+                    index++;
+                    embedBuilder.addField(index + ". " + track.getInfo().title, track.getInfo().author);
+                }
+            } else {
+                embedBuilder.setDescription("Die Playlist ist leer.");
             }
 
             context.getSource().getLeft().getMessage().reply(embedBuilder);
-            return 0;
+            return 1;
         }));
     }
 }

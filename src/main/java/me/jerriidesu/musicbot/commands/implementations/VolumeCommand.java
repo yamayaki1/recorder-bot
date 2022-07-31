@@ -19,11 +19,11 @@ public class VolumeCommand implements Command {
                     //execute
                     int volume = IntegerArgumentType.getInteger(context, "vol");
                     setVolume(context.getSource(), volume);
-                    return 0;
+                    return 1;
                 })).executes(context -> {
                     //execute
                     Reactions.addRefuseReaction(context.getSource().getLeft().getMessage());
-                    return 0;
+                    return 1;
                 })
         );
 

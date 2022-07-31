@@ -20,7 +20,7 @@ public class ConnectCommand implements Command {
                 this.joinChannel(event, serverVoiceChannel);
             }, () -> this.sendError(event));
 
-            return 0;
+            return 1;
         }));
     }
 

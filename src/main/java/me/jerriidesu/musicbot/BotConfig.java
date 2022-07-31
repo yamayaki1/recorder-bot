@@ -11,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class BotConfig {
-
     private final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
     private final Path filePath;
 
