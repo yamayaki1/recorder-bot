@@ -4,6 +4,7 @@ import me.jerriidesu.musicbot.MusicBot;
 import org.javacord.api.entity.server.Server;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class ServerManager {
     private final MusicBot bot;
@@ -20,5 +21,9 @@ public class ServerManager {
     public void removeTrackManager(Server server) {
         this.serverMap.get(server).close();
         this.serverMap.remove(server);
+    }
+
+    public List<TrackManager> getAll() {
+        return this.serverMap.values().stream().toList();
     }
 }

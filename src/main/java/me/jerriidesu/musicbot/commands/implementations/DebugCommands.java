@@ -3,9 +3,11 @@ package me.jerriidesu.musicbot.commands.implementations;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import me.jerriidesu.musicbot.MusicBot;
+import me.jerriidesu.musicbot.audio.TrackManager;
 import me.jerriidesu.musicbot.commands.Command;
 import me.jerriidesu.musicbot.utils.Either;
 import me.jerriidesu.musicbot.utils.Reactions;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
 
@@ -68,6 +70,17 @@ public class DebugCommands implements Command {
                             context.getSource().getLeft().getMessage().reply(
                                     MusicBot.getConfig().getBotVersion()
                             );
+                            return 1;
+                        })
+                ).then(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("last_errors")
+                        .executes(context -> {
+                            EmbedBuilder embedBuilder = new EmbedBuilder();
+
+                            for (TrackManager manager : MusicBot.getAudioManager().getAll()) {
+                                embedBuilder.addField(manager.getServerName(), manager.lastError);
+                            }
+
+                            context.getSource().getLeft().getMessage().reply(embedBuilder);
                             return 1;
                         })
                 ).executes(context -> {

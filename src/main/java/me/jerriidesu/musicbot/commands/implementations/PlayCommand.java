@@ -9,6 +9,7 @@ import me.jerriidesu.musicbot.audio.TrackManager;
 import me.jerriidesu.musicbot.commands.Command;
 import me.jerriidesu.musicbot.utils.Either;
 import me.jerriidesu.musicbot.utils.Reactions;
+import me.jerriidesu.musicbot.utils.UrlTools;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
 
@@ -42,6 +43,10 @@ public class PlayCommand implements Command {
     }
 
     private void addSong(Either<MessageCreateEvent, Server> context, String song) {
+        if (!UrlTools.isURL(song)) {
+            song = "ytmsearch:" + song;
+        }
+
         MusicBot.getAudioManager().getTrackManager(context.getRight()).tryLoadItems(song, playerResponse -> {
             context.getLeft().getMessage().removeEmbed();
 

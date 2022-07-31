@@ -99,6 +99,10 @@ public class TrackManager {
         return this.audioSource;
     }
 
+    public String getServerName() {
+        return this.server.getName();
+    }
+
     public void close() {
         //TODO implement
     }
