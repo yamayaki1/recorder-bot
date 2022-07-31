@@ -26,7 +26,7 @@ public class ConnectCommand implements Command {
 
     private void joinChannel(MessageCreateEvent event, ServerVoiceChannel serverVoiceChannel) {
         serverVoiceChannel.connect(false, false).thenAccept(audioConnection -> {
-            Reactions.addSuccessfullReaction(event.getMessage());
+            Reactions.addSuccessfulReaction(event.getMessage());
         });
     }
 

@@ -17,11 +17,9 @@ public class PlayCommand implements Command {
         dispatcher.register(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("play")
                 .then(RequiredArgumentBuilder.<Either<MessageCreateEvent, Server>, String>argument("song", StringArgumentType.greedyString()).executes(context -> {
                     //execute
-                    context.getSource().getLeft().getServer().ifPresent(server -> {
-                        server.getAudioConnection().ifPresentOrElse(audioConnection -> {
-                            addSong(context.getSource(), StringArgumentType.getString(context, "song"));
-                        }, () -> Reactions.addRefuseReaction(context.getSource().getLeft().getMessage()));
-                    });
+                    context.getSource().getRight().getAudioConnection().ifPresentOrElse(audioConnection -> {
+                        addSong(context.getSource(), StringArgumentType.getString(context, "song"));
+                    }, () -> Reactions.addRefuseReaction(context.getSource().getLeft().getMessage()));
 
                     return 0;
                 })).executes(context -> {
@@ -37,7 +35,7 @@ public class PlayCommand implements Command {
             context.getLeft().getMessage().removeEmbed();
 
             if(playerResponse) {
-                Reactions.addSuccessfullReaction(context.getLeft().getMessage());
+                Reactions.addSuccessfulReaction(context.getLeft().getMessage());
             } else {
                 Reactions.addFailureReaction(context.getLeft().getMessage());
             }

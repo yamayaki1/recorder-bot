@@ -28,7 +28,7 @@ public class RepeatCommand implements Command {
                         .getMessage().reply(new EmbedBuilder().setDescription("Wiederholen ausgeschaltet."));
             }
 
-            Reactions.addSuccessfullReaction(context.getSource().getLeft().getMessage());
+            Reactions.addSuccessfulReaction(context.getSource().getLeft().getMessage());
             return 1;
         }));
     }

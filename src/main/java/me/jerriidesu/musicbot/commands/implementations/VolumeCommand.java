@@ -48,6 +48,6 @@ public class VolumeCommand implements Command {
                 .getAudioPlayer()
                 .setVolume(volume);
 
-        Reactions.addSuccessfullReaction(context.getLeft().getMessage());
+        Reactions.addSuccessfulReaction(context.getLeft().getMessage());
     }
 }

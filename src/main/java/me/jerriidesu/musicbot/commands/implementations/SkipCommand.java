@@ -43,6 +43,6 @@ public class SkipCommand implements Command {
                 .getTrackManager(context.getRight())
                 .skipTracks(amount);
 
-        Reactions.addSuccessfullReaction(context.getLeft().getMessage());
+        Reactions.addSuccessfulReaction(context.getLeft().getMessage());
     }
 }

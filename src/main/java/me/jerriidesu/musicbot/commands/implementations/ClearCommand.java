@@ -19,7 +19,7 @@ public class ClearCommand implements Command {
                             .getTrackManager(context.getSource().getRight())
                             .clearTrackList();
 
-                    Reactions.addSuccessfullReaction(context.getSource().getLeft().getMessage());
+                    Reactions.addSuccessfulReaction(context.getSource().getLeft().getMessage());
                     return 1;
                 })
         );

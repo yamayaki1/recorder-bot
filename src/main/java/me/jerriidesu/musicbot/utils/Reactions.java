@@ -12,7 +12,7 @@ public class Reactions {
         message.addReaction(EmojiParser.parseToUnicode(DISCARD)).join();
     }
 
-    public static void addSuccessfullReaction(Message message) {
+    public static void addSuccessfulReaction(Message message) {
         message.addReaction(EmojiParser.parseToUnicode(MusicBot.getConfig().get().getReactions().getSuccess()));
     }
 

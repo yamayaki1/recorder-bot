@@ -17,7 +17,7 @@ public class DisconnectCommand implements Command {
             context.getSource().getRight().getAudioConnection().ifPresentOrElse(audioConnection -> {
                 MusicBot.getAudioManager().removeTrackManager(context.getSource().getRight());
                 audioConnection.close();
-                Reactions.addSuccessfullReaction(context.getSource().getLeft().getMessage());
+                Reactions.addSuccessfulReaction(context.getSource().getLeft().getMessage());
             }, () -> Reactions.addFailureReaction(context.getSource().getLeft().getMessage()));
 
             return 1;

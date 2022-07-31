@@ -38,8 +38,8 @@ public record CmdLineHandler(MusicBot instance) implements Runnable {
                 threadSet.forEach(thread -> MusicBot.getLogger().info(threadToString(thread)));
             }
             case "reload" -> {
-                this.instance.registerCommands();
                 MusicBot.getConfig().reload();
+                this.instance.registerCommands();
                 this.instance.updatePresence();
             }
         }
