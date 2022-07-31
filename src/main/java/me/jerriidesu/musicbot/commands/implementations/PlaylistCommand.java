@@ -21,12 +21,12 @@ public class PlaylistCommand implements Command {
 
             List<AudioTrack> tracks = MusicBot.getAudioManager()
                     .getTrackManager(context.getSource().getRight())
-                    .getTrackList();
+                    .getTracks();
 
             int index = 0;
             for (AudioTrack track : tracks) {
                 index++;
-                embedBuilder.addField(index+". "+ track.getInfo().title, track.getInfo().author);
+                embedBuilder.addField(index + ". " + track.getInfo().title, track.getInfo().author);
             }
 
             context.getSource().getLeft().getMessage().reply(embedBuilder);

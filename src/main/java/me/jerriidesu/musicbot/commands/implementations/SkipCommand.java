@@ -32,16 +32,16 @@ public class SkipCommand implements Command {
     private void skipTracks(Either<MessageCreateEvent, Server> context, int amount) {
         int max_amount = MusicBot.getAudioManager()
                 .getTrackManager(context.getRight())
-                .getTrackList().size();
+                .getTracks().size();
 
-        if(amount > max_amount) {
+        if (amount > max_amount) {
             Reactions.addFailureReaction(context.getLeft().getMessage());
             return;
         }
 
         MusicBot.getAudioManager()
                 .getTrackManager(context.getRight())
-                .skipTracks(amount);
+                .skipTrack(amount);
 
         Reactions.addSuccessfulReaction(context.getLeft().getMessage());
     }

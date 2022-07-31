@@ -20,7 +20,7 @@ public class RepeatCommand implements Command {
                     .getTrackManager(context.getSource().getRight())
                     .toggleRepeat();
 
-            if(repeat) {
+            if (repeat) {
                 context.getSource().getLeft()
                         .getMessage().reply(new EmbedBuilder().setDescription("Wiederholen eingeschaltet."));
             } else {

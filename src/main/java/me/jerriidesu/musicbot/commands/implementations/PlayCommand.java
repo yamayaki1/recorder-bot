@@ -31,10 +31,10 @@ public class PlayCommand implements Command {
     }
 
     private void addSong(Either<MessageCreateEvent, Server> context, String song) {
-        MusicBot.getAudioManager().getTrackManager(context.getRight()).addItems(song, playerResponse -> {
+        MusicBot.getAudioManager().getTrackManager(context.getRight()).tryLoadItems(song, playerResponse -> {
             context.getLeft().getMessage().removeEmbed();
 
-            if(playerResponse) {
+            if (playerResponse) {
                 Reactions.addSuccessfulReaction(context.getLeft().getMessage());
             } else {
                 Reactions.addFailureReaction(context.getLeft().getMessage());

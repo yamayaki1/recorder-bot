@@ -17,7 +17,7 @@ public class ClearCommand implements Command {
                     //execute
                     MusicBot.getAudioManager()
                             .getTrackManager(context.getSource().getRight())
-                            .clearTrackList();
+                            .clearTracks();
 
                     Reactions.addSuccessfulReaction(context.getSource().getLeft().getMessage());
                     return 1;

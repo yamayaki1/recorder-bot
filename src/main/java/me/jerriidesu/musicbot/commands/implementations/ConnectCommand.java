@@ -18,7 +18,7 @@ public class ConnectCommand implements Command {
 
             event.getMessageAuthor().getConnectedVoiceChannel().ifPresentOrElse(serverVoiceChannel -> {
                 this.joinChannel(event, serverVoiceChannel);
-            }, ()-> this.sendError(event));
+            }, () -> this.sendError(event));
 
             return 0;
         }));

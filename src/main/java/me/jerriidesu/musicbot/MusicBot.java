@@ -75,7 +75,7 @@ public class MusicBot {
 
     public void registerCommands() {
         //remove old listener if one is existing
-        if(this.commandListener != null) {
+        if (this.commandListener != null) {
             this.discordApi.removeListener(this.commandListener);
             this.commandListener = null;
         }

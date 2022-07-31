@@ -52,7 +52,7 @@ public class CommandListener implements MessageCreateListener {
 
     @Override
     public void onMessageCreate(MessageCreateEvent source) {
-        if(!source.isServerMessage() || source.getMessageAuthor().isWebhook() || source.getMessageAuthor().isBotUser() || source.getMessageContent().chars().sum() < 1 || source.getMessageContent().charAt(0) != MusicBot.getConfig().get().getBot().getPrefix()) {
+        if (!source.isServerMessage() || source.getMessageAuthor().isWebhook() || source.getMessageAuthor().isBotUser() || source.getMessageContent().chars().sum() < 1 || source.getMessageContent().charAt(0) != MusicBot.getConfig().get().getBot().getPrefix()) {
             return;
         }
 
@@ -67,7 +67,7 @@ public class CommandListener implements MessageCreateListener {
             ).thenAccept(message -> {
                 Reactions.addTrashReaction(message);
                 message.addReactionAddListener(event -> event.getReaction().ifPresent(reaction -> {
-                    if(reaction.getEmoji().equalsEmoji(EmojiParser.parseToUnicode(Reactions.DISCARD))) {
+                    if (reaction.getEmoji().equalsEmoji(EmojiParser.parseToUnicode(Reactions.DISCARD))) {
                         message.delete();
                     }
                 })).removeAfter(1, TimeUnit.MINUTES);
