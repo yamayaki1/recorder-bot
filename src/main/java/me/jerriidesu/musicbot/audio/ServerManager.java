@@ -19,11 +19,17 @@ public class ServerManager {
     }
 
     public void removeTrackManager(Server server) {
-        this.serverMap.get(server).close();
+        this.serverMap.get(server).shutdown();
         this.serverMap.remove(server);
     }
 
     public List<TrackManager> getAll() {
         return this.serverMap.values().stream().toList();
+    }
+
+    public void shutdown() {
+        for (TrackManager trackManager : serverMap.values()) {
+            trackManager.shutdown();
+        }
     }
 }

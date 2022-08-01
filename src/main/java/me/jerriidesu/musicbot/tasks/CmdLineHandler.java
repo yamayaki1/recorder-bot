@@ -24,7 +24,8 @@ public record CmdLineHandler(MusicBot instance) implements Runnable {
     public void runCommand(String command) {
         switch (command) {
             case "end", "stop" -> {
-                this.instance.getAPI().disconnect();
+                MusicBot.getAudioManager().shutdown();
+                this.instance.getAPI().disconnect().join();
                 MusicBot.getExecutors().shutdown();
 
                 System.exit(0);

@@ -100,7 +100,8 @@ public class TrackManager {
         return this.server.getName();
     }
 
-    public void close() {
-        //TODO implement
+    public void shutdown() {
+        this.clearTracks();
+        this.audioSource.getAudioPlayer().stopTrack();
     }
 }

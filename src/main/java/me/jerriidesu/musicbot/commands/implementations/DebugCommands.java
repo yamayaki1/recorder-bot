@@ -10,6 +10,7 @@ import me.jerriidesu.musicbot.utils.Reactions;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
+import oshi.SystemInfo;
 
 public class DebugCommands implements Command {
     @Override
@@ -53,6 +54,17 @@ public class DebugCommands implements Command {
                             context.getSource().getLeft().getMessage().reply(
                                     MusicBot.getConfig().getBotVersion()
                             );
+                            return 1;
+                        })
+                ).then(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("system")
+                        .executes(context -> {
+                            SystemInfo sys = MusicBot.getSystemInfo();
+                            EmbedBuilder embedBuilder = new EmbedBuilder()
+                                    .addField("OS", sys.getOperatingSystem().getFamily() + " " + sys.getOperatingSystem().getVersionInfo().toString())
+                                    .addField("CPU", sys.getHardware().getProcessor().getProcessorIdentifier().getName())
+                                    .addField("RAM", (sys.getHardware().getMemory().getTotal() - sys.getHardware().getMemory().getAvailable()) + " / " + sys.getHardware().getMemory().getTotal());
+
+                            context.getSource().getLeft().getMessage().reply(embedBuilder);
                             return 1;
                         })
                 ).then(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("last_errors")

@@ -9,6 +9,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.user.UserStatus;
+import oshi.SystemInfo;
 
 import java.io.File;
 import java.util.concurrent.Executors;
@@ -17,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MusicBot {
     private static final Logger logger = LogManager.getLogger(MusicBot.class);
+    private static final SystemInfo systemInfo = new SystemInfo();
     private static final BotConfig botConfig = new BotConfig(new File(".", "config/"));
     private static final ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(4);
 
@@ -44,6 +46,10 @@ public class MusicBot {
 
     public static ServerManager getAudioManager() {
         return serverManager;
+    }
+
+    public static SystemInfo getSystemInfo() {
+        return systemInfo;
     }
 
     protected void launch() {
