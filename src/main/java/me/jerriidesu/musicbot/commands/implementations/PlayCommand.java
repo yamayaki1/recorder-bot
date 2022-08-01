@@ -32,7 +32,7 @@ public class PlayCommand implements Command {
 
                     if (trackManager.paused) {
                         trackManager.resumeTrack();
-                        Reactions.addRefuseReaction(context.getSource().getLeft().getMessage());
+                        Reactions.addSuccessfulReaction(context.getSource().getLeft().getMessage());
                     } else {
                         Reactions.addRefuseReaction(context.getSource().getLeft().getMessage());
                     }
@@ -43,7 +43,7 @@ public class PlayCommand implements Command {
     }
 
     private void addSong(Either<MessageCreateEvent, Server> context, String song) {
-        if (!UrlTools.isURL(song)) {
+        if (!UrlTools.isURL(song) && !song.contains("ytmsearch:") && !song.contains("ytsearch:")) {
             song = "ytmsearch:" + song;
         }
 

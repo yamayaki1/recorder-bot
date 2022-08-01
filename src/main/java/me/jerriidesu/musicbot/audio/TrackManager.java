@@ -1,6 +1,5 @@
 package me.jerriidesu.musicbot.audio;
 
-import com.sedmelluq.discord.lavaplayer.player.event.AudioEventListener;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.jerriidesu.musicbot.audio.handler.AudioEventHandler;
 import me.jerriidesu.musicbot.audio.handler.LoadResultHandler;
@@ -13,20 +12,16 @@ import java.util.function.Consumer;
 
 public class TrackManager {
     private final Server server;
-    private final AudioEventHandler eventHandler;
 
     private final LavaAudioSource audioSource;
     private final List<AudioTrack> trackList = new ArrayList<>();
-
     public boolean paused = false;
     public String lastError = "";
-
     private boolean repeat = false;
 
     public TrackManager(Server server) {
         this.server = server;
-        this.eventHandler = new AudioEventHandler(this);
-        this.audioSource = new LavaAudioSource(server.getApi(), this);
+        this.audioSource = new LavaAudioSource(server.getApi(), new AudioEventHandler(this));
     }
 
     public void tryLoadItems(String song, Consumer<Boolean> consumer) {
@@ -54,11 +49,6 @@ public class TrackManager {
         this.trackList.clear();
     }
 
-    public boolean toggleRepeat() {
-        this.repeat = !this.repeat;
-        return repeat;
-    }
-
     public void startTrackIfIdle() {
         if (this.paused) {
             this.resumeTrack();
@@ -77,6 +67,11 @@ public class TrackManager {
         this.fixAudioSource();
     }
 
+    public AudioTrack getCurrentTrack() {
+        return this.audioSource.getAudioPlayer()
+                .getPlayingTrack();
+    }
+
     public void pauseTrack() {
         this.audioSource.getAudioPlayer()
                 .setPaused(true);
@@ -87,16 +82,18 @@ public class TrackManager {
                 .setPaused(false);
     }
 
+    public boolean toggleRepeat() {
+        this.repeat = !this.repeat;
+        return repeat;
+    }
+
+    public void setVolume(int volume) {
+        this.audioSource.getAudioPlayer()
+                .setVolume(volume);
+    }
+
     public void fixAudioSource() {
         this.server.getAudioConnection().ifPresent(audioConnection -> audioConnection.setAudioSource(this.audioSource));
-    }
-
-    public AudioEventListener getEventHandler() {
-        return this.eventHandler;
-    }
-
-    public LavaAudioSource getAudioSource() {
-        return this.audioSource;
     }
 
     public String getServerName() {

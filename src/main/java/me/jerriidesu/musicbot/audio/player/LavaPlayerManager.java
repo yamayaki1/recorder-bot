@@ -5,7 +5,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
-import me.jerriidesu.musicbot.audio.TrackManager;
+import me.jerriidesu.musicbot.audio.handler.AudioEventHandler;
 
 public class LavaPlayerManager {
     public static AudioPlayerManager getPlayerManager() {
@@ -19,10 +19,10 @@ public class LavaPlayerManager {
         return audioPlayerManager;
     }
 
-    public static AudioPlayer getPlayer(AudioPlayerManager audioPlayerManager, TrackManager trackManager) {
+    public static AudioPlayer getPlayer(AudioPlayerManager audioPlayerManager, AudioEventHandler audioEventHandler) {
         AudioPlayer audioPlayer = audioPlayerManager.createPlayer();
         audioPlayer.setVolume(50);
-        audioPlayer.addListener(trackManager.getEventHandler());
+        audioPlayer.addListener(audioEventHandler);
 
         return audioPlayer;
     }

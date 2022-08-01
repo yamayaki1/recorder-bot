@@ -3,25 +3,25 @@ package me.jerriidesu.musicbot.audio.player;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
-import me.jerriidesu.musicbot.audio.TrackManager;
+import me.jerriidesu.musicbot.audio.handler.AudioEventHandler;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.audio.AudioSource;
 import org.javacord.api.audio.AudioSourceBase;
 
 public class LavaAudioSource extends AudioSourceBase {
-    private final TrackManager trackManager;
+    private final AudioEventHandler audioEventHandler;
 
     private final AudioPlayerManager playerManager;
     private final AudioPlayer audioPlayer;
 
     private AudioFrame lastFrame;
 
-    public LavaAudioSource(DiscordApi api, TrackManager trackManager) {
+    public LavaAudioSource(DiscordApi api, AudioEventHandler audioEventHandler) {
         super(api);
 
-        this.trackManager = trackManager;
+        this.audioEventHandler = audioEventHandler;
         this.playerManager = LavaPlayerManager.getPlayerManager();
-        this.audioPlayer = LavaPlayerManager.getPlayer(this.playerManager, trackManager);
+        this.audioPlayer = LavaPlayerManager.getPlayer(this.playerManager, audioEventHandler);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class LavaAudioSource extends AudioSourceBase {
 
     @Override
     public AudioSource copy() {
-        return new LavaAudioSource(getApi(), this.trackManager);
+        return new LavaAudioSource(getApi(), this.audioEventHandler);
     }
 
     public AudioPlayerManager getPlayerManager() {

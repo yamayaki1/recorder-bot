@@ -15,28 +15,13 @@ public class DebugCommands implements Command {
     @Override
     public void registerBrigadier(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher) {
         dispatcher.register(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("debug")
-                .then(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("isplaying")
-                        .executes(context -> {
-                            //execute
-                            context.getSource().getLeft().getMessage().reply(
-                                    String.valueOf(!MusicBot.getAudioManager()
-                                            .getTrackManager(context.getSource().getRight())
-                                            .getAudioSource()
-                                            .hasFinished()
-                                    )
-                            );
-                            return 1;
-                        })
-                )
                 .then(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("current")
                         .executes(context -> {
                             //execute
                             context.getSource().getLeft().getMessage().reply(
                                     MusicBot.getAudioManager()
                                             .getTrackManager(context.getSource().getRight())
-                                            .getAudioSource()
-                                            .getAudioPlayer()
-                                            .getPlayingTrack()
+                                            .getCurrentTrack()
                                             .getInfo().title
                             );
                             return 1;
@@ -48,9 +33,7 @@ public class DebugCommands implements Command {
                             context.getSource().getLeft().getMessage().reply(
                                     String.valueOf(MusicBot.getAudioManager()
                                             .getTrackManager(context.getSource().getRight())
-                                            .getAudioSource()
-                                            .getAudioPlayer()
-                                            .getPlayingTrack()
+                                            .getCurrentTrack()
                                             .getPosition()
                                     )
                             );
