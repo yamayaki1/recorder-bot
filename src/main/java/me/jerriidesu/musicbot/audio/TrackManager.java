@@ -29,6 +29,11 @@ public class TrackManager {
                 .loadItem(song, new LoadResultHandler(this, consumer));
     }
 
+    public boolean hasFinished() {
+        return this.audioSource
+                .hasFinished();
+    }
+
     public void addTrack(AudioTrack track) {
         this.trackList.add(track);
         this.startTrackIfIdle();

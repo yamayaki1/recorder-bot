@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import me.jerriidesu.musicbot.MusicBot;
+import me.jerriidesu.musicbot.audio.TrackManager;
 import me.jerriidesu.musicbot.commands.Command;
 import me.jerriidesu.musicbot.utils.Either;
 import me.jerriidesu.musicbot.utils.Reactions;
@@ -29,11 +30,12 @@ public class SkipCommand implements Command {
     }
 
     private void skipTracks(Either<MessageCreateEvent, Server> context, int amount) {
-        int max_amount = MusicBot.getAudioManager()
-                .getTrackManager(context.getRight())
-                .getTracks().size();
+        TrackManager manager = MusicBot.getAudioManager()
+                .getTrackManager(context.getRight());
 
-        if (amount > max_amount) {
+        int max_amount = manager.getTracks().size();
+
+        if (amount > max_amount && manager.hasFinished()) {
             Reactions.addFailureReaction(context.getLeft().getMessage());
             return;
         }
