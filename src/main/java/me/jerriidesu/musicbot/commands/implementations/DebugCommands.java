@@ -23,7 +23,7 @@ public class DebugCommands implements Command {
                                     MusicBot.getAudioManager()
                                             .getTrackManager(context.getSource().getRight())
                                             .getCurrentTrack()
-                                            .getInfo().title
+                                            .getIdentifier()
                             );
                             return 1;
                         })

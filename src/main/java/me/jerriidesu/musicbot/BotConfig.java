@@ -68,6 +68,7 @@ public class BotConfig {
     public static class JsonConfig {
         private BotOptions bot = new BotOptions();
         private Reactions reactions = new Reactions();
+        private SpotifyConfig spotify = new SpotifyConfig();
 
         public BotOptions getBot() {
             return bot;
@@ -75,6 +76,10 @@ public class BotConfig {
 
         public Reactions getReactions() {
             return this.reactions;
+        }
+
+        public SpotifyConfig getSpotify() {
+            return this.spotify;
         }
 
         @SuppressWarnings({"CanBeFinal", "FieldMayBeFinal", "FieldCanBeLocal"})
@@ -103,15 +108,29 @@ public class BotConfig {
             private String refuse = ":no_good:";
 
             public String getSuccess() {
-                return success;
+                return this.success;
             }
 
             public String getFailure() {
-                return failure;
+                return this.failure;
             }
 
             public String getRefuse() {
-                return refuse;
+                return this.refuse;
+            }
+        }
+
+        @SuppressWarnings({"CanBeFinal", "FieldMayBeFinal", "FieldCanBeLocal"})
+        public static class SpotifyConfig {
+            private String client_id = "";
+            private String client_secret = "";
+
+            public String getClientId() {
+                return this.client_id;
+            }
+
+            public String getClientSecret() {
+                return this.client_secret;
             }
         }
     }

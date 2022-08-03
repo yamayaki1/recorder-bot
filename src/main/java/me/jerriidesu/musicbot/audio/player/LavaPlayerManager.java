@@ -4,13 +4,16 @@ import com.sedmelluq.discord.lavaplayer.player.AudioConfiguration;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import me.jerriidesu.musicbot.audio.handler.AudioEventHandler;
+import me.jerriidesu.musicbot.audio.source.spotify.SpotifyAudioSourceManager;
 
 public class LavaPlayerManager {
     public static AudioPlayerManager getPlayerManager() {
         AudioPlayerManager audioPlayerManager = new DefaultAudioPlayerManager();
-        AudioSourceManagers.registerRemoteSources(audioPlayerManager);
+
+        audioPlayerManager.registerSourceManager(new SpotifyAudioSourceManager());
+        audioPlayerManager.registerSourceManager(new YoutubeAudioSourceManager());
 
         int OPUS_QUALITY = AudioConfiguration.OPUS_QUALITY_MAX;
         audioPlayerManager.getConfiguration().setOpusEncodingQuality(OPUS_QUALITY);
