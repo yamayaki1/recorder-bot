@@ -26,10 +26,6 @@ public class PlaylistCommand implements Command {
             if (tracks.size() > 0) {
                 int index = 0;
                 for (AudioTrack track : tracks) {
-                    if(track == null) {
-                        continue;
-                    }
-
                     index++;
                     embedBuilder.addField(index + ". " + track.getInfo().title, track.getInfo().author);
                 }

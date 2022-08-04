@@ -31,6 +31,7 @@ import java.net.URL;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -173,16 +174,40 @@ public class SpotifyAudioSourceManager implements AudioSourceManager {
             return null;
         }
 
-        AudioItem audioItem = youtube.loadItem(null, new AudioReference("ytmsearch:" + track.getName() + " - " + track.getArtist(), track.getName()));
-        if(audioItem instanceof AudioTrack audioTrack) {
-            return audioTrack;
-        }
+        //first search in YouTube music
+        AudioItem youtubeMusicItem = youtube.loadItem(null, new AudioReference("ytmsearch:" + track.getName() + " - " + track.getArtist(), track.getName()));
 
-        if(audioItem instanceof AudioPlaylist audioPlaylist) {
-            boolean selected = audioPlaylist.getSelectedTrack() != null;
-            System.out.println(selected);
+        if(youtubeMusicItem instanceof AudioPlaylist audioPlaylist) {
+            for (AudioTrack audioPlaylistTrack : audioPlaylist.getTracks()) {
+                String spotTitle = track.getName().toLowerCase(Locale.ROOT);
+                String spotAuthor = track.getArtist().toLowerCase(Locale.ROOT);
+                String ytTitle = audioPlaylistTrack.getInfo().title.toLowerCase(Locale.ROOT);
+                String ytAuthor = audioPlaylistTrack.getInfo().author.toLowerCase(Locale.ROOT);
 
-            return audioPlaylist.getTracks().get(0);
+                if(spotTitle.equals(ytTitle) && spotAuthor.equals(ytAuthor)) {
+                    return audioPlaylistTrack;
+                }
+
+                if(spotTitle.equals(ytTitle) && spotAuthor.contains(ytAuthor)) {
+                    return audioPlaylistTrack;
+                }
+
+                if(spotTitle.contains(ytTitle) && spotAuthor.equals(ytAuthor)) {
+                    return audioPlaylistTrack;
+                }
+
+                if(spotTitle.contains(ytTitle) && spotAuthor.contains(ytAuthor)) {
+                    return audioPlaylistTrack;
+                }
+
+                if(spotAuthor.equals(ytAuthor)) {
+                    return audioPlaylistTrack;
+                }
+
+                if(spotTitle.equals(ytTitle)) {
+                    return audioPlaylistTrack;
+                }
+            }
         }
 
         return null;

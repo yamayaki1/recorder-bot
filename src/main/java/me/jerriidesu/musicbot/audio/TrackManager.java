@@ -15,9 +15,10 @@ public class TrackManager {
 
     private final LavaAudioSource audioSource;
     private final List<AudioTrack> trackList = new ArrayList<>();
+
+    public boolean repeat = false;
     public boolean paused = false;
     public String lastError = "";
-    private boolean repeat = false;
 
     public TrackManager(Server server) {
         this.server = server;
@@ -35,11 +36,19 @@ public class TrackManager {
     }
 
     public void addTrack(AudioTrack track) {
+        if(track == null) {
+            return;
+        }
+
         this.trackList.add(track);
         this.startTrackIfIdle();
     }
 
     public void skipTrack(int count) {
+        if(count < 1) {
+            return;
+        }
+
         for (int i = 0; i < count; i++) {
             this.audioSource.getAudioPlayer().stopTrack();
             this.startTrackIfIdle();
