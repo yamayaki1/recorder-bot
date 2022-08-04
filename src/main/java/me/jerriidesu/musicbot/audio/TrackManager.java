@@ -36,7 +36,7 @@ public class TrackManager {
     }
 
     public void addTrack(AudioTrack track) {
-        if(track == null) {
+        if (track == null) {
             return;
         }
 
@@ -45,7 +45,7 @@ public class TrackManager {
     }
 
     public void skipTrack(int count) {
-        if(count < 1) {
+        if (count < 1) {
             return;
         }
 

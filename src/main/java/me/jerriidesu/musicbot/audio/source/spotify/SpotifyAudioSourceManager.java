@@ -207,9 +207,9 @@ public class SpotifyAudioSourceManager implements AudioSourceManager {
                 score = score + 1000;
             }
 
-            if(ytAuthor.equals(spotAuthor)) {
+            if (ytAuthor.equals(spotAuthor)) {
                 score = score + 5;
-            } else if(ytAuthor.contains(spotAuthor)) {
+            } else if (ytAuthor.contains(spotAuthor)) {
                 score = score + 3;
             } else {
                 score = score - 20;
@@ -221,7 +221,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager {
                 score = score - 3;
             }
 
-            if(ytTitle.contains(spotTitle)) {
+            if (ytTitle.contains(spotTitle)) {
                 score = score + 1;
             } else {
                 score = score - 1;
