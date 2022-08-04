@@ -54,7 +54,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager {
                 .build();
         this.clientCredentialsRequest = this.spotifyApi.clientCredentials()
                 .build();
-        
+
         this.renewAccessToken();
     }
 
@@ -104,12 +104,12 @@ public class SpotifyAudioSourceManager implements AudioSourceManager {
 
     private AudioItem buildTrack(String url) {
         Matcher matcher = TRACK_PATTERN.matcher(url);
-        if(!matcher.find()) {
+        if (!matcher.find()) {
             return null;
         }
 
         try {
-            if(this.tokenExpires >= Instant.now().getEpochSecond()) {
+            if (this.tokenExpires >= Instant.now().getEpochSecond()) {
                 this.renewAccessToken();
             }
 
@@ -122,12 +122,12 @@ public class SpotifyAudioSourceManager implements AudioSourceManager {
 
     private AudioItem buildPlaylistFromAlbum(String url) {
         Matcher matcher = ALBUM_PATTERN.matcher(url);
-        if(!matcher.find()) {
+        if (!matcher.find()) {
             return null;
         }
 
         try {
-            if(this.tokenExpires >= Instant.now().getEpochSecond()) {
+            if (this.tokenExpires >= Instant.now().getEpochSecond()) {
                 this.renewAccessToken();
             }
 
@@ -146,12 +146,12 @@ public class SpotifyAudioSourceManager implements AudioSourceManager {
 
     private AudioItem buildPlaylist(String url) {
         Matcher matcher = PLAYLIST_PATTERN.matcher(url);
-        if(!matcher.find()) {
+        if (!matcher.find()) {
             return null;
         }
 
         try {
-            if(this.tokenExpires >= Instant.now().getEpochSecond()) {
+            if (this.tokenExpires >= Instant.now().getEpochSecond()) {
                 this.renewAccessToken();
             }
 
@@ -170,47 +170,70 @@ public class SpotifyAudioSourceManager implements AudioSourceManager {
     }
 
     private AudioTrack getAudioItemFromTrack(SpotifyTrack track) {
-        if(track == null) {
+        if (track == null) {
             return null;
         }
 
+        List<AudioTrack> tracks = new ArrayList<>();
+
         //first search in YouTube music
         AudioItem youtubeMusicItem = youtube.loadItem(null, new AudioReference("ytmsearch:" + track.getName() + " - " + track.getArtist(), track.getName()));
+        if (youtubeMusicItem instanceof AudioPlaylist audioPlaylist) {
+            tracks.addAll(audioPlaylist.getTracks());
+        }
 
-        if(youtubeMusicItem instanceof AudioPlaylist audioPlaylist) {
-            for (AudioTrack audioPlaylistTrack : audioPlaylist.getTracks()) {
-                String spotTitle = track.getName().toLowerCase(Locale.ROOT);
-                String spotAuthor = track.getArtist().toLowerCase(Locale.ROOT);
-                String ytTitle = audioPlaylistTrack.getInfo().title.toLowerCase(Locale.ROOT);
-                String ytAuthor = audioPlaylistTrack.getInfo().author.toLowerCase(Locale.ROOT);
+        //then through normal YouTube
+        AudioItem youtubeItem = youtube.loadItem(null, new AudioReference("ytsearch:" + track.getName() + " - " + track.getArtist(), track.getName()));
+        if (youtubeItem instanceof AudioPlaylist audioPlaylist) {
+            tracks.addAll(audioPlaylist.getTracks());
+        }
 
-                if(spotTitle.equals(ytTitle) && spotAuthor.equals(ytAuthor)) {
-                    return audioPlaylistTrack;
-                }
+        return this.weightedTrackSelector(track, tracks);
+    }
 
-                if(spotTitle.equals(ytTitle) && spotAuthor.contains(ytAuthor)) {
-                    return audioPlaylistTrack;
-                }
+    public AudioTrack weightedTrackSelector(SpotifyTrack spotifyTrack, List<AudioTrack> youtubeTracks) {
+        int highest_score = 0;
+        AudioTrack track = null;
 
-                if(spotTitle.contains(ytTitle) && spotAuthor.equals(ytAuthor)) {
-                    return audioPlaylistTrack;
-                }
+        for (AudioTrack youtubeTrack : youtubeTracks) {
+            String spotTitle = spotifyTrack.getName().toLowerCase(Locale.ROOT);
+            String spotAuthor = spotifyTrack.getArtist().toLowerCase(Locale.ROOT);
+            String ytTitle = youtubeTrack.getInfo().title.toLowerCase(Locale.ROOT);
+            String ytAuthor = youtubeTrack.getInfo().author.toLowerCase(Locale.ROOT);
 
-                if(spotTitle.contains(ytTitle) && spotAuthor.contains(ytAuthor)) {
-                    return audioPlaylistTrack;
-                }
+            int score = 0;
 
-                if(spotAuthor.equals(ytAuthor)) {
-                    return audioPlaylistTrack;
-                }
+            if (ytTitle.equals(spotTitle) && ytAuthor.equals(spotAuthor)) {
+                score = score + 1000;
+            }
 
-                if(spotTitle.equals(ytTitle)) {
-                    return audioPlaylistTrack;
-                }
+            if(ytAuthor.equals(spotAuthor)) {
+                score = score + 5;
+            } else if(ytAuthor.contains(spotAuthor)) {
+                score = score + 3;
+            } else {
+                score = score - 3;
+            }
+
+            if (ytTitle.equals(spotTitle)) {
+                score = score + 5;
+            } else {
+                score = score - 3;
+            }
+
+            if(ytTitle.contains(spotTitle)) {
+                score = score + 1;
+            } else {
+                score = score - 1;
+            }
+
+            if (highest_score < score) {
+                track = youtubeTrack;
+                highest_score = score;
             }
         }
 
-        return null;
+        return track;
     }
 
     @Override
