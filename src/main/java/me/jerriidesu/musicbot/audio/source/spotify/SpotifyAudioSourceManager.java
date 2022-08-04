@@ -192,7 +192,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager {
     }
 
     public AudioTrack weightedTrackSelector(SpotifyTrack spotifyTrack, List<AudioTrack> youtubeTracks) {
-        int highest_score = 0;
+        int highest_score = -100;
         AudioTrack track = null;
 
         for (AudioTrack youtubeTrack : youtubeTracks) {
@@ -212,7 +212,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager {
             } else if(ytAuthor.contains(spotAuthor)) {
                 score = score + 3;
             } else {
-                score = score - 3;
+                score = score - 20;
             }
 
             if (ytTitle.equals(spotTitle)) {
