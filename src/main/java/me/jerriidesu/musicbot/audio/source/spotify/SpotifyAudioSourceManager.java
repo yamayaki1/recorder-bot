@@ -12,61 +12,29 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import com.sedmelluq.discord.lavaplayer.track.BasicAudioPlaylist;
 import me.jerriidesu.musicbot.MusicBot;
 import me.jerriidesu.musicbot.audio.source.spotify.entities.SpotifyTrack;
-import org.apache.hc.core5.http.ParseException;
-import se.michaelthelin.spotify.SpotifyApi;
-import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
-import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
+import me.jerriidesu.musicbot.utils.Either;
 import se.michaelthelin.spotify.model_objects.specification.Album;
 import se.michaelthelin.spotify.model_objects.specification.Playlist;
 import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
 import se.michaelthelin.spotify.model_objects.specification.Track;
 import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
-import se.michaelthelin.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class SpotifyAudioSourceManager implements AudioSourceManager {
 
-    private static final Pattern TRACK_PATTERN = Pattern.compile("/tracks?/([^?/\\s]*)");
-    private static final Pattern PLAYLIST_PATTERN = Pattern.compile("/playlists?/([^?/\\s]*)");
-    private static final Pattern ALBUM_PATTERN = Pattern.compile("/albums?/([^?/\\s]*)");
-
-    private static final YoutubeAudioSourceManager youtube = new YoutubeAudioSourceManager();
-
-    private final SpotifyApi spotifyApi;
-    private final ClientCredentialsRequest clientCredentialsRequest;
-    private long tokenExpires = 0;
+    private static YoutubeAudioSourceManager youtube;
 
     public SpotifyAudioSourceManager() {
-        this.spotifyApi = new SpotifyApi.Builder()
-                .setClientId(MusicBot.getConfig().get().getSpotify().getClientId())
-                .setClientSecret(MusicBot.getConfig().get().getSpotify().getClientSecret())
-                .build();
-        this.clientCredentialsRequest = this.spotifyApi.clientCredentials()
-                .build();
-
-        this.renewAccessToken();
-    }
-
-    private void renewAccessToken() {
-        try {
-            final ClientCredentials clientCredentials = clientCredentialsRequest.execute();
-            this.spotifyApi.setAccessToken(clientCredentials.getAccessToken());
-
-            this.tokenExpires = Instant.now().getEpochSecond() + clientCredentials.getExpiresIn();
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            throw new RuntimeException(e);
-        }
+        youtube = new YoutubeAudioSourceManager();
     }
 
     @Override
@@ -76,7 +44,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager {
 
     @Override
     public AudioItem loadItem(AudioPlayerManager manager, AudioReference reference) {
-        if (!reference.identifier.matches("(https?://)?(.*)?spotify\\.com.*")) {
+        if (!SpotifyPatterns.SPOTIFY_PATTERN.matcher(reference.identifier).matches()) {
             return null;
         }
 
@@ -85,15 +53,15 @@ public class SpotifyAudioSourceManager implements AudioSourceManager {
         try {
             String url = new URL(reference.identifier).getPath();
 
-            if (TRACK_PATTERN.matcher(url).matches()) {
+            if (SpotifyPatterns.TRACK_PATTERN.matcher(url).matches()) {
                 audioItem = this.buildTrack(url);
             }
 
-            if (PLAYLIST_PATTERN.matcher(url).matches()) {
+            if (SpotifyPatterns.PLAYLIST_PATTERN.matcher(url).matches()) {
                 audioItem = this.buildPlaylist(url);
             }
 
-            if (ALBUM_PATTERN.matcher(url).matches()) {
+            if (SpotifyPatterns.ALBUM_PATTERN.matcher(url).matches()) {
                 audioItem = this.buildPlaylistFromAlbum(url);
             }
         } catch (MalformedURLException ignored) {
@@ -103,39 +71,31 @@ public class SpotifyAudioSourceManager implements AudioSourceManager {
     }
 
     private AudioItem buildTrack(String url) {
-        Matcher matcher = TRACK_PATTERN.matcher(url);
+        Matcher matcher = SpotifyPatterns.TRACK_PATTERN.matcher(url);
         if (!matcher.find()) {
             return null;
         }
 
         try {
-            if (this.tokenExpires >= Instant.now().getEpochSecond()) {
-                this.renewAccessToken();
-            }
-
-            Track track = this.spotifyApi.getTrack(matcher.group(1)).build().execute();
-            return this.getAudioItemFromTrack(new SpotifyTrack(track));
+            Track track = MusicBot.getSpotifyAccess().getSpotifyApi().getTrack(matcher.group(1)).build().execute();
+            return this.getAudioItemFromTrack(new SpotifyTrack(track)).getLeft();
         } catch (Exception exception) {
             throw new FriendlyException(exception.getMessage(), FriendlyException.Severity.FAULT, exception);
         }
     }
 
     private AudioItem buildPlaylistFromAlbum(String url) {
-        Matcher matcher = ALBUM_PATTERN.matcher(url);
+        Matcher matcher = SpotifyPatterns.ALBUM_PATTERN.matcher(url);
         if (!matcher.find()) {
             return null;
         }
 
         try {
-            if (this.tokenExpires >= Instant.now().getEpochSecond()) {
-                this.renewAccessToken();
-            }
-
-            Album album = this.spotifyApi.getAlbum(matcher.group(1)).build().execute();
+            Album album = MusicBot.getSpotifyAccess().getSpotifyApi().getAlbum(matcher.group(1)).build().execute();
             List<AudioTrack> tracks = new ArrayList<>();
 
             for (TrackSimplified item : album.getTracks().getItems()) {
-                tracks.add(this.getAudioItemFromTrack(new SpotifyTrack(item)));
+                tracks.add(this.getAudioItemFromTrack(new SpotifyTrack(item)).getLeft());
             }
 
             return new BasicAudioPlaylist(album.getName(), tracks, null, false);
@@ -145,22 +105,18 @@ public class SpotifyAudioSourceManager implements AudioSourceManager {
     }
 
     private AudioItem buildPlaylist(String url) {
-        Matcher matcher = PLAYLIST_PATTERN.matcher(url);
+        Matcher matcher = SpotifyPatterns.PLAYLIST_PATTERN.matcher(url);
         if (!matcher.find()) {
             return null;
         }
 
         try {
-            if (this.tokenExpires >= Instant.now().getEpochSecond()) {
-                this.renewAccessToken();
-            }
-
-            Playlist playlist = this.spotifyApi.getPlaylist(matcher.group(1)).build().execute();
+            Playlist playlist = MusicBot.getSpotifyAccess().getSpotifyApi().getPlaylist(matcher.group(1)).build().execute();
             List<AudioTrack> tracks = new ArrayList<>();
 
             for (PlaylistTrack item : playlist.getTracks().getItems()) {
-                Track track = this.spotifyApi.getTrack(item.getTrack().getId()).build().execute();
-                tracks.add(this.getAudioItemFromTrack(new SpotifyTrack(track)));
+                Track track = MusicBot.getSpotifyAccess().getSpotifyApi().getTrack(item.getTrack().getId()).build().execute();
+                tracks.add(this.getAudioItemFromTrack(new SpotifyTrack(track)).getLeft());
             }
 
             return new BasicAudioPlaylist(playlist.getName(), tracks, null, false);
@@ -169,7 +125,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager {
         }
     }
 
-    private AudioTrack getAudioItemFromTrack(SpotifyTrack track) {
+    private Either<AudioTrack, Boolean> getAudioItemFromTrack(SpotifyTrack track) {
         if (track == null) {
             return null;
         }
@@ -191,7 +147,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager {
         return this.weightedTrackSelector(track, tracks);
     }
 
-    public AudioTrack weightedTrackSelector(SpotifyTrack spotifyTrack, List<AudioTrack> youtubeTracks) {
+    public Either<AudioTrack, Boolean> weightedTrackSelector(SpotifyTrack spotifyTrack, List<AudioTrack> youtubeTracks) {
         int highest_score = -100;
         AudioTrack track = null;
 
@@ -233,7 +189,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager {
             }
         }
 
-        return track;
+        return new Either<>(track, highest_score > 1000);
     }
 
     @Override

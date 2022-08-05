@@ -1,6 +1,7 @@
 package me.jerriidesu.musicbot;
 
 import me.jerriidesu.musicbot.audio.ServerManager;
+import me.jerriidesu.musicbot.audio.source.spotify.SpotifyAccess;
 import me.jerriidesu.musicbot.commands.CommandListener;
 import me.jerriidesu.musicbot.tasks.CmdLineHandler;
 import org.apache.logging.log4j.LogManager;
@@ -21,6 +22,8 @@ public class MusicBot {
     private static final SystemInfo systemInfo = new SystemInfo();
     private static final BotConfig botConfig = new BotConfig(new File(".", "config/"));
     private static final ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(4);
+
+    private static final SpotifyAccess spotifyAccess = new SpotifyAccess();
 
     private static ServerManager serverManager = null;
 
@@ -50,6 +53,10 @@ public class MusicBot {
 
     public static SystemInfo getSystemInfo() {
         return systemInfo;
+    }
+
+    public static SpotifyAccess getSpotifyAccess() {
+        return spotifyAccess;
     }
 
     protected void launch() {
