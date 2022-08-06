@@ -11,7 +11,6 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import com.sedmelluq.discord.lavaplayer.track.BasicAudioPlaylist;
 import me.jerriidesu.musicbot.MusicBot;
-import me.jerriidesu.musicbot.audio.source.spotify.entities.SpotifyTrack;
 import me.jerriidesu.musicbot.utils.Either;
 import se.michaelthelin.spotify.model_objects.specification.Album;
 import se.michaelthelin.spotify.model_objects.specification.Playlist;
@@ -26,14 +25,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.regex.Matcher;
 
-public class SpotifyAudioSourceManager implements AudioSourceManager {
+public class SpotifySourceManager implements AudioSourceManager {
 
     private static YoutubeAudioSourceManager youtube;
 
-    public SpotifyAudioSourceManager() {
+    public SpotifySourceManager() {
         youtube = new YoutubeAudioSourceManager();
     }
 
@@ -148,48 +146,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager {
     }
 
     public Either<AudioTrack, Boolean> weightedTrackSelector(SpotifyTrack spotifyTrack, List<AudioTrack> youtubeTracks) {
-        int highest_score = -100;
-        AudioTrack track = null;
-
-        for (AudioTrack youtubeTrack : youtubeTracks) {
-            String spotTitle = spotifyTrack.getName().toLowerCase(Locale.ROOT);
-            String spotAuthor = spotifyTrack.getArtist().toLowerCase(Locale.ROOT);
-            String ytTitle = youtubeTrack.getInfo().title.toLowerCase(Locale.ROOT);
-            String ytAuthor = youtubeTrack.getInfo().author.toLowerCase(Locale.ROOT);
-
-            int score = 0;
-
-            if (ytTitle.equals(spotTitle) && ytAuthor.equals(spotAuthor)) {
-                score = score + 1000;
-            }
-
-            if (ytAuthor.equals(spotAuthor)) {
-                score = score + 5;
-            } else if (ytAuthor.contains(spotAuthor)) {
-                score = score + 3;
-            } else {
-                score = score - 20;
-            }
-
-            if (ytTitle.equals(spotTitle)) {
-                score = score + 5;
-            } else {
-                score = score - 3;
-            }
-
-            if (ytTitle.contains(spotTitle)) {
-                score = score + 1;
-            } else {
-                score = score - 1;
-            }
-
-            if (highest_score < score) {
-                track = youtubeTrack;
-                highest_score = score;
-            }
-        }
-
-        return new Either<>(track, highest_score > 1000);
+        return SpotifyWeightedTrackSelector.getWeightedTrack(spotifyTrack, youtubeTracks);
     }
 
     @Override

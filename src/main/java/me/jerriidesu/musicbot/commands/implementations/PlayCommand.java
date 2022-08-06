@@ -9,7 +9,7 @@ import me.jerriidesu.musicbot.audio.TrackManager;
 import me.jerriidesu.musicbot.commands.Command;
 import me.jerriidesu.musicbot.utils.Either;
 import me.jerriidesu.musicbot.utils.Reactions;
-import me.jerriidesu.musicbot.utils.UrlTools;
+import me.jerriidesu.musicbot.utils.StringTools;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
 
@@ -43,7 +43,7 @@ public class PlayCommand implements Command {
     }
 
     private void addSong(Either<MessageCreateEvent, Server> context, String song) {
-        if (!UrlTools.isURL(song) && !song.contains("ytmsearch:") && !song.contains("ytsearch:")) {
+        if (!StringTools.isURL(song) && !song.contains("ytmsearch:") && !song.contains("ytsearch:")) {
             song = "ytmsearch:" + song;
         }
 

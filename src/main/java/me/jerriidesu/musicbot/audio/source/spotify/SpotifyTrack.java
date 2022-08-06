@@ -1,4 +1,4 @@
-package me.jerriidesu.musicbot.audio.source.spotify.entities;
+package me.jerriidesu.musicbot.audio.source.spotify;
 
 import se.michaelthelin.spotify.model_objects.specification.Track;
 import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;

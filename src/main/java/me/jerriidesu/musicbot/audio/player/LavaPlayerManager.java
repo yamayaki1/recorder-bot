@@ -9,13 +9,13 @@ import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceM
 import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import me.jerriidesu.musicbot.audio.handler.AudioEventHandler;
-import me.jerriidesu.musicbot.audio.source.spotify.SpotifyAudioSourceManager;
+import me.jerriidesu.musicbot.audio.source.spotify.SpotifySourceManager;
 
 public class LavaPlayerManager {
     public static AudioPlayerManager getPlayerManager() {
         AudioPlayerManager audioPlayerManager = new DefaultAudioPlayerManager();
 
-        audioPlayerManager.registerSourceManager(new SpotifyAudioSourceManager());
+        audioPlayerManager.registerSourceManager(new SpotifySourceManager());
         audioPlayerManager.registerSourceManager(new YoutubeAudioSourceManager());
         audioPlayerManager.registerSourceManager(new BandcampAudioSourceManager());
         audioPlayerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
