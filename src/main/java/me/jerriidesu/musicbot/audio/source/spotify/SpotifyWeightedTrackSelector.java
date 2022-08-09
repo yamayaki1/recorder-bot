@@ -6,6 +6,7 @@ import me.jerriidesu.musicbot.utils.Either;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class SpotifyWeightedTrackSelector {
     private final SpotifyTrack spotifyTrack;
@@ -13,6 +14,9 @@ public class SpotifyWeightedTrackSelector {
 
     private int highestScore = -5000;
     private boolean perfectMatch = false;
+
+    private boolean authorExists = false;
+    private boolean titleExists = false;
 
     private AudioTrack selectedTrack = null;
 
@@ -38,51 +42,62 @@ public class SpotifyWeightedTrackSelector {
 
     private void runSelector() {
         for (AudioTrack youtubeTrack : this.youtubeTracks) {
-            if(this.perfectMatch) {
+            if (this.perfectMatch) {
                 continue;
             }
-
-            String spotTitle = spotifyTrack.getName().toLowerCase(Locale.ROOT);
-            String spotAuthor = spotifyTrack.getArtist().toLowerCase(Locale.ROOT);
 
             String ytTitle = youtubeTrack.getInfo().title.toLowerCase(Locale.ROOT);
             String ytAuthor = youtubeTrack.getInfo().author.toLowerCase(Locale.ROOT);
 
-            int score = 0;
-
-            if (ytTitle.equals(spotTitle) && ytAuthor.equals(spotAuthor)) {
+            //early elimination
+            if (ytTitle.equals(spotifyTrack.getNameLower()) && ytAuthor.equals(spotifyTrack.getArtistLower())) {
+                this.authorExists = true; // normally unneeded, but we set it anyway
                 this.perfectMatch = true;
-                score = score + 5000;
-            }
-
-            if (ytAuthor.equals(spotAuthor)) {
-                score = score + 5;
-            } else if (ytAuthor.contains(spotAuthor)) {
-                score = score + 3;
-            } else {
-                score = score - 20;
-            }
-
-            if (ytTitle.equals(spotTitle)) {
-                score = score + 5;
-            } else {
-                score = score - 3;
-            }
-
-            if (ytTitle.contains(spotTitle)) {
-                score = score + 1;
-            } else {
-                score = score - 1;
-            }
-
-            if (this.highestScore < score) {
+                this.highestScore = 5000;
                 this.selectedTrack = youtubeTrack;
-                this.highestScore = score;
+
+                continue;
             }
 
-            if(MusicBot.DEBUG) {
-                MusicBot.getLogger().info("{}: {} ({}) - {} ({})", score, ytTitle, spotTitle, ytAuthor, spotAuthor);
+            AtomicReference<Integer> score = new AtomicReference<>(0);
+
+            this.checkAuthor(spotifyTrack.getArtistLower(), ytAuthor, score);
+            this.checkTitle(spotifyTrack.getNameLower(), ytTitle, score);
+
+            if (this.highestScore < score.get()) {
+                this.selectedTrack = youtubeTrack;
+                this.highestScore = score.get();
             }
+
+            if (MusicBot.DEBUG) {
+                MusicBot.getLogger().info("{}: {} ({}) - {} ({})", score, ytTitle, spotifyTrack.getNameLower(), ytAuthor, spotifyTrack.getArtistLower());
+            }
+        }
+    }
+
+    private void checkAuthor(String spotAuthor, String ytAuthor, AtomicReference<Integer> score) {
+        if (ytAuthor.equals(spotAuthor)) {
+            this.authorExists = true;
+            score.set(score.get() + 5);
+        } else if (ytAuthor.contains(spotAuthor)) {
+            score.set(score.get() + 3);
+        } else {
+            score.set(score.get() - 20);
+        }
+    }
+
+    private void checkTitle(String nameLower, String ytTitle, AtomicReference<Integer> score) {
+        if (ytTitle.equals(nameLower)) {
+            this.titleExists = true;
+            score.set(score.get() + 5);
+        } else {
+            score.set(score.get() - 3);
+        }
+
+        if (ytTitle.contains(nameLower)) {
+            score.set(score.get() + 1);
+        } else {
+            score.set(score.get() - 1);
         }
     }
 }
