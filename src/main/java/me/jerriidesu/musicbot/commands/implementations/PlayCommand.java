@@ -48,8 +48,6 @@ public class PlayCommand implements Command {
         }
 
         MusicBot.getAudioManager().getTrackManager(context.getRight()).tryLoadItems(song, playerResponse -> {
-            context.getLeft().getMessage().removeEmbed();
-
             if (playerResponse) {
                 Reactions.addSuccessfulReaction(context.getLeft().getMessage());
             } else {

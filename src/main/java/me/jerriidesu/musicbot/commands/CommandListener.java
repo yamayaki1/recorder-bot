@@ -8,6 +8,7 @@ import me.jerriidesu.musicbot.commands.implementations.ClearCommand;
 import me.jerriidesu.musicbot.commands.implementations.ConnectCommand;
 import me.jerriidesu.musicbot.commands.implementations.DebugCommands;
 import me.jerriidesu.musicbot.commands.implementations.DisconnectCommand;
+import me.jerriidesu.musicbot.commands.implementations.HelpCommand;
 import me.jerriidesu.musicbot.commands.implementations.PauseCommand;
 import me.jerriidesu.musicbot.commands.implementations.PlayCommand;
 import me.jerriidesu.musicbot.commands.implementations.PlaylistCommand;
@@ -41,7 +42,8 @@ public class CommandListener implements MessageCreateListener {
                 new ClearCommand(),
                 new RepeatCommand(),
                 new PauseCommand(),
-                new ResumeCommand()
+                new ResumeCommand(),
+                new HelpCommand()
         );
     }
 
