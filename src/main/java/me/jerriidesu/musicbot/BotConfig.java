@@ -46,7 +46,7 @@ public class BotConfig {
         try {
             this.config = this.gson.fromJson(new String(Files.readAllBytes(this.filePath)), JsonConfig.class);
         } catch (IOException e) {
-            System.out.println("error reading settings file, generating new one");
+            MusicBot.getLogger().error("error reading settings file, generating new one");
             this.config = new JsonConfig();
         }
 
@@ -60,7 +60,7 @@ public class BotConfig {
             writer.flush();
             writer.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            MusicBot.getLogger().error("error writing config file", e);
         }
     }
 

@@ -2,7 +2,9 @@ package me.jerriidesu.musicbot;
 
 import me.jerriidesu.musicbot.audio.ServerManager;
 import me.jerriidesu.musicbot.audio.source.spotify.SpotifyAccess;
+import me.jerriidesu.musicbot.audio.source.spotify.SpotifyCache;
 import me.jerriidesu.musicbot.commands.CommandListener;
+import me.jerriidesu.musicbot.tasks.AutoSaveHandler;
 import me.jerriidesu.musicbot.tasks.CmdLineHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,6 +28,7 @@ public class MusicBot {
     private static final ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(4);
 
     private static final SpotifyAccess spotifyAccess = new SpotifyAccess();
+    private static final SpotifyCache spotifyCache = new SpotifyCache(new File(".", "config"));
 
     private static ServerManager serverManager = null;
 
@@ -61,6 +64,10 @@ public class MusicBot {
         return spotifyAccess;
     }
 
+    public static SpotifyCache getSpotifyCache() {
+        return spotifyCache;
+    }
+
     protected void launch() {
         //report version
         logger.info("starting music-bot ({}) ...", botConfig.getBotVersion());
@@ -86,6 +93,7 @@ public class MusicBot {
         logger.info("starting tasks and commandline listener ...");
 
         scheduledThreadPool.scheduleAtFixedRate(new CmdLineHandler(this), 0, 1, TimeUnit.SECONDS);
+        scheduledThreadPool.scheduleAtFixedRate(new AutoSaveHandler(), 0, 1, TimeUnit.MINUTES);
     }
 
     public void registerCommands() {

@@ -11,7 +11,6 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import com.sedmelluq.discord.lavaplayer.track.BasicAudioPlaylist;
 import me.jerriidesu.musicbot.MusicBot;
-import me.jerriidesu.musicbot.utils.Either;
 import se.michaelthelin.spotify.model_objects.specification.Album;
 import se.michaelthelin.spotify.model_objects.specification.Playlist;
 import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
@@ -29,10 +28,12 @@ import java.util.regex.Matcher;
 
 public class SpotifySourceManager implements AudioSourceManager {
 
-    private static YoutubeAudioSourceManager youtube;
+    private final YoutubeAudioSourceManager youtube;
+    private final SpotifyCache spotifyCache;
 
     public SpotifySourceManager() {
         youtube = new YoutubeAudioSourceManager();
+        spotifyCache = MusicBot.getSpotifyCache();
     }
 
     @Override
@@ -76,7 +77,7 @@ public class SpotifySourceManager implements AudioSourceManager {
 
         try {
             Track track = MusicBot.getSpotifyAccess().getSpotifyApi().getTrack(matcher.group(1)).build().execute();
-            return this.getAudioItemFromTrack(new SpotifyTrack(track)).getLeft();
+            return this.getAudioItemFromTrack(new SpotifyTrack(track));
         } catch (Exception exception) {
             throw new FriendlyException(exception.getMessage(), FriendlyException.Severity.FAULT, exception);
         }
@@ -93,7 +94,7 @@ public class SpotifySourceManager implements AudioSourceManager {
             List<AudioTrack> tracks = new ArrayList<>();
 
             for (TrackSimplified item : album.getTracks().getItems()) {
-                tracks.add(this.getAudioItemFromTrack(new SpotifyTrack(item)).getLeft());
+                tracks.add(this.getAudioItemFromTrack(new SpotifyTrack(item)));
             }
 
             return new BasicAudioPlaylist(album.getName(), tracks, null, false);
@@ -114,7 +115,7 @@ public class SpotifySourceManager implements AudioSourceManager {
 
             for (PlaylistTrack item : playlist.getTracks().getItems()) {
                 Track track = MusicBot.getSpotifyAccess().getSpotifyApi().getTrack(item.getTrack().getId()).build().execute();
-                tracks.add(this.getAudioItemFromTrack(new SpotifyTrack(track)).getLeft());
+                tracks.add(this.getAudioItemFromTrack(new SpotifyTrack(track)));
             }
 
             return new BasicAudioPlaylist(playlist.getName(), tracks, null, false);
@@ -123,15 +124,15 @@ public class SpotifySourceManager implements AudioSourceManager {
         }
     }
 
-    private Either<AudioTrack, Boolean> getAudioItemFromTrack(SpotifyTrack track) {
+    private AudioTrack getAudioItemFromTrack(SpotifyTrack track) {
         if (track == null) {
             return null;
         }
 
         //first search in YouTube music
-        AudioItem youtubeMusicItem = youtube.loadItem(null, new AudioReference("ytmsearch:" + track.getName() + " - " + track.getArtist(), track.getName()));
+        AudioItem youtubeMusicItem = this.youtube.loadItem(null, new AudioReference("ytmsearch:" + track.getName() + " - " + track.getArtist(), track.getName()));
         if (youtubeMusicItem instanceof AudioPlaylist audioPlaylist) {
-            return SpotifyWeightedTrackSelector.getWeightedTrack(track, audioPlaylist.getTracks());
+            return SpotifyWeightedTrackSelector.getWeightedTrack(track, audioPlaylist.getTracks()).getLeft();
         }
 
         return null;
