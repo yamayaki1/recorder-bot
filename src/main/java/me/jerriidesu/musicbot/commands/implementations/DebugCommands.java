@@ -55,10 +55,9 @@ public class DebugCommands implements Command {
                                     .addField("Repository", "https://github.com/jerriidesu/musicbot")
                                     .addField("Entwickler", "Yamayaki (<@310370479380627458>)")
                                     .setThumbnail("https://avatars.githubusercontent.com/u/65787801?s=100")
-                                    .addField("", "")
                                     .addField("OS", sys.getOperatingSystem().getFamily() + " " + sys.getOperatingSystem().getVersionInfo().toString())
                                     .addField("CPU", sys.getHardware().getProcessor().getProcessorIdentifier().getName() + " (" + sys.getHardware().getProcessor().getMaxFreq() / 1000000 + " MHz)")
-                                    .addField("RAM", ((sys.getHardware().getMemory().getTotal() / 1048576) - (sys.getHardware().getMemory().getAvailable() / 1048576)) + " / " + (sys.getHardware().getMemory().getTotal() / 1048576));
+                                    .addField("RAM", ((sys.getHardware().getMemory().getTotal() / 1048576) - (sys.getHardware().getMemory().getAvailable() / 1048576)) + "MB / " + (sys.getHardware().getMemory().getTotal() / 1048576)+"MB");
 
                             context.getSource().getLeft().getMessage().reply(embedBuilder);
                             return 1;

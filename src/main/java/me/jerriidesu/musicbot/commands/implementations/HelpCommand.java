@@ -20,7 +20,7 @@ public class HelpCommand implements Command {
                     new EmbedBuilder().setTitle("Befehlsübersicht")
                             .addField("Bot verbinden", prefix + "connect")
                             .addField("Bot trennen", prefix + "disconnect")
-                            .addField("Musik abspielen", prefix + "play <spotify|youtube|twitch|soundcloud|search>")
+                            .addField("Musik abspielen", prefix + "play <spotify*|youtube|twitch|soundcloud|search>")
                             .addField("Music pausieren*", prefix + "pause")
                             .addField("Music fortsetzen*", prefix + "resume")
                             .addField("Music überspringen*", prefix + "skip [track-id]")
@@ -28,7 +28,6 @@ public class HelpCommand implements Command {
                             .addField("Playlist anzeigen*", prefix + "playlist")
                             .addField("Playlist wiederholen*", prefix + "repeat")
                             .addField("Playlist leeren", prefix + "clear")
-                            .addField("", "")
                             .addField("*", "Indev-Funktion")
             );
             return 1;
