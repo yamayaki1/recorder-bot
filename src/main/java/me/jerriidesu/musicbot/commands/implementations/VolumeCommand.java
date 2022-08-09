@@ -15,7 +15,7 @@ public class VolumeCommand implements Command {
     @Override
     public void registerBrigadier(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher) {
         dispatcher.register(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("volume")
-                .then(RequiredArgumentBuilder.<Either<MessageCreateEvent, Server>, Integer>argument("vol", IntegerArgumentType.integer(0, 69)).executes(context -> {
+                .then(RequiredArgumentBuilder.<Either<MessageCreateEvent, Server>, Integer>argument("vol", IntegerArgumentType.integer(0, 200)).executes(context -> {
                     //execute
                     int volume = IntegerArgumentType.getInteger(context, "vol");
                     setVolume(context.getSource(), volume);
