@@ -128,25 +128,13 @@ public class SpotifySourceManager implements AudioSourceManager {
             return null;
         }
 
-        List<AudioTrack> tracks = new ArrayList<>();
-
         //first search in YouTube music
         AudioItem youtubeMusicItem = youtube.loadItem(null, new AudioReference("ytmsearch:" + track.getName() + " - " + track.getArtist(), track.getName()));
         if (youtubeMusicItem instanceof AudioPlaylist audioPlaylist) {
-            tracks.addAll(audioPlaylist.getTracks());
+            return SpotifyWeightedTrackSelector.getWeightedTrack(track, audioPlaylist.getTracks());
         }
 
-        //then through normal YouTube
-        AudioItem youtubeItem = youtube.loadItem(null, new AudioReference("ytsearch:" + track.getName() + " - " + track.getArtist(), track.getName()));
-        if (youtubeItem instanceof AudioPlaylist audioPlaylist) {
-            tracks.addAll(audioPlaylist.getTracks());
-        }
-
-        return this.weightedTrackSelector(track, tracks);
-    }
-
-    public Either<AudioTrack, Boolean> weightedTrackSelector(SpotifyTrack spotifyTrack, List<AudioTrack> youtubeTracks) {
-        return SpotifyWeightedTrackSelector.getWeightedTrack(spotifyTrack, youtubeTracks);
+        return null;
     }
 
     @Override

@@ -1,14 +1,13 @@
 package me.jerriidesu.musicbot.audio.source.spotify;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import me.jerriidesu.musicbot.MusicBot;
 import me.jerriidesu.musicbot.utils.Either;
-import me.jerriidesu.musicbot.utils.StringTools;
 
 import java.util.List;
 import java.util.Locale;
 
 public class SpotifyWeightedTrackSelector {
-
     private final SpotifyTrack spotifyTrack;
     private final List<AudioTrack> youtubeTracks;
 
@@ -16,7 +15,6 @@ public class SpotifyWeightedTrackSelector {
     private boolean perfectMatch = false;
 
     private AudioTrack selectedTrack = null;
-
 
     public SpotifyWeightedTrackSelector(SpotifyTrack spotifyTrack, List<AudioTrack> youtubeTracks) {
         this.spotifyTrack = spotifyTrack;
@@ -30,12 +28,25 @@ public class SpotifyWeightedTrackSelector {
         return new Either<>(spotifyWeightedTrackSelector.getSelectedTrack(), spotifyWeightedTrackSelector.isPerfectMatch());
     }
 
+    private Boolean isPerfectMatch() {
+        return this.perfectMatch;
+    }
+
+    private AudioTrack getSelectedTrack() {
+        return this.selectedTrack;
+    }
+
     private void runSelector() {
         for (AudioTrack youtubeTrack : this.youtubeTracks) {
-            String spotTitle = StringTools.romanize(spotifyTrack.getName()).toLowerCase(Locale.ROOT);
-            String spotAuthor = StringTools.romanize(spotifyTrack.getArtist()).toLowerCase(Locale.ROOT);
-            String ytTitle = StringTools.romanize(youtubeTrack.getInfo().title).toLowerCase(Locale.ROOT);
-            String ytAuthor = StringTools.romanize(youtubeTrack.getInfo().author).toLowerCase(Locale.ROOT);
+            if(this.perfectMatch) {
+                continue;
+            }
+
+            String spotTitle = spotifyTrack.getName().toLowerCase(Locale.ROOT);
+            String spotAuthor = spotifyTrack.getArtist().toLowerCase(Locale.ROOT);
+
+            String ytTitle = youtubeTrack.getInfo().title.toLowerCase(Locale.ROOT);
+            String ytAuthor = youtubeTrack.getInfo().author.toLowerCase(Locale.ROOT);
 
             int score = 0;
 
@@ -68,14 +79,10 @@ public class SpotifyWeightedTrackSelector {
                 this.selectedTrack = youtubeTrack;
                 this.highestScore = score;
             }
+
+            if(MusicBot.DEBUG) {
+                MusicBot.getLogger().info("{}: {} ({}) - {} ({})", score, ytTitle, spotTitle, ytAuthor, spotAuthor);
+            }
         }
-    }
-
-    private Boolean isPerfectMatch() {
-        return this.perfectMatch;
-    }
-
-    private AudioTrack getSelectedTrack() {
-        return this.selectedTrack;
     }
 }

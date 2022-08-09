@@ -18,6 +18,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class MusicBot {
+    public static final boolean DEBUG = true;
+
     private static final Logger logger = LogManager.getLogger(MusicBot.class);
     private static final SystemInfo systemInfo = new SystemInfo();
     private static final BotConfig botConfig = new BotConfig(new File(".", "config/"));
