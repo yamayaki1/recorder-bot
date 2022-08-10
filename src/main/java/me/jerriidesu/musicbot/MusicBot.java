@@ -2,7 +2,8 @@ package me.jerriidesu.musicbot;
 
 import me.jerriidesu.musicbot.audio.ServerManager;
 import me.jerriidesu.musicbot.audio.source.spotify.SpotifyAccess;
-import me.jerriidesu.musicbot.audio.source.spotify.SpotifyCache;
+import me.jerriidesu.musicbot.audio.source.spotify.SpotifyTrack;
+import me.jerriidesu.musicbot.utils.TrackCache;
 import me.jerriidesu.musicbot.commands.CommandListener;
 import me.jerriidesu.musicbot.tasks.AutoSaveHandler;
 import me.jerriidesu.musicbot.tasks.CmdLineHandler;
@@ -20,7 +21,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class MusicBot {
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     private static final Logger logger = LogManager.getLogger(MusicBot.class);
     private static final SystemInfo systemInfo = new SystemInfo();
@@ -28,7 +29,7 @@ public class MusicBot {
     private static final ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(4);
 
     private static final SpotifyAccess spotifyAccess = new SpotifyAccess();
-    private static final SpotifyCache spotifyCache = new SpotifyCache(new File(".", "config"));
+    private static final TrackCache trackCache = new TrackCache(new File(".", "config/"));
 
     private static ServerManager serverManager = null;
 
@@ -64,8 +65,16 @@ public class MusicBot {
         return spotifyAccess;
     }
 
-    public static SpotifyCache getSpotifyCache() {
-        return spotifyCache;
+    public static TrackCache getCache() {
+        return trackCache;
+    }
+
+    public static TrackCache.Cache<SpotifyTrack> getSpotifyCache() {
+        return trackCache.getCacheInstance().getSpotifyCache();
+    }
+
+    public static TrackCache.Cache<String> getYouTubeCache() {
+        return trackCache.getCacheInstance().getYouTubeCache();
     }
 
     protected void launch() {

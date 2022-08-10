@@ -28,6 +28,8 @@ public record CmdLineHandler(MusicBot instance) implements Runnable {
                 this.instance.getAPI().disconnect().join();
                 MusicBot.getExecutors().shutdown();
 
+                MusicBot.getCache().saveFile();
+
                 System.exit(0);
             }
             case "status" -> {

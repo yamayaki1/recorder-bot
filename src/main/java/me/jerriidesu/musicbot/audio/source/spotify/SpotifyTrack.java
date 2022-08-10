@@ -8,18 +8,25 @@ import java.util.Locale;
 
 public class SpotifyTrack {
 
+    private final String identifier;
     private final String name;
     private final String artist;
 
 
     public SpotifyTrack(Track item) {
+        this.identifier = item.getId();
         this.name = item.getName();
         this.artist = Arrays.stream(item.getArtists()).toList().get(0).getName();
     }
 
     public SpotifyTrack(TrackSimplified item) {
+        this.identifier = item.getId();
         this.name = item.getName();
         this.artist = Arrays.stream(item.getArtists()).toList().get(0).getName();
+    }
+
+    public String getIdentifier() {
+        return identifier;
     }
 
     public String getName() {

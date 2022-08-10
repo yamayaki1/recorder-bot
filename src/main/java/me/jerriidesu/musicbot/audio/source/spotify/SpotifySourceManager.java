@@ -11,6 +11,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import com.sedmelluq.discord.lavaplayer.track.BasicAudioPlaylist;
 import me.jerriidesu.musicbot.MusicBot;
+import me.jerriidesu.musicbot.utils.Either;
 import se.michaelthelin.spotify.model_objects.specification.Album;
 import se.michaelthelin.spotify.model_objects.specification.Playlist;
 import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
@@ -29,11 +30,9 @@ import java.util.regex.Matcher;
 public class SpotifySourceManager implements AudioSourceManager {
 
     private final YoutubeAudioSourceManager youtube;
-    private final SpotifyCache spotifyCache;
 
     public SpotifySourceManager() {
         youtube = new YoutubeAudioSourceManager();
-        spotifyCache = MusicBot.getSpotifyCache();
     }
 
     @Override
@@ -75,12 +74,19 @@ public class SpotifySourceManager implements AudioSourceManager {
             return null;
         }
 
-        try {
-            Track track = MusicBot.getSpotifyAccess().getSpotifyApi().getTrack(matcher.group(1)).build().execute();
-            return this.getAudioItemFromTrack(new SpotifyTrack(track));
-        } catch (Exception exception) {
-            throw new FriendlyException(exception.getMessage(), FriendlyException.Severity.FAULT, exception);
-        }
+        String trackId = matcher.group(1);
+        SpotifyTrack spotifyTrack = MusicBot.getSpotifyCache().fromCache(trackId).orElseGet(() -> {
+            try {
+                Track track = MusicBot.getSpotifyAccess().getSpotifyApi().getTrack(trackId).build().execute();
+                SpotifyTrack spTrack = new SpotifyTrack(track);
+                MusicBot.getSpotifyCache().toCache(trackId, spTrack);
+                return spTrack;
+            } catch (Exception exception) {
+                throw new FriendlyException(exception.getMessage(), FriendlyException.Severity.FAULT, exception);
+            }
+        });
+
+        return this.getAudioItemFromTrack(spotifyTrack);
     }
 
     private AudioItem buildPlaylistFromAlbum(String url) {
@@ -114,8 +120,19 @@ public class SpotifySourceManager implements AudioSourceManager {
             List<AudioTrack> tracks = new ArrayList<>();
 
             for (PlaylistTrack item : playlist.getTracks().getItems()) {
-                Track track = MusicBot.getSpotifyAccess().getSpotifyApi().getTrack(item.getTrack().getId()).build().execute();
-                tracks.add(this.getAudioItemFromTrack(new SpotifyTrack(track)));
+                String trackId = item.getTrack().getId();
+                SpotifyTrack spotifyTrack = MusicBot.getSpotifyCache().fromCache(trackId).orElseGet(() -> {
+                    try {
+                        Track track = MusicBot.getSpotifyAccess().getSpotifyApi().getTrack(trackId).build().execute();
+                        SpotifyTrack spTrack = new SpotifyTrack(track);
+                        MusicBot.getSpotifyCache().toCache(trackId, spTrack);
+                        return spTrack;
+                    } catch (Exception exception) {
+                        throw new FriendlyException(exception.getMessage(), FriendlyException.Severity.FAULT, exception);
+                    }
+                });
+
+                tracks.add(this.getAudioItemFromTrack(spotifyTrack));
             }
 
             return new BasicAudioPlaylist(playlist.getName(), tracks, null, false);
@@ -129,10 +146,27 @@ public class SpotifySourceManager implements AudioSourceManager {
             return null;
         }
 
-        //first search in YouTube music
-        AudioItem youtubeMusicItem = this.youtube.loadItem(null, new AudioReference("ytmsearch:" + track.getName() + " - " + track.getArtist(), track.getName()));
-        if (youtubeMusicItem instanceof AudioPlaylist audioPlaylist) {
-            return SpotifyWeightedTrackSelector.getWeightedTrack(track, audioPlaylist.getTracks()).getLeft();
+        String ytIdentifier = MusicBot.getYouTubeCache().fromCache(track.getIdentifier()).orElseGet(() -> {
+            AudioItem youtubeMusicItem = this.youtube.loadItem(null, new AudioReference("ytmsearch:" + track.getName() + " - " + track.getArtist(), track.getName()));
+            if(!(youtubeMusicItem instanceof AudioPlaylist)) {
+                return null;
+            }
+
+            Either<AudioTrack, Boolean> weightedResult = SpotifyWeightedTrackSelector.getWeightedTrack(track, ((AudioPlaylist) youtubeMusicItem).getTracks());
+            if (weightedResult.getRight()) {
+                MusicBot.getYouTubeCache().toCache(track.getIdentifier(), weightedResult.getLeft().getIdentifier());
+            }
+
+            return weightedResult.getLeft().getIdentifier();
+        });
+
+        if(ytIdentifier == null) {
+            return null;
+        }
+
+        AudioItem youtubeItem = this.youtube.loadItem(null, new AudioReference("https://youtube.com/watch?v=" + ytIdentifier, track.getName()));
+        if (youtubeItem instanceof AudioTrack ytTrack) {
+            return ytTrack;
         }
 
         return null;

@@ -51,6 +51,7 @@ public class SpotifyWeightedTrackSelector {
 
             //early elimination
             if (ytTitle.equals(spotifyTrack.getNameLower()) && ytAuthor.equals(spotifyTrack.getArtistLower())) {
+                this.titleExists = true;  // normally unneeded, but we set it anyway
                 this.authorExists = true; // normally unneeded, but we set it anyway
                 this.perfectMatch = true;
                 this.highestScore = 5000;
