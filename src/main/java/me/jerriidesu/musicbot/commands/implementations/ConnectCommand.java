@@ -11,7 +11,7 @@ import org.javacord.api.event.message.MessageCreateEvent;
 
 public class ConnectCommand implements Command {
     @Override
-    public void registerBrigadier(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher) {
+    public void register(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher) {
         dispatcher.register(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("connect").executes(context -> {
             //execute
             MessageCreateEvent event = context.getSource().getLeft();

@@ -32,6 +32,7 @@ public class SpotifySourceManager implements AudioSourceManager {
     private final YoutubeAudioSourceManager youtube;
 
     public SpotifySourceManager() {
+        //TODO use shared audio sources
         youtube = new YoutubeAudioSourceManager();
     }
 
@@ -68,6 +69,7 @@ public class SpotifySourceManager implements AudioSourceManager {
         return audioItem;
     }
 
+    //TODO cleanup this garbage
     private AudioItem buildTrack(String url) {
         Matcher matcher = SpotifyPatterns.TRACK_PATTERN.matcher(url);
         if (!matcher.find()) {
@@ -89,6 +91,7 @@ public class SpotifySourceManager implements AudioSourceManager {
         return this.getAudioItemFromTrack(spotifyTrack);
     }
 
+    //TODO cleanup this garbage
     private AudioItem buildPlaylistFromAlbum(String url) {
         Matcher matcher = SpotifyPatterns.ALBUM_PATTERN.matcher(url);
         if (!matcher.find()) {
@@ -109,6 +112,7 @@ public class SpotifySourceManager implements AudioSourceManager {
         }
     }
 
+    //TODO cleanup this garbage
     private AudioItem buildPlaylist(String url) {
         Matcher matcher = SpotifyPatterns.PLAYLIST_PATTERN.matcher(url);
         if (!matcher.find()) {
@@ -148,7 +152,7 @@ public class SpotifySourceManager implements AudioSourceManager {
 
         String ytIdentifier = MusicBot.getYouTubeCache().fromCache(track.getIdentifier()).orElseGet(() -> {
             AudioItem youtubeMusicItem = this.youtube.loadItem(null, new AudioReference("ytmsearch:" + track.getName() + " - " + track.getArtist(), track.getName()));
-            if(!(youtubeMusicItem instanceof AudioPlaylist)) {
+            if (!(youtubeMusicItem instanceof AudioPlaylist)) {
                 return null;
             }
 
@@ -160,7 +164,7 @@ public class SpotifySourceManager implements AudioSourceManager {
             return weightedResult.getLeft().getIdentifier();
         });
 
-        if(ytIdentifier == null) {
+        if (ytIdentifier == null) {
             return null;
         }
 
@@ -189,6 +193,6 @@ public class SpotifySourceManager implements AudioSourceManager {
 
     @Override
     public void shutdown() {
-        //TODO implement
+        //not needed
     }
 }

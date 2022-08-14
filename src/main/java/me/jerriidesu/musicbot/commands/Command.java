@@ -6,5 +6,5 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 public interface Command {
-    void registerBrigadier(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher);
+    void register(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher);
 }

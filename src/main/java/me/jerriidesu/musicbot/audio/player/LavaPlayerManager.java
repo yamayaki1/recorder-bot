@@ -15,6 +15,7 @@ public class LavaPlayerManager {
     public static AudioPlayerManager getPlayerManager() {
         AudioPlayerManager audioPlayerManager = new DefaultAudioPlayerManager();
 
+        //TODO use shared audio sources
         audioPlayerManager.registerSourceManager(new SpotifySourceManager());
         audioPlayerManager.registerSourceManager(new YoutubeAudioSourceManager());
         audioPlayerManager.registerSourceManager(new BandcampAudioSourceManager());

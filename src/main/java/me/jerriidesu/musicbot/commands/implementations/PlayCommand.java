@@ -15,10 +15,11 @@ import org.javacord.api.event.message.MessageCreateEvent;
 
 public class PlayCommand implements Command {
     @Override
-    public void registerBrigadier(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher) {
+    public void register(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher) {
         dispatcher.register(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("play")
                 .then(RequiredArgumentBuilder.<Either<MessageCreateEvent, Server>, String>argument("song", StringArgumentType.greedyString()).executes(context -> {
                     //execute
+                    //TODO unfuck this garbage
                     context.getSource().getRight().getAudioConnection().ifPresentOrElse(audioConnection -> {
                         addSong(context.getSource(), StringArgumentType.getString(context, "song"));
                     }, () -> Reactions.addRefuseReaction(context.getSource().getLeft().getMessage()));
@@ -42,6 +43,7 @@ public class PlayCommand implements Command {
         );
     }
 
+    //TODO unfuck this garbage
     private void addSong(Either<MessageCreateEvent, Server> context, String song) {
         if (!StringTools.isURL(song) && !song.contains("ytmsearch:") && !song.contains("ytsearch:")) {
             song = "ytmsearch:" + song;

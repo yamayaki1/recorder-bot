@@ -51,7 +51,7 @@ public class CommandListener implements MessageCreateListener {
         MusicBot.getLogger().info("registering {} commands", Arrays.stream(command).count());
 
         for (Command clazz : command) {
-            clazz.registerBrigadier(this.commandDispatcher);
+            clazz.register(this.commandDispatcher);
         }
     }
 

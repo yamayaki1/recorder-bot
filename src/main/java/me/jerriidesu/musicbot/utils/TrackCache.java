@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
+//TODO maybe use something like LMDB or RocksDB?
 public class TrackCache {
     private final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
     private final Path cacheFile;

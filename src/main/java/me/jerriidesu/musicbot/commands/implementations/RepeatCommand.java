@@ -12,7 +12,7 @@ import org.javacord.api.event.message.MessageCreateEvent;
 
 public class RepeatCommand implements Command {
     @Override
-    public void registerBrigadier(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher) {
+    public void register(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher) {
         dispatcher.register(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("repeat").executes(context -> {
             //execute
             boolean repeat = MusicBot.getAudioManager()

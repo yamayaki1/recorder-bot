@@ -63,6 +63,7 @@ public class TrackManager {
         this.trackList.clear();
     }
 
+    //TODO make this more resilient
     public void startTrackIfIdle() {
         if (this.paused) {
             this.resumeTrack();
@@ -96,6 +97,7 @@ public class TrackManager {
                 .setPaused(false);
     }
 
+    //TODO make this more resilient
     public boolean toggleRepeat() {
         this.repeat = !this.repeat;
         return repeat;

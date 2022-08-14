@@ -11,7 +11,7 @@ import org.javacord.api.event.message.MessageCreateEvent;
 
 public class PauseCommand implements Command {
     @Override
-    public void registerBrigadier(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher) {
+    public void register(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher) {
         dispatcher.register(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("pause").executes(context -> {
             //execute
             MusicBot.getAudioManager()

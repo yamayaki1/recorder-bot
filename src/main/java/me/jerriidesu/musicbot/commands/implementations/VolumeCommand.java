@@ -13,7 +13,7 @@ import org.javacord.api.event.message.MessageCreateEvent;
 
 public class VolumeCommand implements Command {
     @Override
-    public void registerBrigadier(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher) {
+    public void register(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher) {
         dispatcher.register(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("volume")
                 .then(RequiredArgumentBuilder.<Either<MessageCreateEvent, Server>, Integer>argument("vol", IntegerArgumentType.integer(0, 200)).executes(context -> {
                     //execute
@@ -24,19 +24,6 @@ public class VolumeCommand implements Command {
                     //execute
                     Reactions.addRefuseReaction(context.getSource().getLeft().getMessage());
                     return 1;
-                })
-        );
-
-        dispatcher.register(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("volume_allow_ear_rape")
-                .then(RequiredArgumentBuilder.<Either<MessageCreateEvent, Server>, Integer>argument("vol", IntegerArgumentType.integer(0)).executes(context -> {
-                    //execute
-                    int volume = IntegerArgumentType.getInteger(context, "vol");
-                    setVolume(context.getSource(), Math.min(volume, 200));
-                    return 0;
-                })).executes(context -> {
-                    //execute
-                    Reactions.addRefuseReaction(context.getSource().getLeft().getMessage());
-                    return 0;
                 })
         );
     }

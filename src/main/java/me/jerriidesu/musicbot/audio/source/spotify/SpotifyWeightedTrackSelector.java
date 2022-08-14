@@ -40,6 +40,7 @@ public class SpotifyWeightedTrackSelector {
         return this.selectedTrack;
     }
 
+    //TODO use multiple passes with (pre-)filtering
     private void runSelector() {
         for (AudioTrack youtubeTrack : this.youtubeTracks) {
             if (this.perfectMatch) {

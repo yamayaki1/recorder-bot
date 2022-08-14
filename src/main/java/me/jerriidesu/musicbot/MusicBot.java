@@ -3,10 +3,10 @@ package me.jerriidesu.musicbot;
 import me.jerriidesu.musicbot.audio.ServerManager;
 import me.jerriidesu.musicbot.audio.source.spotify.SpotifyAccess;
 import me.jerriidesu.musicbot.audio.source.spotify.SpotifyTrack;
-import me.jerriidesu.musicbot.utils.TrackCache;
 import me.jerriidesu.musicbot.commands.CommandListener;
 import me.jerriidesu.musicbot.tasks.AutoSaveHandler;
 import me.jerriidesu.musicbot.tasks.CmdLineHandler;
+import me.jerriidesu.musicbot.utils.TrackCache;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
@@ -91,7 +91,7 @@ public class MusicBot {
 
         logger.info("discord login successful, continuing ... ");
 
-        serverManager = new ServerManager(this);
+        serverManager = new ServerManager();
 
         this.registerCommands();
         this.updatePresence();

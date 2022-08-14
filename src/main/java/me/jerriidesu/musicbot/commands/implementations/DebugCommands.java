@@ -15,7 +15,7 @@ import oshi.SystemInfo;
 
 public class DebugCommands implements Command {
     @Override
-    public void registerBrigadier(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher) {
+    public void register(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher) {
         dispatcher.register(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("debug")
                 .then(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("current")
                         .executes(context -> {

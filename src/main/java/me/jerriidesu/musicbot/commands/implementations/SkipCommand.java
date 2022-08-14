@@ -14,7 +14,7 @@ import org.javacord.api.event.message.MessageCreateEvent;
 
 public class SkipCommand implements Command {
     @Override
-    public void registerBrigadier(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher) {
+    public void register(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher) {
         dispatcher.register(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("skip")
                 .then(RequiredArgumentBuilder.<Either<MessageCreateEvent, Server>, Integer>argument("count", IntegerArgumentType.integer(1)).executes(context -> {
                     //execute

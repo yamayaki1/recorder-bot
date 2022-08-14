@@ -14,7 +14,7 @@ import java.util.List;
 
 public class PlaylistCommand implements Command {
     @Override
-    public void registerBrigadier(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher) {
+    public void register(CommandDispatcher<Either<MessageCreateEvent, Server>> dispatcher) {
         dispatcher.register(LiteralArgumentBuilder.<Either<MessageCreateEvent, Server>>literal("playlist").executes(context -> {
             //execute
             EmbedBuilder embedBuilder = new EmbedBuilder().setTitle("Playlist");
@@ -24,10 +24,9 @@ public class PlaylistCommand implements Command {
                     .getTracks();
 
             if (tracks.size() > 0) {
-                int index = 0;
-                for (AudioTrack track : tracks) {
-                    index++;
-                    embedBuilder.addField(index + ". " + track.getInfo().title, track.getInfo().author);
+                for (int i = 0; i < tracks.size(); i++) {
+                    AudioTrack audioTrack = tracks.get(i);
+                    embedBuilder.addField((i + 1) + ". " + audioTrack.getInfo().title, audioTrack.getInfo().author);
                 }
             } else {
                 embedBuilder.setDescription("Die Playlist ist leer.");

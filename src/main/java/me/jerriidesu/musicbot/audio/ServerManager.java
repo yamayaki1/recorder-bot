@@ -1,17 +1,15 @@
 package me.jerriidesu.musicbot.audio;
 
-import me.jerriidesu.musicbot.MusicBot;
 import org.javacord.api.entity.server.Server;
 
 import java.util.HashMap;
 import java.util.List;
 
 public class ServerManager {
-    private final MusicBot bot;
-    private final HashMap<Server, TrackManager> serverMap = new HashMap<>();
+    private final HashMap<Server, TrackManager> serverMap;
 
-    public ServerManager(MusicBot bot) {
-        this.bot = bot;
+    public ServerManager() {
+        this.serverMap = new HashMap<>();
     }
 
     public TrackManager getTrackManager(Server server) {
