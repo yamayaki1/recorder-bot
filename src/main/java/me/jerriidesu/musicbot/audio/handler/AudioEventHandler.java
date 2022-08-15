@@ -57,7 +57,7 @@ public class AudioEventHandler extends AudioEventAdapter {
      * @param exception The exception that occurred
      */
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
-        // Adapter dummy method
+        this.trackManager.lastError = exception.getMessage();
     }
 
     /**

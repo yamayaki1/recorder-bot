@@ -46,7 +46,7 @@ public class LoadResultHandler implements AudioLoadResultHandler {
 
     @Override
     public void loadFailed(FriendlyException exception) {
-        MusicBot.getLogger().error("[playlist-manager] {}", exception.getMessage());
+        MusicBot.getLogger().error("Failed to load track: {}", exception.getMessage(), exception);
 
         this.trackManager.lastError = exception.getMessage();
         this.consumer.accept(false);

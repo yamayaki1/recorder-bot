@@ -4,26 +4,14 @@ import com.sedmelluq.discord.lavaplayer.player.AudioConfiguration;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.bandcamp.BandcampAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import me.jerriidesu.musicbot.audio.handler.AudioEventHandler;
-import me.jerriidesu.musicbot.audio.source.spotify.SpotifySourceManager;
 
 public class LavaPlayerManager {
     public static AudioPlayerManager getPlayerManager() {
         AudioPlayerManager audioPlayerManager = new DefaultAudioPlayerManager();
+        LavaSourceManager.registerAudioSources(audioPlayerManager);
 
-        //TODO use shared audio sources
-        audioPlayerManager.registerSourceManager(new SpotifySourceManager());
-        audioPlayerManager.registerSourceManager(new YoutubeAudioSourceManager());
-        audioPlayerManager.registerSourceManager(new BandcampAudioSourceManager());
-        audioPlayerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
-        audioPlayerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
-
-        int OPUS_QUALITY = AudioConfiguration.OPUS_QUALITY_MAX;
-        audioPlayerManager.getConfiguration().setOpusEncodingQuality(OPUS_QUALITY);
+        audioPlayerManager.getConfiguration().setOpusEncodingQuality(AudioConfiguration.OPUS_QUALITY_MAX);
         audioPlayerManager.getConfiguration().setResamplingQuality(AudioConfiguration.ResamplingQuality.HIGH);
 
         return audioPlayerManager;

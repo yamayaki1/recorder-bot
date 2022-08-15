@@ -2,7 +2,6 @@ package me.jerriidesu.musicbot.audio.source.spotify;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioItem;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
@@ -11,6 +10,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import com.sedmelluq.discord.lavaplayer.track.BasicAudioPlaylist;
 import me.jerriidesu.musicbot.MusicBot;
+import me.jerriidesu.musicbot.audio.player.LavaSourceManager;
 import me.jerriidesu.musicbot.utils.Either;
 import se.michaelthelin.spotify.model_objects.specification.Album;
 import se.michaelthelin.spotify.model_objects.specification.Playlist;
@@ -28,14 +28,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 
 public class SpotifySourceManager implements AudioSourceManager {
-
-    private final YoutubeAudioSourceManager youtube;
-
-    public SpotifySourceManager() {
-        //TODO use shared audio sources
-        youtube = new YoutubeAudioSourceManager();
-    }
-
     @Override
     public String getSourceName() {
         return "spotify";
@@ -151,7 +143,7 @@ public class SpotifySourceManager implements AudioSourceManager {
         }
 
         String ytIdentifier = MusicBot.getYouTubeCache().fromCache(track.getIdentifier()).orElseGet(() -> {
-            AudioItem youtubeMusicItem = this.youtube.loadItem(null, new AudioReference("ytmsearch:" + track.getName() + " - " + track.getArtist(), track.getName()));
+            AudioItem youtubeMusicItem = LavaSourceManager.youtubeSource.loadItem(null, new AudioReference("ytmsearch:" + track.getName() + " - " + track.getArtist(), track.getName()));
             if (!(youtubeMusicItem instanceof AudioPlaylist)) {
                 return null;
             }
@@ -168,7 +160,7 @@ public class SpotifySourceManager implements AudioSourceManager {
             return null;
         }
 
-        AudioItem youtubeItem = this.youtube.loadItem(null, new AudioReference("https://youtube.com/watch?v=" + ytIdentifier, track.getName()));
+        AudioItem youtubeItem = LavaSourceManager.youtubeSource.loadItem(null, new AudioReference("https://youtube.com/watch?v=" + ytIdentifier, track.getName()));
         if (youtubeItem instanceof AudioTrack ytTrack) {
             return ytTrack;
         }

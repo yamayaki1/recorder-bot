@@ -35,8 +35,7 @@ public class LavaAudioSource extends AudioSourceBase {
 
     @Override
     public boolean hasFinished() {
-        return this.audioPlayer.getPlayingTrack() == null
-                || this.audioPlayer.getPlayingTrack().getPosition() >= this.audioPlayer.getPlayingTrack().getDuration();
+        return this.audioPlayer.getPlayingTrack() == null || this.audioPlayer.getPlayingTrack().getPosition() >= this.audioPlayer.getPlayingTrack().getDuration();
     }
 
     @Override
