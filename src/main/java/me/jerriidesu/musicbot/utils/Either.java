@@ -1,6 +1,5 @@
 package me.jerriidesu.musicbot.utils;
 
-@SuppressWarnings({})
 public class Either<L, R> {
     private final L left;
     private final R right;

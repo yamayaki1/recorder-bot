@@ -5,28 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="52aabf90-1bdf-41b3-a67a-d033bb32ee3b" name="Changes" comment="some smaller cleanups; add todos">
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/MusicBot.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/MusicBot.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/audio/ServerManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/audio/ServerManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/audio/TrackManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/audio/TrackManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/audio/player/LavaPlayerManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/audio/player/LavaPlayerManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/audio/source/spotify/SpotifySourceManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/audio/source/spotify/SpotifySourceManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/audio/source/spotify/SpotifyWeightedTrackSelector.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/audio/source/spotify/SpotifyWeightedTrackSelector.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/Command.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/Command.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/CommandListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/CommandListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/implementations/ClearCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/implementations/ClearCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/implementations/ConnectCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/implementations/ConnectCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/implementations/DebugCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/implementations/DebugCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/implementations/DisconnectCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/implementations/DisconnectCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/implementations/HelpCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/implementations/HelpCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/implementations/PauseCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/implementations/PauseCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/implementations/PlayCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/implementations/PlayCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/implementations/PlaylistCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/implementations/PlaylistCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/implementations/RepeatCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/implementations/RepeatCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/implementations/ResumeCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/implementations/ResumeCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/implementations/SkipCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/implementations/SkipCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/implementations/VolumeCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/commands/implementations/VolumeCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/utils/TrackCache.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/utils/TrackCache.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/utils/Either.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/me/jerriidesu/musicbot/utils/Either.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,23 +32,6 @@
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
                 <item name="musicbot" type="f1a62948:ProjectNode" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="musicbot" type="f1a62948:ProjectNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="musicbot" type="f1a62948:ProjectNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-                <item name="build" type="c8890929:TasksNode$1" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="musicbot" type="f1a62948:ProjectNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-                <item name="shadow" type="c8890929:TasksNode$1" />
               </path>
               <path>
                 <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
@@ -111,7 +76,7 @@
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
+    &quot;settings.editor.selected.configurable&quot;: &quot;vcs.Git&quot;
   },
   &quot;keyToStringList&quot;: {
     &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [

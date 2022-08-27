@@ -81,7 +81,7 @@ public class MusicBot {
         //report version
         logger.info("starting music-bot ({}) ...", botConfig.getBotVersion());
 
-        //init jda-builder
+        //init api-builder
         logger.info("initializing discord-api ...");
 
         discordApi = new DiscordApiBuilder()
