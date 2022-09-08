@@ -4,7 +4,7 @@ plugins {
     id 'java'
 }
 
-group 'me.jerriidesu'
+group 'me.yamayaki'
 version '0.1.0+' + getVersionMetadata()
 
 repositories {
@@ -32,7 +32,7 @@ jar {
     manifest {
         attributes(
                 'Multi-Release': 'true',
-                'Main-Class': 'me.jerriidesu.musicbot.MusicBot'
+                'Main-Class': 'me.yamayaki.musicbot.MusicBot'
         )
     }
 }
