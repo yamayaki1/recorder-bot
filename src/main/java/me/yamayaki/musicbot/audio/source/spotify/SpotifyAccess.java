@@ -18,8 +18,8 @@ public class SpotifyAccess {
 
     public SpotifyAccess() {
         this.spotifyApi = new SpotifyApi.Builder()
-                .setClientId(MusicBot.getConfig().get().getSpotify().getClientId())
-                .setClientSecret(MusicBot.getConfig().get().getSpotify().getClientSecret())
+                .setClientId(MusicBot.CONFIG.get().getSpotify().getClientId())
+                .setClientSecret(MusicBot.CONFIG.get().getSpotify().getClientSecret())
                 .build();
 
         this.clientCredentialsRequest = this.spotifyApi.clientCredentials()

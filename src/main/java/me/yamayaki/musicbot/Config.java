@@ -10,14 +10,14 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class BotConfig {
+public class Config {
     private final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
     private final Path filePath;
 
     private JsonConfig config;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public BotConfig(File file) {
+    public Config(File file) {
         if (!file.exists()) {
             file.mkdirs();
         }
@@ -40,13 +40,13 @@ public class BotConfig {
     }
 
     public void reload() {
-        MusicBot.getLogger().info("reloading config...");
+        MusicBot.LOGGER.info("reloading config...");
         this.config = null;
 
         try {
             this.config = this.gson.fromJson(new String(Files.readAllBytes(this.filePath)), JsonConfig.class);
         } catch (IOException e) {
-            MusicBot.getLogger().error("error reading settings file, generating new one");
+            MusicBot.LOGGER.error("error reading settings file, generating new one");
             this.config = new JsonConfig();
         }
 
@@ -60,22 +60,17 @@ public class BotConfig {
             writer.flush();
             writer.close();
         } catch (IOException e) {
-            MusicBot.getLogger().error("error writing config file", e);
+            MusicBot.LOGGER.error("error writing config file", e);
         }
     }
 
     @SuppressWarnings({"CanBeFinal", "FieldMayBeFinal"})
     public static class JsonConfig {
         private BotOptions bot = new BotOptions();
-        private Reactions reactions = new Reactions();
         private SpotifyConfig spotify = new SpotifyConfig();
 
         public BotOptions getBot() {
             return bot;
-        }
-
-        public Reactions getReactions() {
-            return this.reactions;
         }
 
         public SpotifyConfig getSpotify() {
@@ -86,7 +81,6 @@ public class BotConfig {
         public static class BotOptions {
             private String status = "ONLINE";
             private String token = "";
-            private String prefix = ":";
 
             public String getStatus() {
                 return status;
@@ -94,29 +88,6 @@ public class BotConfig {
 
             public String getToken() {
                 return token;
-            }
-
-            public char getPrefix() {
-                return this.prefix.charAt(0);
-            }
-        }
-
-        @SuppressWarnings({"CanBeFinal", "FieldMayBeFinal", "FieldCanBeLocal"})
-        public static class Reactions {
-            private String success = ":thumbsup:";
-            private String failure = ":x:";
-            private String refuse = ":no_good:";
-
-            public String getSuccess() {
-                return this.success;
-            }
-
-            public String getFailure() {
-                return this.failure;
-            }
-
-            public String getRefuse() {
-                return this.refuse;
             }
         }
 

@@ -35,7 +35,7 @@ public class TrackCache {
         } catch (IOException e) {
             this.cacheInstance = new CacheInstance();
             this.saveFile();
-            MusicBot.getLogger().error("error reading track-cache file, generating new one", e);
+            MusicBot.LOGGER.error("error reading track-cache file, generating new one", e);
         }
     }
 
@@ -43,7 +43,7 @@ public class TrackCache {
         try {
             Files.writeString(this.cacheFile, this.gson.toJson(this.cacheInstance, CacheInstance.class));
         } catch (IOException e) {
-            MusicBot.getLogger().error("error writing track-cache file", e);
+            MusicBot.LOGGER.error("error writing track-cache file", e);
         }
     }
 

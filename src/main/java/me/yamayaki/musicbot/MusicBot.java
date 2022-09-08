@@ -3,7 +3,7 @@ package me.yamayaki.musicbot;
 import me.yamayaki.musicbot.audio.ServerManager;
 import me.yamayaki.musicbot.audio.source.spotify.SpotifyAccess;
 import me.yamayaki.musicbot.audio.source.spotify.SpotifyTrack;
-import me.yamayaki.musicbot.commands.CommandListener;
+import me.yamayaki.musicbot.interactions.InteractionListener;
 import me.yamayaki.musicbot.tasks.AutoSaveHandler;
 import me.yamayaki.musicbot.tasks.CmdLineHandler;
 import me.yamayaki.musicbot.utils.TrackCache;
@@ -13,7 +13,6 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.user.UserStatus;
-import oshi.SystemInfo;
 
 import java.io.File;
 import java.util.concurrent.Executors;
@@ -23,42 +22,22 @@ import java.util.concurrent.TimeUnit;
 public class MusicBot {
     public static final boolean DEBUG = false;
 
-    private static final Logger logger = LogManager.getLogger(MusicBot.class);
-    private static final SystemInfo systemInfo = new SystemInfo();
-    private static final BotConfig botConfig = new BotConfig(new File(".", "config/"));
-    private static final ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(4);
+    public static final Logger LOGGER = LogManager.getLogger(MusicBot.class);
+    public static final Config CONFIG = new Config(new File(".", "config/"));
 
     private static final SpotifyAccess spotifyAccess = new SpotifyAccess();
     private static final TrackCache trackCache = new TrackCache(new File(".", "config/"));
-
     private static ServerManager serverManager = null;
-
+    private final ScheduledExecutorService executorPool = Executors.newScheduledThreadPool(2);
     private DiscordApi discordApi;
-    private CommandListener commandListener = null;
 
     public static void main(String[] args) {
         MusicBot bot = new MusicBot();
         bot.launch();
     }
 
-    public static ScheduledExecutorService getExecutors() {
-        return scheduledThreadPool;
-    }
-
-    public static BotConfig getConfig() {
-        return botConfig;
-    }
-
-    public static Logger getLogger() {
-        return logger;
-    }
-
     public static ServerManager getAudioManager() {
         return serverManager;
-    }
-
-    public static SystemInfo getSystemInfo() {
-        return systemInfo;
     }
 
     public static SpotifyAccess getSpotifyAccess() {
@@ -79,45 +58,34 @@ public class MusicBot {
 
     protected void launch() {
         //report version
-        logger.info("starting music-bot ({}) ...", botConfig.getBotVersion());
+        LOGGER.info("starting music-bot ({}) ...", CONFIG.getBotVersion());
 
         //init api-builder
-        logger.info("initializing discord-api ...");
+        LOGGER.info("initializing discord-api ...");
 
         discordApi = new DiscordApiBuilder()
-                .setToken(botConfig.get().getBot().getToken())
+                .setToken(CONFIG.get().getBot().getToken())
                 .setIntents(Intent.GUILD_MESSAGE_REACTIONS, Intent.GUILD_MESSAGES, Intent.GUILD_VOICE_STATES)
                 .login().join();
 
-        logger.info("discord login successful, continuing ... ");
+        LOGGER.info("discord login successful, continuing ... ");
+        discordApi.addListener(new InteractionListener(this.discordApi));
 
         serverManager = new ServerManager();
 
-        this.registerCommands();
         this.updatePresence();
         this.runTasks();
     }
 
     protected void runTasks() {
-        logger.info("starting tasks and commandline listener ...");
+        LOGGER.info("starting tasks and commandline listener ...");
 
-        scheduledThreadPool.scheduleAtFixedRate(new CmdLineHandler(this), 0, 1, TimeUnit.SECONDS);
-        scheduledThreadPool.scheduleAtFixedRate(new AutoSaveHandler(), 0, 1, TimeUnit.MINUTES);
-    }
-
-    public void registerCommands() {
-        //remove old listener if one is existing
-        if (this.commandListener != null) {
-            this.discordApi.removeListener(this.commandListener);
-            this.commandListener = null;
-        }
-
-        this.commandListener = new CommandListener();
-        this.discordApi.addListener(this.commandListener);
+        executorPool.scheduleAtFixedRate(new CmdLineHandler(this), 0, 1, TimeUnit.SECONDS);
+        executorPool.scheduleAtFixedRate(new AutoSaveHandler(), 0, 1, TimeUnit.MINUTES);
     }
 
     public void updatePresence() {
-        discordApi.updateStatus(UserStatus.fromString(botConfig.get().getBot().getStatus()));
+        discordApi.updateStatus(UserStatus.fromString(CONFIG.get().getBot().getStatus()));
     }
 
     public DiscordApi getAPI() {

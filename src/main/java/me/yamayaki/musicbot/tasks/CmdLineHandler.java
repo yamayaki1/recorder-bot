@@ -26,7 +26,6 @@ public record CmdLineHandler(MusicBot instance) implements Runnable {
             case "end", "stop" -> {
                 MusicBot.getAudioManager().shutdown();
                 this.instance.getAPI().disconnect().join();
-                MusicBot.getExecutors().shutdown();
 
                 MusicBot.getCache().saveFile();
 
@@ -35,13 +34,12 @@ public record CmdLineHandler(MusicBot instance) implements Runnable {
             case "status" -> {
                 Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
 
-                MusicBot.getLogger().info("- GateWay-Ping: {}", this.instance.getAPI().getLatestGatewayLatency().getSeconds());
-                MusicBot.getLogger().info("- Running Threads:");
-                threadSet.forEach(thread -> MusicBot.getLogger().info(threadToString(thread)));
+                MusicBot.LOGGER.info("- GateWay-Ping: {}", this.instance.getAPI().getLatestGatewayLatency().getSeconds());
+                MusicBot.LOGGER.info("- Running Threads:");
+                threadSet.forEach(thread -> MusicBot.LOGGER.info(threadToString(thread)));
             }
             case "reload" -> {
-                MusicBot.getConfig().reload();
-                this.instance.registerCommands();
+                MusicBot.CONFIG.reload();
                 this.instance.updatePresence();
             }
         }

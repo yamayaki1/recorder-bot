@@ -112,6 +112,10 @@ public class TrackManager {
         this.server.getAudioConnection().ifPresent(audioConnection -> audioConnection.setAudioSource(this.audioSource));
     }
 
+    public boolean isConnected() {
+        return this.server.getAudioConnection().isPresent();
+    }
+
     public String getServerName() {
         return this.server.getName();
     }
