@@ -52,7 +52,7 @@ public class DebugCommands implements Command {
                             SystemInfo sys = MusicBot.getSystemInfo();
                             EmbedBuilder embedBuilder = new EmbedBuilder()
                                     .addField("Version", MusicBot.getConfig().getBotVersion())
-                                    .addField("Repository", "https://github.com/jerriidesu/musicbot")
+                                    .addField("Repository", "https://github.com/yamayaki1/musicbot")
                                     .addField("Entwickler", "Yamayaki (<@310370479380627458>)")
                                     .setThumbnail("https://avatars.githubusercontent.com/u/65787801?s=100")
                                     .addField("OS", sys.getOperatingSystem().getFamily() + " " + sys.getOperatingSystem().getVersionInfo().toString())
