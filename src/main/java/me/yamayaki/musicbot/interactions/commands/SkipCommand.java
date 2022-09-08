@@ -20,7 +20,7 @@ public class SkipCommand implements Command {
     public void register(DiscordApi api) {
         SlashCommand.with(getName(), "Überspringe Lieder in der Playlist.")
                 .setEnabledInDms(false)
-                .addOption(SlashCommandOption.createDecimalOption("amount", "Anzahl", true, 1.0, 20.0))
+                .addOption(SlashCommandOption.createDecimalOption("amount", "Anzahl", false, 1.0, 20.0))
                 .createGlobal(api).join();
     }
 
