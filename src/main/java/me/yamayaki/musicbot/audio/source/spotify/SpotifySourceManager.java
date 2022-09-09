@@ -69,11 +69,11 @@ public class SpotifySourceManager implements AudioSourceManager {
         }
 
         String trackId = matcher.group(1);
-        SpotifyTrack spotifyTrack = MusicBot.getSpotifyCache().fromCache(trackId).orElseGet(() -> {
+        SpotifyTrack spotifyTrack = MusicBot.getCache().getSpotifyCache().getValue(trackId).orElseGet(() -> {
             try {
                 Track track = MusicBot.getSpotifyAccess().getSpotifyApi().getTrack(trackId).build().execute();
                 SpotifyTrack spTrack = new SpotifyTrack(track);
-                MusicBot.getSpotifyCache().toCache(trackId, spTrack);
+                MusicBot.getCache().getSpotifyCache().putValue(trackId, spTrack);
                 return spTrack;
             } catch (Exception exception) {
                 throw new FriendlyException(exception.getMessage(), FriendlyException.Severity.FAULT, exception);
@@ -117,11 +117,11 @@ public class SpotifySourceManager implements AudioSourceManager {
 
             for (PlaylistTrack item : playlist.getTracks().getItems()) {
                 String trackId = item.getTrack().getId();
-                SpotifyTrack spotifyTrack = MusicBot.getSpotifyCache().fromCache(trackId).orElseGet(() -> {
+                SpotifyTrack spotifyTrack = MusicBot.getCache().getSpotifyCache().getValue(trackId).orElseGet(() -> {
                     try {
                         Track track = MusicBot.getSpotifyAccess().getSpotifyApi().getTrack(trackId).build().execute();
                         SpotifyTrack spTrack = new SpotifyTrack(track);
-                        MusicBot.getSpotifyCache().toCache(trackId, spTrack);
+                        MusicBot.getCache().getSpotifyCache().putValue(trackId, spTrack);
                         return spTrack;
                     } catch (Exception exception) {
                         throw new FriendlyException(exception.getMessage(), FriendlyException.Severity.FAULT, exception);
@@ -142,7 +142,7 @@ public class SpotifySourceManager implements AudioSourceManager {
             return null;
         }
 
-        String ytIdentifier = MusicBot.getYouTubeCache().fromCache(track.getIdentifier()).orElseGet(() -> {
+        String ytIdentifier = MusicBot.getCache().getYoutubeCache().getValue(track.getIdentifier()).orElseGet(() -> {
             AudioItem youtubeMusicItem = LavaSourceManager.youtubeSource.loadItem(null, new AudioReference("ytmsearch:" + track.getName() + " - " + track.getArtist(), track.getName()));
             if (!(youtubeMusicItem instanceof AudioPlaylist)) {
                 return null;
@@ -150,7 +150,7 @@ public class SpotifySourceManager implements AudioSourceManager {
 
             Either<AudioTrack, Boolean> weightedResult = SpotifyWeightedTrackSelector.getWeightedTrack(track, ((AudioPlaylist) youtubeMusicItem).getTracks());
             if (weightedResult.getRight()) {
-                MusicBot.getYouTubeCache().toCache(track.getIdentifier(), weightedResult.getLeft().getIdentifier());
+                MusicBot.getCache().getYoutubeCache().putValue(track.getIdentifier(), weightedResult.getLeft().getIdentifier());
             }
 
             return weightedResult.getLeft().getIdentifier();

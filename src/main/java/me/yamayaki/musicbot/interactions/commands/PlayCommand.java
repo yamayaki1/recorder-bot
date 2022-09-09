@@ -3,7 +3,7 @@ package me.yamayaki.musicbot.interactions.commands;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.TrackManager;
 import me.yamayaki.musicbot.interactions.Command;
-import me.yamayaki.musicbot.tasks.ChannelUtilities;
+import me.yamayaki.musicbot.utils.ChannelUtilities;
 import me.yamayaki.musicbot.utils.Either;
 import me.yamayaki.musicbot.utils.StringTools;
 import org.javacord.api.DiscordApi;
@@ -45,7 +45,7 @@ public class PlayCommand implements Command {
                 String message;
                 if (playerResponse.isSuccess()) {
                     message = playerResponse.getCount() > 1
-                            ? "Es wurden " + playerResponse.getCount() + " Lieder der Playlist hinzugefügt"
+                            ? "Es wurden " + playerResponse.getCount() + " Lieder der Playlist hinzugefügt."
                             : "Ein Lied der Playlist hinzugefügt.";
                 } else {
                     message = "Beim Laden der Lieder ist ein Fehler aufgetreten!";

@@ -1,6 +1,5 @@
-package me.yamayaki.musicbot.tasks;
+package me.yamayaki.musicbot.utils;
 
-import me.yamayaki.musicbot.utils.Either;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.SlashCommandInteraction;
 

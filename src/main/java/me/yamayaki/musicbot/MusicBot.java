@@ -2,9 +2,7 @@ package me.yamayaki.musicbot;
 
 import me.yamayaki.musicbot.audio.ServerManager;
 import me.yamayaki.musicbot.audio.source.spotify.SpotifyAccess;
-import me.yamayaki.musicbot.audio.source.spotify.SpotifyTrack;
 import me.yamayaki.musicbot.interactions.InteractionListener;
-import me.yamayaki.musicbot.tasks.AutoSaveHandler;
 import me.yamayaki.musicbot.tasks.CmdLineHandler;
 import me.yamayaki.musicbot.utils.TrackCache;
 import org.apache.logging.log4j.LogManager;
@@ -13,6 +11,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.user.UserStatus;
+import org.rocksdb.RocksDBException;
 
 import java.io.File;
 import java.util.concurrent.Executors;
@@ -26,8 +25,10 @@ public class MusicBot {
     public static final Config CONFIG = new Config(new File(".", "config/"));
 
     private static final SpotifyAccess spotifyAccess = new SpotifyAccess();
-    private static final TrackCache trackCache = new TrackCache(new File(".", "config/"));
+    private static final TrackCache trackCache = new TrackCache(new File(".", "cache/"));
+
     private static ServerManager serverManager = null;
+
     private final ScheduledExecutorService executorPool = Executors.newScheduledThreadPool(2);
     private DiscordApi discordApi;
 
@@ -46,14 +47,6 @@ public class MusicBot {
 
     public static TrackCache getCache() {
         return trackCache;
-    }
-
-    public static TrackCache.Cache<SpotifyTrack> getSpotifyCache() {
-        return trackCache.getCacheInstance().getSpotifyCache();
-    }
-
-    public static TrackCache.Cache<String> getYouTubeCache() {
-        return trackCache.getCacheInstance().getYouTubeCache();
     }
 
     protected void launch() {
@@ -81,7 +74,6 @@ public class MusicBot {
         LOGGER.info("starting tasks and commandline listener ...");
 
         executorPool.scheduleAtFixedRate(new CmdLineHandler(this), 0, 1, TimeUnit.SECONDS);
-        executorPool.scheduleAtFixedRate(new AutoSaveHandler(), 0, 1, TimeUnit.MINUTES);
     }
 
     public void updatePresence() {
@@ -93,8 +85,13 @@ public class MusicBot {
     }
 
     public void shutdown() {
-        this.discordApi.disconnect().join();
-        this.executorPool.shutdown();
+        try {
+            this.discordApi.disconnect().join();
+            this.executorPool.shutdown();
+            MusicBot.getCache().shutdown();
+        } catch (Exception e) {
+            MusicBot.LOGGER.error(e);
+        }
 
         System.exit(1);
     }

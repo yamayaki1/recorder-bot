@@ -20,3 +20,4 @@ bin/
 # musicbot
 logs/
 config/
+cache/

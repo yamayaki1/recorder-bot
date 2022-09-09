@@ -23,14 +23,7 @@ public record CmdLineHandler(MusicBot instance) implements Runnable {
 
     public void runCommand(String command) {
         switch (command) {
-            case "end", "stop" -> {
-                MusicBot.getAudioManager().shutdown();
-                this.instance.getAPI().disconnect().join();
-
-                MusicBot.getCache().saveFile();
-
-                System.exit(0);
-            }
+            case "end", "stop" -> this.instance.shutdown();
             case "status" -> {
                 Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
 

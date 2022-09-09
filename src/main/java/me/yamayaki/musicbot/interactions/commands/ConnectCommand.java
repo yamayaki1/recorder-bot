@@ -1,7 +1,7 @@
 package me.yamayaki.musicbot.interactions.commands;
 
 import me.yamayaki.musicbot.interactions.Command;
-import me.yamayaki.musicbot.tasks.ChannelUtilities;
+import me.yamayaki.musicbot.utils.ChannelUtilities;
 import me.yamayaki.musicbot.utils.Either;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.server.Server;
