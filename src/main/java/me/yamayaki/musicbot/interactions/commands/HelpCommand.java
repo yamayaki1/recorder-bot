@@ -6,6 +6,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.SlashCommand;
+import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
 
 public class HelpCommand implements Command {
@@ -15,10 +16,9 @@ public class HelpCommand implements Command {
     }
 
     @Override
-    public void register(DiscordApi api) {
-        SlashCommand.with(getName(), "Zeige alle vorhandene Befehle")
-                .setEnabledInDms(false)
-                .createGlobal(api).join();
+    public SlashCommandBuilder register(DiscordApi api) {
+        return SlashCommand.with(getName(), "Zeige alle vorhandene Befehle")
+                .setEnabledInDms(false);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class HelpCommand implements Command {
                 .addField("Music überspringen*", "/skip [track-id]")
                 .addField("Lautstärke ändern", "/volume <0-120>")
                 .addField("Playlist anzeigen*", "/playlist")
-                .addField("Playlist wiederholen*", "/repeat")
+                .addField("Playlist wiederholen*", "/loop")
                 .addField("Playlist leeren", "/clear")
                 .addField("*", "Indev-Funktion");
 

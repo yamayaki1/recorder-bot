@@ -6,6 +6,7 @@ import me.yamayaki.musicbot.utils.Either;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.SlashCommand;
+import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
 
 public class ClearCommand implements Command {
@@ -15,10 +16,9 @@ public class ClearCommand implements Command {
     }
 
     @Override
-    public void register(DiscordApi api) {
-        SlashCommand.with(getName(), "Lösche alle Lieder aus der Playlist.")
-                .setEnabledInDms(false)
-                .createGlobal(api).join();
+    public SlashCommandBuilder register(DiscordApi api) {
+        return SlashCommand.with(getName(), "Lösche alle Lieder aus der Playlist.")
+                .setEnabledInDms(false);
     }
 
     @Override
@@ -27,7 +27,8 @@ public class ClearCommand implements Command {
 
         MusicBot.getAudioManager()
                 .getTrackManager(either.getRight())
-                .clearTracks();
+                .getPlaylist()
+                .clearList();
 
         interUpdater.setContent("Playlist gecleart.").update();
     }

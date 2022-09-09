@@ -6,6 +6,7 @@ import me.yamayaki.musicbot.utils.Either;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.SlashCommand;
+import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
 
 public class DisconnectCommand implements Command {
@@ -15,10 +16,9 @@ public class DisconnectCommand implements Command {
     }
 
     @Override
-    public void register(DiscordApi api) {
-        SlashCommand.with(getName(), "Trenne die Verbindung des Bots.")
-                .setEnabledInDms(false)
-                .createGlobal(api).join();
+    public SlashCommandBuilder register(DiscordApi api) {
+        return SlashCommand.with(getName(), "Trenne die Verbindung des Bots.")
+                .setEnabledInDms(false);
     }
 
     @Override

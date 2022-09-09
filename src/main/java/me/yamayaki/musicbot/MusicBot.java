@@ -91,4 +91,11 @@ public class MusicBot {
     public DiscordApi getAPI() {
         return this.discordApi;
     }
+
+    public void shutdown() {
+        this.discordApi.disconnect().join();
+        this.executorPool.shutdown();
+
+        System.exit(1);
+    }
 }

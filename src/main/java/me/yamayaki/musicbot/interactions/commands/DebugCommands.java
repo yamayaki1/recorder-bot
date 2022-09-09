@@ -10,6 +10,7 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.SlashCommand;
+import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
 import org.javacord.api.interaction.SlashCommandOption;
 import org.javacord.api.interaction.SlashCommandOptionChoiceBuilder;
@@ -22,16 +23,15 @@ public class DebugCommands implements Command {
     }
 
     @Override
-    public void register(DiscordApi api) {
-        SlashCommand.withRequiredPermissions(getName(), "Befehle für die Botentwicklung", PermissionType.ADMINISTRATOR)
+    public SlashCommandBuilder register(DiscordApi api) {
+        return SlashCommand.withRequiredPermissions(getName(), "Befehle für die Botentwicklung", PermissionType.ADMINISTRATOR)
                 .setEnabledInDms(false)
                 .addOption(SlashCommandOption.createWithChoices(SlashCommandOptionType.STRING, "subcommand", "Unterbefehl", true,
                         new SlashCommandOptionChoiceBuilder().setName("Über den Bot").setValue("about"),
                         new SlashCommandOptionChoiceBuilder().setName("Aktueller Song").setValue("current_song"),
                         new SlashCommandOptionChoiceBuilder().setName("Ausgabe fixen").setValue("fix_output"),
                         new SlashCommandOptionChoiceBuilder().setName("Letzte Fehler").setValue("last_errors")
-                ))
-                .createGlobal(api).join();
+                ));
     }
 
     @Override
@@ -53,6 +53,7 @@ public class DebugCommands implements Command {
             case "current_song" -> {
                 AudioTrack audioTrack = MusicBot.getAudioManager()
                         .getTrackManager(either.getRight())
+                        .getPlaylist()
                         .getCurrentTrack();
 
                 if (audioTrack == null) {

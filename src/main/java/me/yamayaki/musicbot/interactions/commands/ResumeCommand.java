@@ -6,6 +6,7 @@ import me.yamayaki.musicbot.utils.Either;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.SlashCommand;
+import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
 
 public class ResumeCommand implements Command {
@@ -15,10 +16,9 @@ public class ResumeCommand implements Command {
     }
 
     @Override
-    public void register(DiscordApi api) {
-        SlashCommand.with(getName(), "Setze das aktuelle Lied fort.")
-                .setEnabledInDms(false)
-                .createGlobal(api).join();
+    public SlashCommandBuilder register(DiscordApi api) {
+        return SlashCommand.with(getName(), "Setze das aktuelle Lied fort.")
+                .setEnabledInDms(false);
     }
 
     @Override
@@ -26,7 +26,7 @@ public class ResumeCommand implements Command {
         var interUpdater = either.getLeft().respondLater(true).join();
         MusicBot.getAudioManager()
                 .getTrackManager(either.getRight())
-                .resumeTrack();
+                .setPaused(false);
 
         interUpdater.setContent("Lied fortgesetzt.").update();
     }

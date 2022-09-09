@@ -3,6 +3,7 @@ package me.yamayaki.musicbot.audio;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.audio.handler.AudioEventHandler;
 import me.yamayaki.musicbot.audio.handler.LoadResultHandler;
+import me.yamayaki.musicbot.audio.handler.LoaderResponse;
 import me.yamayaki.musicbot.audio.player.LavaAudioSource;
 import org.javacord.api.entity.server.Server;
 
@@ -14,34 +15,24 @@ public class TrackManager {
     private final Server server;
 
     private final LavaAudioSource audioSource;
-    private final List<AudioTrack> trackList = new ArrayList<>();
+    private final PlaylistManager playlistManager;
 
-    public boolean repeat = false;
-    public boolean paused = false;
     public String lastError = "";
 
     public TrackManager(Server server) {
         this.server = server;
         this.audioSource = new LavaAudioSource(server.getApi(), new AudioEventHandler(this));
+        this.playlistManager = new PlaylistManager(this);
     }
 
-    public void tryLoadItems(String song, Consumer<Boolean> consumer) {
+    public void tryLoadItems(String song, Consumer<LoaderResponse> consumer) {
         this.audioSource.getPlayerManager()
                 .loadItem(song, new LoadResultHandler(this, consumer));
     }
 
-    public boolean hasFinished() {
-        return this.audioSource
-                .hasFinished();
-    }
-
     public void addTrack(AudioTrack track) {
-        if (track == null) {
-            return;
-        }
-
-        this.trackList.add(track);
-        this.startTrackIfIdle();
+        this.playlistManager.addTrack(track);
+        this.resumeOrNext();
     }
 
     public void skipTrack(int count) {
@@ -51,56 +42,36 @@ public class TrackManager {
 
         for (int i = 0; i < count; i++) {
             this.audioSource.getAudioPlayer().stopTrack();
-            this.startTrackIfIdle();
+            this.resumeOrNext();
         }
     }
 
-    public List<AudioTrack> getTracks() {
-        return new ArrayList<>(this.trackList);
-    }
-
-    public void clearTracks() {
-        this.trackList.clear();
-    }
-
-    //TODO make this more resilient
-    public void startTrackIfIdle() {
-        if (this.paused) {
-            this.resumeTrack();
+    public void resumeOrNext() {
+        if (this.isPaused()) {
+            this.setPaused(false);
         }
 
-        if (this.audioSource.hasFinished() && this.trackList.size() != 0) {
-            if (this.repeat) {
-                AudioTrack oldTrack = this.trackList.get(0);
-                this.trackList.add(oldTrack.makeClone());
-            }
-
-            this.audioSource.getAudioPlayer().playTrack(this.trackList.get(0));
-            this.trackList.remove(0);
+        if (this.audioSource.hasFinished() && this.playlistManager.hasNext()) {
+            this.audioSource.getAudioPlayer()
+                    .playTrack(this.playlistManager.getNext());
         }
 
         this.fixAudioSource();
     }
 
-    public AudioTrack getCurrentTrack() {
+    public boolean hasFinished() {
+        return this.audioSource
+                .hasFinished();
+    }
+
+    public void setPaused(boolean bool) {
+        this.audioSource.getAudioPlayer()
+                .setPaused(bool);
+    }
+
+    public boolean isPaused() {
         return this.audioSource.getAudioPlayer()
-                .getPlayingTrack();
-    }
-
-    public void pauseTrack() {
-        this.audioSource.getAudioPlayer()
-                .setPaused(true);
-    }
-
-    public void resumeTrack() {
-        this.audioSource.getAudioPlayer()
-                .setPaused(false);
-    }
-
-    //TODO make this more resilient
-    public boolean toggleRepeat() {
-        this.repeat = !this.repeat;
-        return repeat;
+                .isPaused();
     }
 
     public void setVolume(int volume) {
@@ -112,8 +83,8 @@ public class TrackManager {
         this.server.getAudioConnection().ifPresent(audioConnection -> audioConnection.setAudioSource(this.audioSource));
     }
 
-    public boolean isConnected() {
-        return this.server.getAudioConnection().isPresent();
+    public PlaylistManager getPlaylist() {
+        return this.playlistManager;
     }
 
     public String getServerName() {
@@ -121,7 +92,7 @@ public class TrackManager {
     }
 
     public void shutdown() {
-        this.clearTracks();
+        this.playlistManager.clearList();
         this.audioSource.getAudioPlayer().stopTrack();
     }
 }

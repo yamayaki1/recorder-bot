@@ -1,10 +1,12 @@
 package me.yamayaki.musicbot.interactions.commands;
 
 import me.yamayaki.musicbot.interactions.Command;
+import me.yamayaki.musicbot.tasks.ChannelUtilities;
 import me.yamayaki.musicbot.utils.Either;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.SlashCommand;
+import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
 
 public class ConnectCommand implements Command {
@@ -14,25 +16,21 @@ public class ConnectCommand implements Command {
     }
 
     @Override
-    public void register(DiscordApi api) {
-        SlashCommand.with(getName(), "Verbinde den Bot mit einem Sprachkanal.")
-                .setEnabledInDms(false)
-                .createGlobal(api).join();
+    public SlashCommandBuilder register(DiscordApi api) {
+        return SlashCommand.with(getName(), "Verbinde den Bot mit einem Sprachkanal.")
+                .setEnabledInDms(false);
     }
 
     @Override
     public void execute(Either<SlashCommandInteraction, Server> either) {
         var interUpdater = either.getLeft().respondLater(true).join();
-        var optChannel = either.getLeft().getUser()
-                .getConnectedVoiceChannel(either.getRight());
 
-        optChannel.ifPresentOrElse(voiceChannel -> {
-            voiceChannel.connect().thenAccept(audioConnection -> {
-                audioConnection.setSelfDeafened(true);
-                interUpdater.setContent("Verbindung hergstellt.").update();
-            });
+        ChannelUtilities.joinVoiceChannel(either, ()-> {
+            interUpdater.setContent("Verbindung hergstellt.")
+                    .update();
         }, () -> {
-            interUpdater.setContent("Beim Beitreten des Sprachkanals ist ein Fehler aufgetreten. Befindest du dich in einem Kanal?").update();
+            interUpdater.setContent("Beim Beitreten des Sprachkanals ist ein Fehler aufgetreten. Befindest du dich in einem Kanal?")
+                    .update();
         });
     }
 }

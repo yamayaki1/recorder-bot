@@ -42,6 +42,13 @@ public record CmdLineHandler(MusicBot instance) implements Runnable {
                 MusicBot.CONFIG.reload();
                 this.instance.updatePresence();
             }
+            case "reset_commands" -> {
+                MusicBot.LOGGER.info("deleting commands...");
+                this.instance.getAPI().getGlobalSlashCommands().thenAccept(list -> list.forEach(cmd -> cmd.deleteGlobal().join()));
+
+                MusicBot.LOGGER.info("deleted commands, stopping instance ...");
+                this.instance.shutdown();
+            }
         }
     }
 
