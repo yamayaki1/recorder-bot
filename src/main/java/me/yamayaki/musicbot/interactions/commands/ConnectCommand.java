@@ -25,7 +25,7 @@ public class ConnectCommand implements Command {
     public void execute(Either<SlashCommandInteraction, Server> either) {
         var interUpdater = either.getLeft().respondLater(true).join();
 
-        ChannelUtilities.joinVoiceChannel(either, ()-> {
+        ChannelUtilities.joinVoiceChannel(either, () -> {
             interUpdater.setContent("Verbindung hergstellt.")
                     .update();
         }, () -> {

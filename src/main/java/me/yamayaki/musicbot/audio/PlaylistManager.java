@@ -9,6 +9,7 @@ public class PlaylistManager {
     private final List<AudioTrack> trackList;
 
     private AudioTrack currentTrack = null;
+
     public boolean loop = false;
 
     public PlaylistManager(TrackManager trackManager) {
@@ -30,7 +31,7 @@ public class PlaylistManager {
     public List<AudioTrack> getTracks(boolean inclCurrent) {
         final ArrayList<AudioTrack> list = new ArrayList<>();
 
-        if(inclCurrent) {
+        if (inclCurrent) {
             list.add(this.currentTrack);
         }
 
@@ -48,11 +49,11 @@ public class PlaylistManager {
     }
 
     public AudioTrack getNext() {
-        if(!this.hasNext()) {
+        if (!this.hasNext()) {
             return null;
         }
 
-        if(this.loop) {
+        if (this.loop) {
             this.trackList.add(this.currentTrack.makeClone());
         }
 

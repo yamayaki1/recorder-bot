@@ -11,7 +11,7 @@ public class ChannelUtilities {
         var curChannel = either.getRight()
                 .getAudioConnection();
 
-        if(curChannel.isPresent() && curChannel.get().getChannel().equals(optChannel.orElse(null))) {
+        if (curChannel.isPresent() && curChannel.get().getChannel().equals(optChannel.orElse(null))) {
             onSuccess.run();
             return;
         }

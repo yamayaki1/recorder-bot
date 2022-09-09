@@ -21,27 +21,27 @@ public class LoadResultHandler implements AudioLoadResultHandler {
     @Override
     public void trackLoaded(AudioTrack track) {
         this.trackManager.addTrack(track);
-        this.consumer.accept(new LoaderResponse(true));
+        this.consumer.accept(new LoaderResponse(true, 1));
     }
 
     @Override
     public void playlistLoaded(AudioPlaylist playlist) {
-        this.consumer.accept(new LoaderResponse(true));
-
         if (playlist.isSearchResult()) {
             this.trackManager.addTrack(playlist.getTracks().get(0));
+            this.consumer.accept(new LoaderResponse(true, 1));
             return;
         }
 
         for (AudioTrack track : playlist.getTracks()) {
             this.trackManager.addTrack(track);
+            this.consumer.accept(new LoaderResponse(true, playlist.getTracks().size()));
         }
     }
 
     @Override
     public void noMatches() {
         this.trackManager.lastError = "no matches";
-        this.consumer.accept(new LoaderResponse(false));
+        this.consumer.accept(new LoaderResponse(false, 0, "Keine Ergebnisse."));
     }
 
     @Override
@@ -49,6 +49,6 @@ public class LoadResultHandler implements AudioLoadResultHandler {
         MusicBot.LOGGER.error("Failed to load track: {}", exception.getMessage(), exception);
 
         this.trackManager.lastError = exception.getMessage();
-        this.consumer.accept(new LoaderResponse(false));
+        this.consumer.accept(new LoaderResponse(false, 0, "Fehler beim Laden des Tracks."));
     }
 }

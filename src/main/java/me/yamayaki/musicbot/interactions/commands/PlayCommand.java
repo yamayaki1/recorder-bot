@@ -35,15 +35,22 @@ public class PlayCommand implements Command {
                 .getAudioManager()
                 .getTrackManager(either.getRight());
 
-
-        ChannelUtilities.joinVoiceChannel(either, ()-> {
+        ChannelUtilities.joinVoiceChannel(either, () -> {
             String song = either.getLeft().getOptionStringValueByName("query").orElse("");
             if (!StringTools.isURL(song) && !song.contains("ytmsearch:") && !song.contains("ytsearch:")) {
                 song = "ytmsearch:" + song;
             }
 
             trackManager.tryLoadItems(song, playerResponse -> {
-                String message = playerResponse.isSuccess() ? "Lied(er) erfolgreich geladen." : "Beim Laden der Lieder ist ein Fehler aufgetreten!";
+                String message;
+                if (playerResponse.isSuccess()) {
+                    message = playerResponse.getCount() > 1
+                            ? "Es wurden " + playerResponse.getCount() + " Lieder der Playlist hinzugefügt"
+                            : "Ein Lied der Playlist hinzugefügt.";
+                } else {
+                    message = "Beim Laden der Lieder ist ein Fehler aufgetreten!";
+                }
+
                 interUpdater.setContent(message).update();
             });
         }, () -> interUpdater.setContent("Beim Beitreten des Sprachkanals ist ein Fehler aufgetreten. Befindest du dich in einem Kanal?").update());

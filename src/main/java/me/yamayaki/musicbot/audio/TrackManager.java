@@ -7,8 +7,6 @@ import me.yamayaki.musicbot.audio.handler.LoaderResponse;
 import me.yamayaki.musicbot.audio.player.LavaAudioSource;
 import org.javacord.api.entity.server.Server;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Consumer;
 
 public class TrackManager {

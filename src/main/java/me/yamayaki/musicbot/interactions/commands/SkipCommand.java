@@ -47,7 +47,7 @@ public class SkipCommand implements Command {
             final List<SlashCommandOptionChoice> choices = new ArrayList<>();
             for (int i = 0; i < trackList.size(); i++) {
                 AudioTrackInfo trackInfo = trackList.get(i).getInfo();
-                choices.add(SlashCommandOptionChoice.create(i+1+". "+trackInfo.title + " - "+ trackInfo.author.replaceAll("- Topic", ""), i+1));
+                choices.add(SlashCommandOptionChoice.create(i + 1 + ". " + trackInfo.title + " - " + trackInfo.author.replaceAll("- Topic", ""), i + 1));
             }
 
             event.getAutocompleteInteraction().respondWithChoices(choices);
