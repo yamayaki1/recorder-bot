@@ -46,7 +46,7 @@ public class DebugCommands implements Command {
                         .addField("Entwickler", "Yamayaki (<@310370479380627458>)")
                         .setThumbnail("https://avatars.githubusercontent.com/u/65787801?s=100")
                         .addField("Betriebssystem", System.getProperty("os.name"))
-                        .addField("Arbeitsspeicher", ((Runtime.getRuntime().freeMemory() - Runtime.getRuntime().totalMemory()) / 1048576) + "/" + (Runtime.getRuntime().totalMemory() / 1048576) + "MB");
+                        .addField("Arbeitsspeicher", ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576) + "/" + (Runtime.getRuntime().totalMemory() / 1048576) + "MB");
 
                 interUpdater.addEmbed(embedBuilder).update();
             }

@@ -44,7 +44,7 @@ public class InteractionListener implements SlashCommandCreateListener {
     }
 
     private void registerCommands(DiscordApi discordApi, Command... commands) {
-        MusicBot.LOGGER.info("registering {} commands ...", Arrays.stream(commands).count());
+        MusicBot.LOGGER.info("registering {} commands, this may take a minute ...", Arrays.stream(commands).count());
 
         for (Command clazz : commands) {
             clazz.register(discordApi);
