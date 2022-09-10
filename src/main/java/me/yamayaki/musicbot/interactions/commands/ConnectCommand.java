@@ -17,7 +17,7 @@ public class ConnectCommand implements Command {
 
     @Override
     public SlashCommandBuilder register(DiscordApi api) {
-        return SlashCommand.with(getName(), "Verbinde den Bot mit einem Sprachkanal.")
+        return SlashCommand.with(getName(), "Verbinde den Bot mit einen Sprachkanal.")
                 .setEnabledInDms(false);
     }
 
@@ -29,7 +29,7 @@ public class ConnectCommand implements Command {
             interUpdater.setContent("Verbindung hergstellt.")
                     .update();
         }, () -> {
-            interUpdater.setContent("Beim Beitreten des Sprachkanals ist ein Fehler aufgetreten. Befindest du dich in einem Kanal?")
+            interUpdater.setContent("Beim Beitreten des Sprachkanals ist ein Fehler aufgetreten. Befindest du dich in einen Kanal?")
                     .update();
         });
     }

@@ -30,6 +30,6 @@ public class ClearCommand implements Command {
                 .getPlaylist()
                 .clearList();
 
-        interUpdater.setContent("Playlist gecleart.").update();
+        interUpdater.setContent("Alle Lieder aus der Playlist entfernt.").update();
     }
 }

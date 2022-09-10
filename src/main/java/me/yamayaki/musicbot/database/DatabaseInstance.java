@@ -16,6 +16,8 @@ import java.util.Optional;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class DatabaseInstance<K, V> {
+    private static boolean shownStats = false;
+
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final RocksDB database;
 
@@ -25,6 +27,11 @@ public class DatabaseInstance<K, V> {
     public DatabaseInstance(File file, DatabaseSpec<K, V> spec) {
         if (file.mkdirs() && !file.isDirectory()) {
             throw new RuntimeException("Couldn't create directory: " + file);
+        }
+
+        if (!shownStats) {
+            MusicBot.LOGGER.info("using rocksdb ({}) as caching backend ...", RocksDB.rocksdbVersion());
+            shownStats = true;
         }
 
         this.keySerializer = DefaultSerializers.getSerializer(spec.key);
@@ -68,12 +75,11 @@ public class DatabaseInstance<K, V> {
             return data != null ? Optional.of(this.valSerializer.deserialize(data)) : Optional.empty();
         } catch (RocksDBException | IOException e) {
             MusicBot.LOGGER.error("Error reading value: ", e);
+            return Optional.empty();
         } finally {
             this.lock.readLock()
                     .unlock();
         }
-
-        return Optional.empty();
     }
 
     public void close() throws RocksDBException {

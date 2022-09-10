@@ -45,7 +45,7 @@ public class DebugCommands implements Command {
                         .addField("Repository", "https://github.com/yamayaki1/musicbot")
                         .addField("Entwickler", "Yamayaki (<@310370479380627458>)")
                         .setThumbnail("https://avatars.githubusercontent.com/u/65787801?s=100")
-                        .addField("Betriebssystem", System.getProperty("os.name"))
+                        .addField("Betriebssystem", String.format("%s (%s) %s", System.getProperty("os.name"), System.getProperty("os.arch"), System.getProperty("os.version")))
                         .addField("Arbeitsspeicher", ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576) + "/" + (Runtime.getRuntime().totalMemory() / 1048576) + "MB");
 
                 interUpdater.addEmbed(embedBuilder).update();

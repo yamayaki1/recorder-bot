@@ -68,7 +68,10 @@ public class SkipCommand implements Command {
         int max_amount = manager.getPlaylist().getTracks(false).size() + 1;
 
         if (amount > max_amount || manager.hasFinished()) {
-            interUpdater.setContent("Es können maximal " + (max_amount - 1) + " Lieder übersprungen werden.").update();
+            String message = max_amount - 1 > 1
+                    ? "Es können maximal " + max_amount + " Lieder übersprungen werden."
+                    : "Es kann maximal ein Lied übersprungen werden.";
+            interUpdater.setContent(message).update();
             return;
         }
 
@@ -76,6 +79,6 @@ public class SkipCommand implements Command {
                 .getTrackManager(either.getRight())
                 .skipTrack(amount);
 
-        interUpdater.setContent(amount + " Lieder übersprungen.").update();
+        interUpdater.setContent(amount > 1 ? amount + " Lieder übersprungen." : "Ein Lied übersprungen.").update();
     }
 }
