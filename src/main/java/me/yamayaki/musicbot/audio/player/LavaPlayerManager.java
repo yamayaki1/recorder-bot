@@ -19,7 +19,7 @@ public class LavaPlayerManager {
 
     public static AudioPlayer getPlayer(AudioPlayerManager audioPlayerManager, AudioEventHandler audioEventHandler) {
         AudioPlayer audioPlayer = audioPlayerManager.createPlayer();
-        audioPlayer.setVolume(50);
+        audioPlayer.setVolume(80);
         audioPlayer.addListener(audioEventHandler);
 
         return audioPlayer;

@@ -4,6 +4,7 @@ import me.yamayaki.musicbot.audio.ServerManager;
 import me.yamayaki.musicbot.audio.source.spotify.SpotifyAccess;
 import me.yamayaki.musicbot.interactions.InteractionListener;
 import me.yamayaki.musicbot.tasks.CmdLineHandler;
+import me.yamayaki.musicbot.tasks.ShutdownHandler;
 import me.yamayaki.musicbot.utils.TrackCache;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -73,6 +74,7 @@ public class MusicBot {
         LOGGER.info("starting tasks and commandline listener ...");
 
         executorPool.scheduleAtFixedRate(new CmdLineHandler(this), 0, 1, TimeUnit.SECONDS);
+        Runtime.getRuntime().addShutdownHook(new ShutdownHandler(this));
     }
 
     public void updatePresence() {
@@ -84,6 +86,7 @@ public class MusicBot {
     }
 
     public void shutdown() {
+        MusicBot.LOGGER.info("shutting down ...");
         try {
             this.discordApi.disconnect().join();
             this.executorPool.shutdown();
@@ -91,7 +94,5 @@ public class MusicBot {
         } catch (Exception e) {
             MusicBot.LOGGER.error(e);
         }
-
-        System.exit(1);
     }
 }
