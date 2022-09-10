@@ -50,7 +50,10 @@ public class SpotifyWeightedTrackSelector {
             }
 
             //when both, the authors and the titles match, we can early exit and speed up this process quite a lot
-            if (youtubeTrack.getInfo().author.equalsIgnoreCase(spotifyTrack.getArtist()) && youtubeTrack.getInfo().title.equalsIgnoreCase(spotifyTrack.getName())) {
+            if (
+                    (youtubeTrack.getInfo().author.equalsIgnoreCase(spotifyTrack.getArtist()) && youtubeTrack.getInfo().title.equalsIgnoreCase(spotifyTrack.getName()))
+                            || (youtubeTrack.getInfo().author.equalsIgnoreCase(spotifyTrack.getArtist() + " - Topic") && youtubeTrack.getInfo().title.equalsIgnoreCase(spotifyTrack.getName()))
+            ) {
                 this.titleExactExists = true;
                 this.authorExactExists = true;
                 this.perfectMatch = true;

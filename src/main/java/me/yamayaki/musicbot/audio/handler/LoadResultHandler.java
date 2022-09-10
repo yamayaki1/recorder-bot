@@ -49,6 +49,6 @@ public class LoadResultHandler implements AudioLoadResultHandler {
         MusicBot.LOGGER.error("Failed to load track: {}", exception.getMessage(), exception);
 
         this.trackManager.lastError = exception.getMessage();
-        this.consumer.accept(new LoaderResponse(false, 0, "Fehler beim Laden des Tracks."));
+        this.consumer.accept(new LoaderResponse(false, 0, exception.getMessage()));
     }
 }

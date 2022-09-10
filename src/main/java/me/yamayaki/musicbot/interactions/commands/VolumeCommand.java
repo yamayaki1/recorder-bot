@@ -21,7 +21,7 @@ public class VolumeCommand implements Command {
         return SlashCommand.with(getName(), "Stellt die Lautstärke ein.")
                 .setEnabledInDms(false)
                 .addOption(
-                        SlashCommandOption.createDecimalOption("volume", "Lautstärke", true, 0.0, 120.0)
+                        SlashCommandOption.createDecimalOption("volume", "Lautstärke", true, 0.0, 150.0)
                 );
     }
 
