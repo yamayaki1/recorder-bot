@@ -31,7 +31,7 @@ public class PlaylistManager {
     public List<AudioTrack> getTracks(boolean inclCurrent) {
         final ArrayList<AudioTrack> list = new ArrayList<>();
 
-        if (inclCurrent) {
+        if (inclCurrent && this.currentTrack != null) {
             list.add(this.currentTrack);
         }
 

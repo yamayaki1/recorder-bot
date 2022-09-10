@@ -11,7 +11,6 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.user.UserStatus;
-import org.rocksdb.RocksDBException;
 
 import java.io.File;
 import java.util.concurrent.Executors;
