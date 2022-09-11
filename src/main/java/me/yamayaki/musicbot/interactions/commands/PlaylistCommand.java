@@ -38,7 +38,7 @@ public class PlaylistCommand implements Command {
 
         if (tracks.size() > 0) {
             for (int i = 0; i < tracks.size(); i++) {
-                if(i > 24) {
+                if (i > 24) {
                     break;
                 }
 

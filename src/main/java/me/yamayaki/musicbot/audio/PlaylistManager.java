@@ -1,11 +1,13 @@
 package me.yamayaki.musicbot.audio;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import me.yamayaki.musicbot.MusicBot;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PlaylistManager {
+    private final TrackManager trackManager;
     private final List<AudioTrack> trackList;
 
     private AudioTrack currentTrack = null;
@@ -13,7 +15,9 @@ public class PlaylistManager {
     public boolean loop = false;
 
     public PlaylistManager(TrackManager trackManager) {
+        this.trackManager = trackManager;
         this.trackList = new ArrayList<>();
+        this.restore();
     }
 
     public AudioTrack getCurrentTrack() {
@@ -66,5 +70,36 @@ public class PlaylistManager {
     public boolean toggleRepeat() {
         this.loop = !this.loop;
         return this.loop;
+    }
+
+    public void restore() {
+        var response = MusicBot.getCache()
+                .getPlaylistCache()
+                .getValue(this.trackManager.getServerId());
+
+        if (response.isEmpty()) {
+            return;
+        }
+
+        for (String url : response.get()) {
+            this.trackManager.tryLoadItems(url, loaderResponse -> {
+                if(MusicBot.DEBUG) {
+                    MusicBot.LOGGER.info("restored track {}", loaderResponse.getTitle());
+                }
+            });
+        }
+
+        MusicBot.getCache()
+                .getPlaylistCache()
+                .deleteValue(this.trackManager.getServerId());
+    }
+
+    public void store() {
+        final List<String> ids = new ArrayList<>();
+        trackList.forEach(track -> ids.add(track.getInfo().uri));
+
+        MusicBot.getCache()
+                .getPlaylistCache()
+                .putValue(this.trackManager.getServerId(), ids.toArray(String[]::new));
     }
 }

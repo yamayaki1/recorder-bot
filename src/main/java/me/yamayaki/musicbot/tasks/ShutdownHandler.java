@@ -10,8 +10,7 @@ public class ShutdownHandler extends Thread {
     }
 
     @Override
-    public void run()
-    {
+    public void run() {
         this.instance.shutdown();
     }
 }

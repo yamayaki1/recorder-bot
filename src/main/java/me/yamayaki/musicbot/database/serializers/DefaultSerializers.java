@@ -3,7 +3,9 @@ package me.yamayaki.musicbot.database.serializers;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceMap;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import me.yamayaki.musicbot.audio.source.spotify.SpotifyTrack;
+import me.yamayaki.musicbot.database.serializers.impl.LongSerializer;
 import me.yamayaki.musicbot.database.serializers.impl.SpotifyTrackSerializer;
+import me.yamayaki.musicbot.database.serializers.impl.StringArrSerializer;
 import me.yamayaki.musicbot.database.serializers.impl.StringSerializer;
 
 public class DefaultSerializers {
@@ -12,6 +14,8 @@ public class DefaultSerializers {
     static {
         serializers.put(String.class, new StringSerializer());
         serializers.put(SpotifyTrack.class, new SpotifyTrackSerializer());
+        serializers.put(Long.class, new LongSerializer());
+        serializers.put(String[].class, new StringArrSerializer());
     }
 
     @SuppressWarnings("unchecked")

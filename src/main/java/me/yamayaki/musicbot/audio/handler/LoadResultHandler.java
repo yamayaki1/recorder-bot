@@ -21,7 +21,7 @@ public class LoadResultHandler implements AudioLoadResultHandler {
     @Override
     public void trackLoaded(AudioTrack track) {
         this.trackManager.addTrack(track);
-        this.consumer.accept(new LoaderResponse(true, 1));
+        this.consumer.accept(new LoaderResponse(true, 1, "", track.getInfo().title));
     }
 
     @Override

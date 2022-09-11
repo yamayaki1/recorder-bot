@@ -9,4 +9,7 @@ public class CacheSpecs {
 
     public static final DatabaseSpec<String, String> YOUTUBE_CACHE =
             new DatabaseSpec<>(String.class, String.class);
+
+    public static final DatabaseSpec<Long, String[]> PLAYLIST_CACHE =
+            new DatabaseSpec<>(Long.class, String[].class);
 }

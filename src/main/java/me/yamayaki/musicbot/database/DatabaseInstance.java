@@ -3,6 +3,7 @@ package me.yamayaki.musicbot.database;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.database.serializers.DefaultSerializers;
 import me.yamayaki.musicbot.database.serializers.Serializer;
+import org.rocksdb.CompactionStyle;
 import org.rocksdb.CompressionType;
 import org.rocksdb.Options;
 import org.rocksdb.ReadOptions;
@@ -37,7 +38,13 @@ public class DatabaseInstance<K, V> {
         this.keySerializer = DefaultSerializers.getSerializer(spec.key);
         this.valSerializer = DefaultSerializers.getSerializer(spec.value);
 
-        try (Options options = new Options().setCreateIfMissing(true).setLogFileTimeToRoll(60).setCompressionType(CompressionType.SNAPPY_COMPRESSION)) {
+        try (
+                Options options = new Options()
+                        .setCreateIfMissing(true)
+                        .setKeepLogFileNum(2)
+                        .setCompressionType(CompressionType.SNAPPY_COMPRESSION)
+                        .setCompactionStyle(CompactionStyle.FIFO)
+        ) {
             this.database = RocksDB.open(options, file.getPath());
         } catch (RocksDBException e) {
             throw new RuntimeException("Failed to open database: ", e);
@@ -78,6 +85,23 @@ public class DatabaseInstance<K, V> {
             return Optional.empty();
         } finally {
             this.lock.readLock()
+                    .unlock();
+        }
+    }
+
+    public void deleteValue(K key) {
+        this.lock.writeLock()
+                .lock();
+
+        try (WriteOptions writeOptions = new WriteOptions()) {
+            this.database.delete(
+                    writeOptions,
+                    this.keySerializer.serialize(key)
+            );
+        } catch (RocksDBException | IOException e) {
+            MusicBot.LOGGER.error("Error deleting value: ", e);
+        } finally {
+            this.lock.writeLock()
                     .unlock();
         }
     }

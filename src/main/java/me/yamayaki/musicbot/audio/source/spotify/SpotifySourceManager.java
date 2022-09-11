@@ -143,7 +143,7 @@ public class SpotifySourceManager implements AudioSourceManager {
         }
 
         String ytIdentifier = MusicBot.getCache().getYoutubeCache().getValue(track.getIdentifier()).orElseGet(() -> {
-            AudioItem youtubeMusicItem = LavaSourceManager.youtubeSource.loadItem(null, new AudioReference("ytmsearch:" + track.getName() + " - " + track.getArtist(), track.getName()));
+            AudioItem youtubeMusicItem = LavaSourceManager.youtubeSource.loadItem(null, new AudioReference("ytmsearch:" + track.getName().replaceAll("-", "") + " - " + track.getArtist(), track.getName()));
             if (!(youtubeMusicItem instanceof AudioPlaylist)) {
                 return null;
             }

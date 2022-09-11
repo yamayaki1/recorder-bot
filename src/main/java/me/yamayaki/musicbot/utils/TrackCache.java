@@ -10,6 +10,7 @@ import java.io.File;
 public class TrackCache {
     private final DatabaseInstance<String, SpotifyTrack> spotifyCache;
     private final DatabaseInstance<String, String> youtubeCache;
+    private final DatabaseInstance<Long, String[]> playlistCache;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public TrackCache(File cachePath) {
@@ -19,6 +20,7 @@ public class TrackCache {
 
         this.spotifyCache = new DatabaseInstance<>(new File(cachePath, "spotify"), CacheSpecs.SPOTIFY_CACHE);
         this.youtubeCache = new DatabaseInstance<>(new File(cachePath, "youtube"), CacheSpecs.YOUTUBE_CACHE);
+        this.playlistCache = new DatabaseInstance<>(new File(cachePath, "playlist"), CacheSpecs.PLAYLIST_CACHE);
     }
 
     public DatabaseInstance<String, SpotifyTrack> getSpotifyCache() {
@@ -29,8 +31,13 @@ public class TrackCache {
         return youtubeCache;
     }
 
+    public DatabaseInstance<Long, String[]> getPlaylistCache() {
+        return playlistCache;
+    }
+
     public void shutdown() throws RocksDBException {
         this.spotifyCache.close();
         this.youtubeCache.close();
+        this.playlistCache.close();
     }
 }

@@ -59,6 +59,11 @@ public class SpotifyWeightedTrackSelector {
                 this.perfectMatch = true;
                 this.highestScore = 5000;
                 this.selectedTrack = youtubeTrack;
+
+                if (MusicBot.DEBUG) {
+                    MusicBot.LOGGER.info("perfect match: {} ({}) - {} ({})", youtubeTrack.getInfo().title, spotifyTrack.getName(), youtubeTrack.getInfo().author, spotifyTrack.getArtist());
+                }
+
                 continue;
             }
 

@@ -17,7 +17,7 @@ public class ServerManager {
     }
 
     public void removeTrackManager(Server server) {
-        this.serverMap.get(server).shutdown();
+        this.serverMap.get(server).shutdown(false);
         this.serverMap.remove(server);
     }
 
@@ -27,7 +27,7 @@ public class ServerManager {
 
     public void shutdown() {
         for (TrackManager trackManager : serverMap.values()) {
-            trackManager.shutdown();
+            trackManager.shutdown(true);
         }
     }
 }

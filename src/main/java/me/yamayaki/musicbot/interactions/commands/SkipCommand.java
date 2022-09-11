@@ -46,7 +46,7 @@ public class SkipCommand implements Command {
             //Build Autocomplete list
             final List<SlashCommandOptionChoice> choices = new ArrayList<>();
             for (int i = 0; i < trackList.size(); i++) {
-                if(i > 24) {
+                if (i > 24) {
                     break;
                 }
 

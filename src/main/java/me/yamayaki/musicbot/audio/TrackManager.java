@@ -85,11 +85,19 @@ public class TrackManager {
         return this.playlistManager;
     }
 
+    public Long getServerId() {
+        return this.server.getId();
+    }
+
     public String getServerName() {
         return this.server.getName();
     }
 
-    public void shutdown() {
+    public void shutdown(boolean save) {
+        if (save) {
+            this.playlistManager.store();
+        }
+
         this.playlistManager.clearList();
         this.audioSource.getAudioPlayer().stopTrack();
     }

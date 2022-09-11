@@ -88,6 +88,7 @@ public class MusicBot {
     public void shutdown() {
         MusicBot.LOGGER.info("shutting down ...");
         try {
+            serverManager.shutdown();
             this.discordApi.disconnect().join();
             this.executorPool.shutdown();
             MusicBot.getCache().shutdown();

@@ -1,5 +1,6 @@
 package me.yamayaki.musicbot.interactions.commands;
 
+import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.interactions.Command;
 import me.yamayaki.musicbot.utils.ChannelUtilities;
 import me.yamayaki.musicbot.utils.Either;
@@ -28,6 +29,10 @@ public class ConnectCommand implements Command {
         ChannelUtilities.joinVoiceChannel(either, () -> {
             interUpdater.setContent("Verbindung hergstellt.")
                     .update();
+
+            MusicBot.getAudioManager()
+                    .getTrackManager(either.getRight())
+                    .resumeOrNext();
         }, () -> {
             interUpdater.setContent("Beim Beitreten des Sprachkanals ist ein Fehler aufgetreten. Befindest du dich in einen Kanal?")
                     .update();
