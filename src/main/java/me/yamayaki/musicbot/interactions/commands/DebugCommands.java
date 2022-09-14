@@ -42,7 +42,7 @@ public class DebugCommands implements Command {
             case "about" -> {
                 EmbedBuilder embedBuilder = new EmbedBuilder()
                         .addField("Version", MusicBot.CONFIG.getBotVersion())
-                        .addField("Repository", "https://github.com/yamayaki1/musicbot", true)
+                        .addField("Repository", "https://github.com/yamayaki1/recorder-bot", true)
                         .addField("Entwickler", "Yamayaki (<@310370479380627458>)", true)
                         .addField("Betriebssystem", String.format("%s (%s) %s", System.getProperty("os.name"), System.getProperty("os.arch"), System.getProperty("os.version")), true)
                         .addField("Arbeitsspeicher", ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576) + "/" + (Runtime.getRuntime().totalMemory() / 1048576) + "MB", true);
