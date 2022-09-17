@@ -96,6 +96,11 @@ public class PlaylistManager {
 
     public void store() {
         final List<String> ids = new ArrayList<>();
+
+        //add currently playing track
+        ids.add(this.getCurrentTrack().getInfo().uri);
+
+        //add all remaining songs
         trackList.forEach(track -> ids.add(track.getInfo().uri));
 
         MusicBot.getCache()

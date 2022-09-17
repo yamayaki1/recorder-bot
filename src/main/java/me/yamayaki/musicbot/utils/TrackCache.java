@@ -2,15 +2,15 @@ package me.yamayaki.musicbot.utils;
 
 import me.yamayaki.musicbot.audio.source.spotify.SpotifyTrack;
 import me.yamayaki.musicbot.database.DatabaseInstance;
-import me.yamayaki.musicbot.database.specs.CacheSpecs;
+import me.yamayaki.musicbot.database.RocksManager;
+import me.yamayaki.musicbot.database.specs.DatabaseSpec;
+import me.yamayaki.musicbot.database.specs.impl.CacheSpecs;
 import org.rocksdb.RocksDBException;
 
 import java.io.File;
 
 public class TrackCache {
-    private final DatabaseInstance<String, SpotifyTrack> spotifyCache;
-    private final DatabaseInstance<String, String> youtubeCache;
-    private final DatabaseInstance<Long, String[]> playlistCache;
+    private final RocksManager cacheInstance;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public TrackCache(File cachePath) {
@@ -18,26 +18,26 @@ public class TrackCache {
             cachePath.mkdirs();
         }
 
-        this.spotifyCache = new DatabaseInstance<>(new File(cachePath, "spotify"), CacheSpecs.SPOTIFY_CACHE);
-        this.youtubeCache = new DatabaseInstance<>(new File(cachePath, "youtube"), CacheSpecs.YOUTUBE_CACHE);
-        this.playlistCache = new DatabaseInstance<>(new File(cachePath, "playlist"), CacheSpecs.PLAYLIST_CACHE);
+        this.cacheInstance = new RocksManager(cachePath, new DatabaseSpec[]{
+                CacheSpecs.SPOTIFY_CACHE,
+                CacheSpecs.YOUTUBE_CACHE,
+                CacheSpecs.PLAYLIST_CACHE
+        });
     }
 
     public DatabaseInstance<String, SpotifyTrack> getSpotifyCache() {
-        return spotifyCache;
+        return this.cacheInstance.getDatabase(CacheSpecs.SPOTIFY_CACHE);
     }
 
     public DatabaseInstance<String, String> getYoutubeCache() {
-        return youtubeCache;
+        return this.cacheInstance.getDatabase(CacheSpecs.YOUTUBE_CACHE);
     }
 
     public DatabaseInstance<Long, String[]> getPlaylistCache() {
-        return playlistCache;
+        return this.cacheInstance.getDatabase(CacheSpecs.PLAYLIST_CACHE);
     }
 
     public void shutdown() throws RocksDBException {
-        this.spotifyCache.close();
-        this.youtubeCache.close();
-        this.playlistCache.close();
+        this.cacheInstance.close();
     }
 }
