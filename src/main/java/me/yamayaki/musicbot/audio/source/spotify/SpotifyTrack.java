@@ -33,4 +33,9 @@ public class SpotifyTrack {
     public String getArtist() {
         return artist;
     }
+
+    @Override
+    public String toString() {
+        return "SpotifyTrack{" + "identifier='" + identifier + ", name='" + name + ", artist='" + artist + '}';
+    }
 }

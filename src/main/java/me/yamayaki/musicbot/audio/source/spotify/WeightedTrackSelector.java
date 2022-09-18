@@ -7,7 +7,7 @@ import me.yamayaki.musicbot.utils.Either;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class SpotifyWeightedTrackSelector {
+public class WeightedTrackSelector {
     private final SpotifyTrack spotifyTrack;
     private final List<AudioTrack> youtubeTracks;
 
@@ -21,17 +21,17 @@ public class SpotifyWeightedTrackSelector {
 
     private AudioTrack selectedTrack = null;
 
-    public SpotifyWeightedTrackSelector(SpotifyTrack spotifyTrack, List<AudioTrack> youtubeTracks) {
+    public WeightedTrackSelector(SpotifyTrack spotifyTrack, List<AudioTrack> youtubeTracks) {
         this.spotifyTrack = spotifyTrack;
         this.youtubeTracks = youtubeTracks;
     }
 
     public static Either<AudioTrack, Boolean> getWeightedTrack(SpotifyTrack spotifyTrack, List<AudioTrack> youtubeTracks) {
-        SpotifyWeightedTrackSelector spotifyWeightedTrackSelector = new SpotifyWeightedTrackSelector(spotifyTrack, youtubeTracks);
-        spotifyWeightedTrackSelector.runPreFilter();
-        spotifyWeightedTrackSelector.runSelector();
+        WeightedTrackSelector weightedTrackSelector = new WeightedTrackSelector(spotifyTrack, youtubeTracks);
+        weightedTrackSelector.runPreFilter();
+        weightedTrackSelector.runSelector();
 
-        return new Either<>(spotifyWeightedTrackSelector.getSelectedTrack(), spotifyWeightedTrackSelector.isPerfectMatch());
+        return new Either<>(weightedTrackSelector.getSelectedTrack(), weightedTrackSelector.isPerfectMatch());
     }
 
     private Boolean isPerfectMatch() {

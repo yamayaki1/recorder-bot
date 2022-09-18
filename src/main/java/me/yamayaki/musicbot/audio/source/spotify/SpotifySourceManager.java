@@ -11,12 +11,9 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import com.sedmelluq.discord.lavaplayer.track.BasicAudioPlaylist;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.player.LavaSourceManager;
-import me.yamayaki.musicbot.utils.Either;
 import se.michaelthelin.spotify.model_objects.specification.Album;
 import se.michaelthelin.spotify.model_objects.specification.Playlist;
-import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
 import se.michaelthelin.spotify.model_objects.specification.Track;
-import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -25,6 +22,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 
 public class SpotifySourceManager implements AudioSourceManager {
@@ -35,137 +33,135 @@ public class SpotifySourceManager implements AudioSourceManager {
 
     @Override
     public AudioItem loadItem(AudioPlayerManager manager, AudioReference reference) {
-        if (!SpotifyPatterns.SPOTIFY_PATTERN.matcher(reference.identifier).matches()) {
+        if (!SpotifyAccess.SPOTIFY_PATTERN.matcher(reference.identifier).matches()) {
             return null;
         }
 
         AudioItem audioItem = null;
 
         try {
-            String url = new URL(reference.identifier).getPath();
+            final String url = new URL(reference.identifier).getPath();
+            SpotifyTrack[] tracks = new SpotifyTrack[0];
 
-            if (SpotifyPatterns.TRACK_PATTERN.matcher(url).matches()) {
-                audioItem = this.buildTrack(url);
+            final Matcher trackMatcher = SpotifyAccess.TRACK_PATTERN.matcher(url);
+            if (trackMatcher.find()) {
+                tracks = this.buildFromTrack(trackMatcher.group(1));
             }
 
-            if (SpotifyPatterns.PLAYLIST_PATTERN.matcher(url).matches()) {
-                audioItem = this.buildPlaylist(url);
+            final Matcher albumMatcher = SpotifyAccess.ALBUM_PATTERN.matcher(url);
+            if (albumMatcher.find()) {
+                tracks = this.buildFromAlbum(albumMatcher.group(1));
             }
 
-            if (SpotifyPatterns.ALBUM_PATTERN.matcher(url).matches()) {
-                audioItem = this.buildPlaylistFromAlbum(url);
+            final Matcher playlistMatcher = SpotifyAccess.PLAYLIST_PATTERN.matcher(url);
+            if (playlistMatcher.find()) {
+                tracks = this.buildFromPlaylist(playlistMatcher.group(1));
             }
+
+            audioItem = this.getAudioItem(tracks);
         } catch (MalformedURLException ignored) {
         }
 
         return audioItem;
     }
 
-    //TODO cleanup this garbage
-    private AudioItem buildTrack(String url) {
-        Matcher matcher = SpotifyPatterns.TRACK_PATTERN.matcher(url);
-        if (!matcher.find()) {
-            return null;
-        }
+    private SpotifyTrack[] buildFromTrack(String trackId) {
+        try {
+            var spotifyTrack = MusicBot.getCache()
+                    .getTrackCache()
+                    .getValue(trackId);
 
-        String trackId = matcher.group(1);
-        SpotifyTrack spotifyTrack = MusicBot.getCache().getSpotifyCache().getValue(trackId).orElseGet(() -> {
-            try {
-                Track track = MusicBot.getSpotifyAccess().getSpotifyApi().getTrack(trackId).build().execute();
-                SpotifyTrack spTrack = new SpotifyTrack(track);
-                MusicBot.getCache().getSpotifyCache().putValue(trackId, spTrack);
-                return spTrack;
-            } catch (Exception exception) {
-                throw new FriendlyException(exception.getMessage(), FriendlyException.Severity.FAULT, exception);
+            if(spotifyTrack.isEmpty()) {
+                final Track track = MusicBot.getSpotifyAccess().getSpotifyApi()
+                        .getTrack(trackId)
+                        .build().execute();
+                spotifyTrack = Optional.of(new SpotifyTrack(track));
+
+                MusicBot.getCache()
+                        .getTrackCache()
+                        .putValue(trackId, spotifyTrack.get());
             }
-        });
 
-        return this.getAudioItemFromTrack(spotifyTrack);
+            return new SpotifyTrack[]{spotifyTrack.get()};
+        } catch(Exception exception) {
+            throw new FriendlyException(exception.getMessage(), FriendlyException.Severity.FAULT, exception);
+        }
     }
 
-    //TODO cleanup this garbage
-    private AudioItem buildPlaylistFromAlbum(String url) {
-        Matcher matcher = SpotifyPatterns.ALBUM_PATTERN.matcher(url);
-        if (!matcher.find()) {
-            return null;
-        }
-
+    private SpotifyTrack[] buildFromAlbum(String albumId) {
         try {
-            Album album = MusicBot.getSpotifyAccess().getSpotifyApi().getAlbum(matcher.group(1)).build().execute();
-            List<AudioTrack> tracks = new ArrayList<>();
+            final Album album = MusicBot.getSpotifyAccess().getSpotifyApi()
+                    .getAlbum(albumId)
+                    .build().execute();
 
-            for (TrackSimplified item : album.getTracks().getItems()) {
-                tracks.add(this.getAudioItemFromTrack(new SpotifyTrack(item)));
+            SpotifyTrack[] tracks = new SpotifyTrack[album.getTracks().getItems().length];
+            for (int i = 0; i < album.getTracks().getItems().length; i++) {
+                tracks[i] = this.buildFromTrack(album.getTracks().getItems()[i].getId())[0];
             }
 
-            return new BasicAudioPlaylist(album.getName(), tracks, null, false);
+            return tracks;
         } catch (Exception exception) {
             throw new FriendlyException(exception.getMessage(), FriendlyException.Severity.FAULT, exception);
         }
     }
 
-    //TODO cleanup this garbage
-    private AudioItem buildPlaylist(String url) {
-        Matcher matcher = SpotifyPatterns.PLAYLIST_PATTERN.matcher(url);
-        if (!matcher.find()) {
-            return null;
-        }
-
+    private SpotifyTrack[] buildFromPlaylist(String playlistId) {
         try {
-            Playlist playlist = MusicBot.getSpotifyAccess().getSpotifyApi().getPlaylist(matcher.group(1)).build().execute();
-            List<AudioTrack> tracks = new ArrayList<>();
+            final Playlist playlist = MusicBot.getSpotifyAccess()
+                    .getSpotifyApi().getPlaylist(playlistId)
+                    .build().execute();
 
-            for (PlaylistTrack item : playlist.getTracks().getItems()) {
-                String trackId = item.getTrack().getId();
-                SpotifyTrack spotifyTrack = MusicBot.getCache().getSpotifyCache().getValue(trackId).orElseGet(() -> {
-                    try {
-                        Track track = MusicBot.getSpotifyAccess().getSpotifyApi().getTrack(trackId).build().execute();
-                        SpotifyTrack spTrack = new SpotifyTrack(track);
-                        MusicBot.getCache().getSpotifyCache().putValue(trackId, spTrack);
-                        return spTrack;
-                    } catch (Exception exception) {
-                        throw new FriendlyException(exception.getMessage(), FriendlyException.Severity.FAULT, exception);
-                    }
-                });
-
-                tracks.add(this.getAudioItemFromTrack(spotifyTrack));
+            SpotifyTrack[] tracks = new SpotifyTrack[playlist.getTracks().getItems().length];
+            for (int i = 0; i < playlist.getTracks().getItems().length; i++) {
+                tracks[i] = this.buildFromTrack(playlist.getTracks().getItems()[i].getTrack().getId())[0];
             }
 
-            return new BasicAudioPlaylist(playlist.getName(), tracks, null, false);
+            return tracks;
         } catch (Exception exception) {
             throw new FriendlyException(exception.getMessage(), FriendlyException.Severity.FAULT, exception);
         }
     }
 
-    private AudioTrack getAudioItemFromTrack(SpotifyTrack track) {
-        if (track == null) {
-            return null;
-        }
+    private AudioItem getAudioItem(final SpotifyTrack[] spotifyTracks) {
+        final List<AudioTrack> tracks = new ArrayList<>();
 
-        String ytIdentifier = MusicBot.getCache().getYoutubeCache().getValue(track.getIdentifier()).orElseGet(() -> {
-            AudioItem youtubeMusicItem = LavaSourceManager.youtubeSource.loadItem(null, new AudioReference("ytmsearch:" + track.getName().replaceAll("-", "") + " - " + track.getArtist(), track.getName()));
-            if (!(youtubeMusicItem instanceof AudioPlaylist)) {
-                return null;
+        for (SpotifyTrack spotifyTrack : spotifyTracks) {
+            var ytIdent = MusicBot.getCache()
+                    .getYoutubeCache()
+                    .getValue(spotifyTrack.getIdentifier());
+
+            if(ytIdent.isEmpty()) {
+                final String artist = spotifyTrack.getArtist();
+                final String title = spotifyTrack.getName();
+
+                final var reference = new AudioReference("ytmsearch:" + title.replaceAll("-", "") + " - " + artist, title);
+                final AudioItem youtubeMusicItem = LavaSourceManager.youtubeSource.loadItem(null, reference);
+                if (!(youtubeMusicItem instanceof AudioPlaylist playlistItem)) {
+                    continue;
+                }
+
+                final var weightedResult = WeightedTrackSelector
+                        .getWeightedTrack(spotifyTrack, playlistItem.getTracks());
+                tracks.add(weightedResult.getLeft());
+
+                if (weightedResult.getRight()) {
+                    MusicBot.getCache()
+                            .getYoutubeCache()
+                            .putValue(spotifyTrack.getIdentifier(), weightedResult.getLeft().getIdentifier());
+                }
+
+                continue;
             }
 
-            Either<AudioTrack, Boolean> weightedResult = SpotifyWeightedTrackSelector.getWeightedTrack(track, ((AudioPlaylist) youtubeMusicItem).getTracks());
-            if (weightedResult.getRight()) {
-                MusicBot.getCache().getYoutubeCache().putValue(track.getIdentifier(), weightedResult.getLeft().getIdentifier());
+            final var reference = new AudioReference("https://youtube.com/watch?v=" + ytIdent.get(), spotifyTrack.getName());
+            final AudioItem youtubeItem = LavaSourceManager.youtubeSource.loadItem(null, reference);
+
+            if (youtubeItem instanceof AudioTrack ytTrack) {
+                tracks.add(ytTrack);
             }
-
-            return weightedResult.getLeft().getIdentifier();
-        });
-
-        if (ytIdentifier == null) {
-            return null;
         }
 
-        AudioItem youtubeItem = LavaSourceManager.youtubeSource.loadItem(null, new AudioReference("https://youtube.com/watch?v=" + ytIdentifier, track.getName()));
-        if (youtubeItem instanceof AudioTrack ytTrack) {
-            return ytTrack;
-        }
-
-        return null;
+        return new BasicAudioPlaylist("YouTube-List", tracks, null, false);
     }
 
     @Override

@@ -12,7 +12,7 @@ public class TrackCache {
         this.cacheInstance = rocksManager;
     }
 
-    public DatabaseInstance<String, SpotifyTrack> getSpotifyCache() {
+    public DatabaseInstance<String, SpotifyTrack> getTrackCache() {
         return this.cacheInstance.getDatabase(CacheSpecs.SPOTIFY_CACHE);
     }
 
