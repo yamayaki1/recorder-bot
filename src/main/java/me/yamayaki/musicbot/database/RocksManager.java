@@ -4,13 +4,17 @@ import it.unimi.dsi.fastutil.objects.Reference2ReferenceMap;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.database.specs.DatabaseSpec;
-import org.rocksdb.CompactionStyle;
-import org.rocksdb.CompressionType;
-import org.rocksdb.Options;
+import org.rocksdb.ColumnFamilyDescriptor;
+import org.rocksdb.ColumnFamilyHandle;
+import org.rocksdb.DBOptions;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class RocksManager {
@@ -27,24 +31,40 @@ public class RocksManager {
         }
 
         if (!shownStats) {
-            MusicBot.LOGGER.info("using rocksdb ({}) as caching backend ...", RocksDB.rocksdbVersion());
+            MusicBot.LOGGER.info("using rocksdb ({}) as database backend ...", RocksDB.rocksdbVersion());
             shownStats = true;
         }
 
-        try (
-                Options options = new Options()
-                        .setCreateIfMissing(true)
-                        .setKeepLogFileNum(2)
-                        .setCompressionType(CompressionType.SNAPPY_COMPRESSION)
-                        .setCompactionStyle(CompactionStyle.FIFO)
-        ) {
-            this.database = RocksDB.open(options, file.getPath());
-        } catch (RocksDBException e) {
-            throw new RuntimeException("Failed to open database: ", e);
-        }
+        final List<ColumnFamilyDescriptor> familyDescriptors = new ArrayList<>();
+        final List<ColumnFamilyHandle> familyHandles = new ArrayList<>();
+
+        familyDescriptors.add(new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY));
 
         for (DatabaseSpec<?, ?> spec : specs) {
-            this.databases.put(spec, new DatabaseInstance<>(spec, this));
+            familyDescriptors.add(new ColumnFamilyDescriptor(spec.name.getBytes(StandardCharsets.UTF_8)));
+        }
+
+        try (
+                DBOptions options = new DBOptions()
+                        .setCreateIfMissing(true)
+                        .setKeepLogFileNum(2)
+                        .setCreateMissingColumnFamilies(true)
+        ) {
+            this.database = RocksDB.open(options, file.getPath(), familyDescriptors, familyHandles);
+
+            for (DatabaseSpec<?, ?> spec : specs) {
+                ColumnFamilyHandle handle = null;
+                for (ColumnFamilyHandle familyHandle : familyHandles) {
+                    if(Arrays.equals(spec.name.getBytes(StandardCharsets.UTF_8), familyHandle.getName())) {
+                        handle = familyHandle;
+                        break;
+                    }
+                }
+
+                this.databases.put(spec, new DatabaseInstance<>(spec, this, handle));
+            }
+        } catch (RocksDBException e) {
+            throw new RuntimeException("Failed to open database: ", e);
         }
     }
 
@@ -68,6 +88,10 @@ public class RocksManager {
     }
 
     public void close() throws RocksDBException {
+        for(DatabaseInstance<?, ?> database : this.databases.values()) {
+            database.close();
+        }
+
         this.database.closeE();
     }
 }

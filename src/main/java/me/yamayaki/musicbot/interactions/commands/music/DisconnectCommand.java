@@ -1,4 +1,4 @@
-package me.yamayaki.musicbot.interactions.commands;
+package me.yamayaki.musicbot.interactions.commands.music;
 
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.interactions.Command;
@@ -9,26 +9,29 @@ import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
 
-public class PauseCommand implements Command {
+public class DisconnectCommand implements Command {
     @Override
     public String getName() {
-        return "pause";
+        return "disconnect";
     }
 
     @Override
     public SlashCommandBuilder register(DiscordApi api) {
-        return SlashCommand.with(getName(), "Pausiere das aktuelle Lied.")
+        return SlashCommand.with(getName(), "Trenne die Verbindung des Bots.")
                 .setEnabledInDms(false);
     }
 
     @Override
     public void execute(Either<SlashCommandInteraction, Server> either) {
         var interUpdater = either.getLeft().respondLater(true).join();
+        var optConnection = either.getRight()
+                .getAudioConnection();
 
-        MusicBot.getAudioManager()
-                .getTrackManager(either.getRight())
-                .setPaused(true);
+        optConnection.ifPresentOrElse(audioConnection -> {
+            MusicBot.getAudioManager().removeTrackManager(either.getRight());
+            audioConnection.close();
 
-        interUpdater.setContent("Aktuelles Lied pausiert.").update();
+            interUpdater.setContent("Verbindung getrennt.").update();
+        }, () -> interUpdater.setContent("Es ist ein Fehler aufgetreten!").update());
     }
 }

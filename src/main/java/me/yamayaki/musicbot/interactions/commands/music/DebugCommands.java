@@ -1,4 +1,4 @@
-package me.yamayaki.musicbot.interactions.commands;
+package me.yamayaki.musicbot.interactions.commands.music;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.MusicBot;

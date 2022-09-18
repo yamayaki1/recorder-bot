@@ -1,10 +1,16 @@
 package me.yamayaki.musicbot.audio;
 
+import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
+import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
+import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.MusicBot;
+import me.yamayaki.musicbot.audio.player.LavaPlayerManager;
+import me.yamayaki.musicbot.audio.player.LavaSourceManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class PlaylistManager {
     private final TrackManager trackManager;
@@ -17,7 +23,12 @@ public class PlaylistManager {
     public PlaylistManager(TrackManager trackManager) {
         this.trackManager = trackManager;
         this.trackList = new ArrayList<>();
-        this.restore();
+
+        try {
+            this.restore();
+        } catch (ExecutionException | InterruptedException e) {
+            MusicBot.LOGGER.error("failed to restore playlist:", e);
+        }
     }
 
     public AudioTrack getCurrentTrack() {
@@ -72,7 +83,7 @@ public class PlaylistManager {
         return this.loop;
     }
 
-    public void restore() {
+    public void restore() throws ExecutionException, InterruptedException {
         var response = MusicBot.getCache()
                 .getPlaylistCache()
                 .getValue(this.trackManager.getServerId());
@@ -82,11 +93,27 @@ public class PlaylistManager {
         }
 
         for (String url : response.get()) {
-            this.trackManager.tryLoadItems(url, loaderResponse -> {
-                if(MusicBot.DEBUG) {
-                    MusicBot.LOGGER.info("restored track {}", loaderResponse.getTitle());
+            LavaPlayerManager.getPlayerManager().loadItem(url, new AudioLoadResultHandler() {
+                @Override
+                public void trackLoaded(AudioTrack track) {
+                    trackList.add(track);
                 }
-            });
+
+                @Override
+                public void playlistLoaded(AudioPlaylist playlist) {
+                    trackList.addAll(playlist.getTracks());
+                }
+
+                @Override
+                public void noMatches() {
+                    //do nothing
+                }
+
+                @Override
+                public void loadFailed(FriendlyException exception) {
+                    MusicBot.LOGGER.error(exception);
+                }
+            }).get();
         }
 
         MusicBot.getCache()

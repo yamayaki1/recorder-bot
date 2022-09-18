@@ -21,6 +21,7 @@ public class TrackManager {
         this.server = server;
         this.audioSource = new LavaAudioSource(server.getApi(), new AudioEventHandler(this));
         this.playlistManager = new PlaylistManager(this);
+        this.resumeOrNext();
     }
 
     public void tryLoadItems(String song, Consumer<LoaderResponse> consumer) {

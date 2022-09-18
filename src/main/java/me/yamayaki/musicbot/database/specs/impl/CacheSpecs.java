@@ -5,11 +5,11 @@ import me.yamayaki.musicbot.database.specs.DatabaseSpec;
 
 public class CacheSpecs {
     public static final DatabaseSpec<String, SpotifyTrack> SPOTIFY_CACHE =
-            new DatabaseSpec<>(0, String.class, SpotifyTrack.class);
+            new DatabaseSpec<>("spotify_cache", String.class, SpotifyTrack.class);
 
     public static final DatabaseSpec<String, String> YOUTUBE_CACHE =
-            new DatabaseSpec<>(1, String.class, String.class);
+            new DatabaseSpec<>("youtube_cache", String.class, String.class);
 
     public static final DatabaseSpec<Long, String[]> PLAYLIST_CACHE =
-            new DatabaseSpec<>(2, Long.class, String[].class);
+            new DatabaseSpec<>("playlist_cache", Long.class, String[].class);
 }

@@ -1,4 +1,4 @@
-package me.yamayaki.musicbot.interactions.commands;
+package me.yamayaki.musicbot.interactions.commands.music;
 
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.TrackManager;

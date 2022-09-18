@@ -1,4 +1,4 @@
-package me.yamayaki.musicbot.interactions.commands;
+package me.yamayaki.musicbot.interactions.commands.music;
 
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.interactions.Command;
@@ -8,32 +8,27 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
-import org.javacord.api.interaction.SlashCommandOption;
 
-public class VolumeCommand implements Command {
+public class PauseCommand implements Command {
     @Override
     public String getName() {
-        return "volume";
+        return "pause";
     }
 
     @Override
     public SlashCommandBuilder register(DiscordApi api) {
-        return SlashCommand.with(getName(), "Stellt die Lautstärke ein.")
-                .setEnabledInDms(false)
-                .addOption(
-                        SlashCommandOption.createDecimalOption("volume", "Lautstärke", true, 0.0, 150.0)
-                );
+        return SlashCommand.with(getName(), "Pausiere das aktuelle Lied.")
+                .setEnabledInDms(false);
     }
 
     @Override
     public void execute(Either<SlashCommandInteraction, Server> either) {
         var interUpdater = either.getLeft().respondLater(true).join();
-        int volume = either.getLeft().getOptionDecimalValueByName("volume").orElse(50.0).intValue();
 
         MusicBot.getAudioManager()
                 .getTrackManager(either.getRight())
-                .setVolume(volume);
+                .setPaused(true);
 
-        interUpdater.setContent("Lautstärke angepasst.").update();
+        interUpdater.setContent("Aktuelles Lied pausiert.").update();
     }
 }

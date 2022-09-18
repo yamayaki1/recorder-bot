@@ -1,12 +1,12 @@
 package me.yamayaki.musicbot.database.specs;
 
 public class DatabaseSpec<K, V> {
-    public final Integer prefix;
+    public final String name;
     public final Class<K> key;
     public final Class<V> value;
 
-    public DatabaseSpec(Integer prefix, Class<K> key, Class<V> value) {
-        this.prefix = prefix;
+    public DatabaseSpec(String name, Class<K> key, Class<V> value) {
+        this.name = name;
         this.key = key;
         this.value = value;
     }

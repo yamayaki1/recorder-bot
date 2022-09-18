@@ -1,24 +1,26 @@
 package me.yamayaki.musicbot.interactions;
 
 import me.yamayaki.musicbot.MusicBot;
-import me.yamayaki.musicbot.interactions.commands.ClearCommand;
-import me.yamayaki.musicbot.interactions.commands.ConnectCommand;
-import me.yamayaki.musicbot.interactions.commands.DebugCommands;
-import me.yamayaki.musicbot.interactions.commands.DisconnectCommand;
-import me.yamayaki.musicbot.interactions.commands.HelpCommand;
-import me.yamayaki.musicbot.interactions.commands.LoopCommand;
-import me.yamayaki.musicbot.interactions.commands.PauseCommand;
-import me.yamayaki.musicbot.interactions.commands.PlayCommand;
-import me.yamayaki.musicbot.interactions.commands.PlaylistCommand;
-import me.yamayaki.musicbot.interactions.commands.ResumeCommand;
-import me.yamayaki.musicbot.interactions.commands.SkipCommand;
-import me.yamayaki.musicbot.interactions.commands.VolumeCommand;
+import me.yamayaki.musicbot.interactions.commands.channels.GhostCommand;
+import me.yamayaki.musicbot.interactions.commands.music.ClearCommand;
+import me.yamayaki.musicbot.interactions.commands.music.ConnectCommand;
+import me.yamayaki.musicbot.interactions.commands.music.DebugCommands;
+import me.yamayaki.musicbot.interactions.commands.music.DisconnectCommand;
+import me.yamayaki.musicbot.interactions.commands.music.HelpCommand;
+import me.yamayaki.musicbot.interactions.commands.music.LoopCommand;
+import me.yamayaki.musicbot.interactions.commands.music.PauseCommand;
+import me.yamayaki.musicbot.interactions.commands.music.PlayCommand;
+import me.yamayaki.musicbot.interactions.commands.music.PlaylistCommand;
+import me.yamayaki.musicbot.interactions.commands.music.ResumeCommand;
+import me.yamayaki.musicbot.interactions.commands.music.SkipCommand;
+import me.yamayaki.musicbot.interactions.commands.music.VolumeCommand;
 import me.yamayaki.musicbot.utils.Either;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.event.interaction.SlashCommandCreateEvent;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
+import org.javacord.api.interaction.SlashCommandInteractionOption;
 import org.javacord.api.listener.interaction.SlashCommandCreateListener;
 
 import java.util.ArrayList;
@@ -77,7 +79,19 @@ public class InteractionListener implements SlashCommandCreateListener {
 
         Command command = this.commands.getOrDefault(interaction.getCommandName(), null);
         if (command != null) {
+            this.printCommandUsed(interaction);
             command.execute(new Either<>(interaction, interaction.getServer().orElse(null)));
         }
+    }
+
+    private void printCommandUsed(SlashCommandInteraction interaction) {
+        StringBuilder builder = new StringBuilder(interaction.getUser().getDiscriminatedName() +" using '/");
+        builder.append(interaction.getCommandName()).append(" ");
+        for (SlashCommandInteractionOption argument : interaction.getArguments()) {
+            builder.append(argument.getName()).append(":").append(argument.getStringRepresentationValue().orElse(""));
+        }
+        builder.append("'");
+
+        MusicBot.LOGGER.info(builder);
     }
 }
