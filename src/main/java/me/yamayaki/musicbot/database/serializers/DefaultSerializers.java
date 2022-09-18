@@ -1,16 +1,16 @@
 package me.yamayaki.musicbot.database.serializers;
 
-import it.unimi.dsi.fastutil.objects.Reference2ReferenceMap;
-import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import me.yamayaki.musicbot.audio.source.spotify.SpotifyTrack;
-import me.yamayaki.musicbot.database.serializers.impl.LongSerializer;
 import me.yamayaki.musicbot.database.serializers.impl.JsonSerializer;
+import me.yamayaki.musicbot.database.serializers.impl.LongSerializer;
 import me.yamayaki.musicbot.database.serializers.impl.StringArrSerializer;
 import me.yamayaki.musicbot.database.serializers.impl.StringSerializer;
 import me.yamayaki.musicbot.utils.ChannelInfo;
 
+import java.util.HashMap;
+
 public class DefaultSerializers {
-    private static final Reference2ReferenceMap<Class<?>, Serializer<?>> serializers = new Reference2ReferenceOpenHashMap<>();
+    private static final HashMap<Class<?>, Serializer<?>> serializers = new HashMap<>();
 
     static {
         serializers.put(ChannelInfo.class, new JsonSerializer<>(ChannelInfo.class));

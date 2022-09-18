@@ -1,7 +1,5 @@
 package me.yamayaki.musicbot.database;
 
-import it.unimi.dsi.fastutil.objects.Reference2ReferenceMap;
-import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.database.specs.DatabaseSpec;
 import org.rocksdb.ColumnFamilyDescriptor;
@@ -14,6 +12,7 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -23,7 +22,7 @@ public class RocksManager {
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final RocksDB database;
 
-    private final Reference2ReferenceMap<DatabaseSpec<?, ?>, DatabaseInstance<?, ?>> databases = new Reference2ReferenceOpenHashMap<>();
+    private final HashMap<DatabaseSpec<?, ?>, DatabaseInstance<?, ?>> databases = new HashMap<>();
 
     public RocksManager(File file, DatabaseSpec<?, ?>[] specs) {
         if (file.mkdirs() && !file.isDirectory()) {
@@ -55,7 +54,7 @@ public class RocksManager {
             for (DatabaseSpec<?, ?> spec : specs) {
                 ColumnFamilyHandle handle = null;
                 for (ColumnFamilyHandle familyHandle : familyHandles) {
-                    if(Arrays.equals(spec.name.getBytes(StandardCharsets.UTF_8), familyHandle.getName())) {
+                    if (Arrays.equals(spec.name.getBytes(StandardCharsets.UTF_8), familyHandle.getName())) {
                         handle = familyHandle;
                         break;
                     }
@@ -88,7 +87,7 @@ public class RocksManager {
     }
 
     public void close() throws RocksDBException {
-        for(DatabaseInstance<?, ?> database : this.databases.values()) {
+        for (DatabaseInstance<?, ?> database : this.databases.values()) {
             database.close();
         }
 

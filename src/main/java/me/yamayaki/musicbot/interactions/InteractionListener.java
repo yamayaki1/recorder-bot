@@ -1,7 +1,6 @@
 package me.yamayaki.musicbot.interactions;
 
 import me.yamayaki.musicbot.MusicBot;
-import me.yamayaki.musicbot.interactions.commands.channels.GhostCommand;
 import me.yamayaki.musicbot.interactions.commands.music.ClearCommand;
 import me.yamayaki.musicbot.interactions.commands.music.ConnectCommand;
 import me.yamayaki.musicbot.interactions.commands.music.DebugCommands;
@@ -85,7 +84,7 @@ public class InteractionListener implements SlashCommandCreateListener {
     }
 
     private void printCommandUsed(SlashCommandInteraction interaction) {
-        StringBuilder builder = new StringBuilder(interaction.getUser().getDiscriminatedName() +" using '/");
+        StringBuilder builder = new StringBuilder(interaction.getUser().getDiscriminatedName() + " using '/");
         builder.append(interaction.getCommandName()).append(" ");
         for (SlashCommandInteractionOption argument : interaction.getArguments()) {
             builder.append(argument.getName()).append(":").append(argument.getStringRepresentationValue().orElse(""));

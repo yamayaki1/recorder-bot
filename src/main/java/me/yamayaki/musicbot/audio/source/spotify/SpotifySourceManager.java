@@ -71,7 +71,7 @@ public class SpotifySourceManager implements AudioSourceManager {
                     .getTrackCache()
                     .getValue(trackId);
 
-            if(spotifyTrack.isEmpty()) {
+            if (spotifyTrack.isEmpty()) {
                 final Track track = MusicBot.getSpotifyAccess().getSpotifyApi()
                         .getTrack(trackId)
                         .build().execute();
@@ -83,7 +83,7 @@ public class SpotifySourceManager implements AudioSourceManager {
             }
 
             return new SpotifyTrack[]{spotifyTrack.get()};
-        } catch(Exception exception) {
+        } catch (Exception exception) {
             throw new FriendlyException(exception.getMessage(), FriendlyException.Severity.FAULT, exception);
         }
     }
@@ -130,7 +130,7 @@ public class SpotifySourceManager implements AudioSourceManager {
                     .getYoutubeCache()
                     .getValue(spotifyTrack.getIdentifier());
 
-            if(ytIdent.isEmpty()) {
+            if (ytIdent.isEmpty()) {
                 final String artist = spotifyTrack.getArtist();
                 final String title = spotifyTrack.getName();
 

@@ -22,7 +22,7 @@ public class DatabaseInstance<K, V> {
     public DatabaseInstance(DatabaseSpec<K, V> spec, RocksManager rocksManager, ColumnFamilyHandle columnHandle) {
         this.rocksManager = rocksManager;
 
-        if(columnHandle == null) {
+        if (columnHandle == null) {
             throw new RuntimeException("cant open instance, handle is null");
         }
 
