@@ -1,6 +1,7 @@
 package me.yamayaki.musicbot.interactions;
 
 import me.yamayaki.musicbot.MusicBot;
+import me.yamayaki.musicbot.interactions.commands.channels.GhostCommand;
 import me.yamayaki.musicbot.interactions.commands.music.ClearCommand;
 import me.yamayaki.musicbot.interactions.commands.music.ConnectCommand;
 import me.yamayaki.musicbot.interactions.commands.music.DebugCommands;
@@ -28,7 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 
 public class InteractionListener implements SlashCommandCreateListener {
-
     private final HashMap<String, Command> commands = new HashMap<>();
 
     public InteractionListener(DiscordApi discordApi) {
@@ -44,7 +44,9 @@ public class InteractionListener implements SlashCommandCreateListener {
                 new LoopCommand(),
                 new PauseCommand(),
                 new ResumeCommand(),
-                new HelpCommand()
+                new HelpCommand(),
+
+                new GhostCommand()
         );
     }
 
@@ -74,13 +76,16 @@ public class InteractionListener implements SlashCommandCreateListener {
 
     @Override
     public void onSlashCommandCreate(SlashCommandCreateEvent event) {
-        SlashCommandInteraction interaction = event.getSlashCommandInteraction();
-
-        Command command = this.commands.getOrDefault(interaction.getCommandName(), null);
-        if (command != null) {
+        MusicBot.THREAD_POOL.execute(() -> {
+            SlashCommandInteraction interaction = event.getSlashCommandInteraction();
             this.printCommandUsed(interaction);
-            command.execute(new Either<>(interaction, interaction.getServer().orElse(null)));
-        }
+
+            Command command = this.commands.getOrDefault(interaction.getCommandName(), null);
+            if (command != null) {
+                command.execute(new Either<>(interaction, interaction.getServer().orElse(null)));
+
+            }
+        });
     }
 
     private void printCommandUsed(SlashCommandInteraction interaction) {

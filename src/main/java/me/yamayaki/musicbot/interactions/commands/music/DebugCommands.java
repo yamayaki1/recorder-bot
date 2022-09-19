@@ -71,16 +71,20 @@ public class DebugCommands implements Command {
                 var optChannel = either.getLeft().getUser()
                         .getConnectedVoiceChannel(either.getRight());
 
-                optChannel.ifPresent(serverVoiceChannel -> {
-                    var audioConnection = serverVoiceChannel.connect().join();
+                if (optChannel.isEmpty()) {
+                    interUpdater.setContent("In keinem Voicechannel.").update();
+                    return;
+                }
+
+                optChannel.get().connect().thenAccept(audioConnection -> {
                     audioConnection.setSelfDeafened(true);
+
+                    MusicBot.getAudioManager()
+                            .getTrackManager(either.getRight())
+                            .fixAudioSource();
+
+                    interUpdater.setContent("Audioconnection wiederhergestellt").update();
                 });
-
-                MusicBot.getAudioManager()
-                        .getTrackManager(either.getRight())
-                        .fixAudioSource();
-
-                interUpdater.setContent("Audioconnection wiederhergestellt").update();
             }
             case "last_errors" -> {
                 EmbedBuilder embedBuilder = new EmbedBuilder();

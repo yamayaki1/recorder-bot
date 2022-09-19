@@ -9,8 +9,6 @@ import me.yamayaki.musicbot.database.specs.impl.ChannelSpecs;
 import me.yamayaki.musicbot.interactions.InteractionListener;
 import me.yamayaki.musicbot.tasks.CmdLineHandler;
 import me.yamayaki.musicbot.tasks.ShutdownHandler;
-import me.yamayaki.musicbot.utils.ChannelSettings;
-import me.yamayaki.musicbot.utils.TrackCache;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
@@ -19,6 +17,7 @@ import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.user.UserStatus;
 
 import java.io.File;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -29,7 +28,9 @@ public class MusicBot {
     public static final Logger LOGGER = LogManager.getLogger(MusicBot.class);
     public static final Config CONFIG = new Config(new File(".", "config/"));
 
-    public static final RocksManager database = new RocksManager(new File(".", "database/"), new DatabaseSpec[]{
+    public static final ExecutorService THREAD_POOL = Executors.newCachedThreadPool();
+
+    public static final RocksManager DATABASE = new RocksManager(new File(".", "database/"), new DatabaseSpec[]{
             CacheSpecs.SPOTIFY_CACHE,
             CacheSpecs.YOUTUBE_CACHE,
             CacheSpecs.PLAYLIST_CACHE,
@@ -38,8 +39,6 @@ public class MusicBot {
     });
 
     private static final SpotifyAccess spotifyAccess = new SpotifyAccess();
-    private static final TrackCache trackCache = new TrackCache(database);
-    private static final ChannelSettings channelSettings = new ChannelSettings(database);
 
     private static ServerManager serverManager = null;
 
@@ -57,14 +56,6 @@ public class MusicBot {
 
     public static SpotifyAccess getSpotifyAccess() {
         return spotifyAccess;
-    }
-
-    public static TrackCache getCache() {
-        return trackCache;
-    }
-
-    public static ChannelSettings getChannelSettings() {
-        return channelSettings;
     }
 
     protected void launch() {
@@ -107,7 +98,7 @@ public class MusicBot {
         MusicBot.LOGGER.info("shutting down ...");
         try {
             serverManager.shutdown();
-            database.close();
+            DATABASE.close();
             this.discordApi.disconnect().join();
             this.executorPool.shutdown();
         } catch (Exception e) {

@@ -60,10 +60,7 @@ public class WeightedTrackSelector {
                 this.highestScore = 5000;
                 this.selectedTrack = youtubeTrack;
 
-                if (MusicBot.DEBUG) {
-                    MusicBot.LOGGER.info("perfect match: {} ({}) - {} ({})", youtubeTrack.getInfo().title, spotifyTrack.getName(), youtubeTrack.getInfo().author, spotifyTrack.getArtist());
-                }
-
+                MusicBot.LOGGER.debug("perfect match: {} ({}) - {} ({})", youtubeTrack.getInfo().title, spotifyTrack.getName(), youtubeTrack.getInfo().author, spotifyTrack.getArtist());
                 continue;
             }
 
@@ -117,9 +114,7 @@ public class WeightedTrackSelector {
                 this.highestScore = score.get();
             }
 
-            if (MusicBot.DEBUG) {
-                MusicBot.LOGGER.info("{}: {} ({}) - {} ({})", score, youtubeTrack.getInfo().title, spotifyTrack.getName(), youtubeTrack.getInfo().author, spotifyTrack.getArtist());
-            }
+            MusicBot.LOGGER.debug("{}: {} ({}) - {} ({})", score, youtubeTrack.getInfo().title, spotifyTrack.getName(), youtubeTrack.getInfo().author, spotifyTrack.getArtist());
         }
     }
 

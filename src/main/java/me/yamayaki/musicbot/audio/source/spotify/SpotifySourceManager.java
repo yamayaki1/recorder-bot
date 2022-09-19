@@ -11,6 +11,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import com.sedmelluq.discord.lavaplayer.track.BasicAudioPlaylist;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.player.LavaSourceManager;
+import me.yamayaki.musicbot.database.specs.impl.CacheSpecs;
 import se.michaelthelin.spotify.model_objects.specification.Album;
 import se.michaelthelin.spotify.model_objects.specification.Playlist;
 import se.michaelthelin.spotify.model_objects.specification.Track;
@@ -67,8 +68,8 @@ public class SpotifySourceManager implements AudioSourceManager {
 
     private SpotifyTrack[] buildFromTrack(String trackId) {
         try {
-            var spotifyTrack = MusicBot.getCache()
-                    .getTrackCache()
+            var spotifyTrack = MusicBot.DATABASE
+                    .getDatabase(CacheSpecs.SPOTIFY_CACHE)
                     .getValue(trackId);
 
             if (spotifyTrack.isEmpty()) {
@@ -77,8 +78,8 @@ public class SpotifySourceManager implements AudioSourceManager {
                         .build().execute();
                 spotifyTrack = Optional.of(new SpotifyTrack(track));
 
-                MusicBot.getCache()
-                        .getTrackCache()
+                MusicBot.DATABASE
+                        .getDatabase(CacheSpecs.SPOTIFY_CACHE)
                         .putValue(trackId, spotifyTrack.get());
             }
 
@@ -126,8 +127,8 @@ public class SpotifySourceManager implements AudioSourceManager {
         final List<AudioTrack> tracks = new ArrayList<>();
 
         for (SpotifyTrack spotifyTrack : spotifyTracks) {
-            var ytIdent = MusicBot.getCache()
-                    .getYoutubeCache()
+            var ytIdent = MusicBot.DATABASE
+                    .getDatabase(CacheSpecs.YOUTUBE_CACHE)
                     .getValue(spotifyTrack.getIdentifier());
 
             if (ytIdent.isEmpty()) {
@@ -145,8 +146,8 @@ public class SpotifySourceManager implements AudioSourceManager {
                 tracks.add(weightedResult.getLeft());
 
                 if (weightedResult.getRight()) {
-                    MusicBot.getCache()
-                            .getYoutubeCache()
+                    MusicBot.DATABASE
+                            .getDatabase(CacheSpecs.YOUTUBE_CACHE)
                             .putValue(spotifyTrack.getIdentifier(), weightedResult.getLeft().getIdentifier());
                 }
 

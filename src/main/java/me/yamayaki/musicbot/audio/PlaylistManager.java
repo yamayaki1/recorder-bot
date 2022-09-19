@@ -6,6 +6,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.player.LavaPlayerManager;
+import me.yamayaki.musicbot.database.specs.impl.CacheSpecs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,8 +84,8 @@ public class PlaylistManager {
     }
 
     public void restore() throws ExecutionException, InterruptedException {
-        var response = MusicBot.getCache()
-                .getPlaylistCache()
+        var response = MusicBot.DATABASE
+                .getDatabase(CacheSpecs.PLAYLIST_CACHE)
                 .getValue(this.trackManager.getServerId());
 
         if (response.isEmpty()) {
@@ -115,8 +116,8 @@ public class PlaylistManager {
             }).get();
         }
 
-        MusicBot.getCache()
-                .getPlaylistCache()
+        MusicBot.DATABASE
+                .getDatabase(CacheSpecs.PLAYLIST_CACHE)
                 .deleteValue(this.trackManager.getServerId());
     }
 
@@ -129,8 +130,8 @@ public class PlaylistManager {
         //add all remaining songs
         trackList.forEach(track -> ids.add(track.getInfo().uri));
 
-        MusicBot.getCache()
-                .getPlaylistCache()
+        MusicBot.DATABASE
+                .getDatabase(CacheSpecs.PLAYLIST_CACHE)
                 .putValue(this.trackManager.getServerId(), ids.toArray(String[]::new));
     }
 }

@@ -5,7 +5,6 @@ import me.yamayaki.musicbot.database.serializers.impl.JsonSerializer;
 import me.yamayaki.musicbot.database.serializers.impl.LongSerializer;
 import me.yamayaki.musicbot.database.serializers.impl.StringArrSerializer;
 import me.yamayaki.musicbot.database.serializers.impl.StringSerializer;
-import me.yamayaki.musicbot.utils.ChannelInfo;
 
 import java.util.HashMap;
 
@@ -13,7 +12,6 @@ public class DefaultSerializers {
     private static final HashMap<Class<?>, Serializer<?>> serializers = new HashMap<>();
 
     static {
-        serializers.put(ChannelInfo.class, new JsonSerializer<>(ChannelInfo.class));
         serializers.put(SpotifyTrack.class, new JsonSerializer<>(SpotifyTrack.class));
         serializers.put(Long.class, new LongSerializer());
         serializers.put(String[].class, new StringArrSerializer());
