@@ -59,7 +59,7 @@ public class GhostCommand implements Command {
             curChannel.get().delete().join();
         }, () -> {
             var channelBuilder = either.getRight().createVoiceChannelBuilder()
-                    .setName(curChannel.get().getName() + " \uD83D\uDC7B")
+                    .setName("\uD83D\uDC7B-Ghost Channel")
                     .setUserlimit(curChannel.get().getUserLimit().orElse(0))
                     .setCategory(curChannel.get().getCategory().orElse(null));
             channelBuilder.addPermissionOverwrite(either.getRight().getEveryoneRole(), new PermissionsBuilder().setDenied(PermissionType.VIEW_CHANNEL).build());
