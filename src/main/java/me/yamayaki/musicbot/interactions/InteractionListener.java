@@ -4,7 +4,7 @@ import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.interactions.commands.channels.GhostCommand;
 import me.yamayaki.musicbot.interactions.commands.music.ClearCommand;
 import me.yamayaki.musicbot.interactions.commands.music.ConnectCommand;
-import me.yamayaki.musicbot.interactions.commands.music.DebugCommands;
+import me.yamayaki.musicbot.interactions.commands.DebugCommands;
 import me.yamayaki.musicbot.interactions.commands.music.DisconnectCommand;
 import me.yamayaki.musicbot.interactions.commands.music.HelpCommand;
 import me.yamayaki.musicbot.interactions.commands.music.LoopCommand;
@@ -83,16 +83,15 @@ public class InteractionListener implements SlashCommandCreateListener {
             Command command = this.commands.getOrDefault(interaction.getCommandName(), null);
             if (command != null) {
                 command.execute(new Either<>(interaction, interaction.getServer().orElse(null)));
-
             }
         });
     }
 
     private void printCommandUsed(SlashCommandInteraction interaction) {
         StringBuilder builder = new StringBuilder(interaction.getUser().getDiscriminatedName() + " using '/");
-        builder.append(interaction.getCommandName()).append(" ");
+        builder.append(interaction.getCommandName());
         for (SlashCommandInteractionOption argument : interaction.getArguments()) {
-            builder.append(argument.getName()).append(":").append(argument.getStringRepresentationValue().orElse(""));
+            builder.append(" ").append(argument.getName()).append(":").append(argument.getStringRepresentationValue().orElse(""));
         }
         builder.append("'");
 

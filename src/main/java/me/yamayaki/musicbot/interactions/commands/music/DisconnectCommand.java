@@ -29,7 +29,13 @@ public class DisconnectCommand implements Command {
 
         optConnection.ifPresentOrElse(audioConnection -> {
             MusicBot.getAudioManager().removeTrackManager(either.getRight());
-            audioConnection.close();
+
+            try {
+                audioConnection.close();
+            } catch(NullPointerException e) {
+                interUpdater.setContent("Es ist ein Fehler aufgetreten, starte Bot neu!").update().join();
+                System.exit(-1);
+            }
 
             interUpdater.setContent("Verbindung getrennt.").update();
         }, () -> interUpdater.setContent("Es ist ein Fehler aufgetreten!").update());

@@ -1,4 +1,4 @@
-package me.yamayaki.musicbot.interactions.commands.music;
+package me.yamayaki.musicbot.interactions.commands;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.MusicBot;
@@ -76,15 +76,20 @@ public class DebugCommands implements Command {
                     return;
                 }
 
-                optChannel.get().connect().thenAccept(audioConnection -> {
-                    audioConnection.setSelfDeafened(true);
+                try {
+                    optChannel.get().connect().thenAccept(audioConnection -> {
+                        audioConnection.setSelfDeafened(true);
 
-                    MusicBot.getAudioManager()
-                            .getTrackManager(either.getRight())
-                            .fixAudioSource();
+                        MusicBot.getAudioManager()
+                                .getTrackManager(either.getRight())
+                                .fixAudioSource();
 
-                    interUpdater.setContent("Audioconnection wiederhergestellt").update();
-                });
+                        interUpdater.setContent("Audioconnection wiederhergestellt").update();
+                    });
+                } catch(NullPointerException e) {
+                    interUpdater.setContent("Fehler im AudioWebSocketAdapter, starte Bot neu!").update().join();
+                    System.exit(-1);
+                }
             }
             case "last_errors" -> {
                 EmbedBuilder embedBuilder = new EmbedBuilder();
