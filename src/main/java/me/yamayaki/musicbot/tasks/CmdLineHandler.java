@@ -3,7 +3,6 @@ package me.yamayaki.musicbot.tasks;
 import me.yamayaki.musicbot.MusicBot;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Set;
 
@@ -12,13 +11,17 @@ public record CmdLineHandler(MusicBot instance) implements Runnable {
 
     @Override
     public void run() {
+        String command;
+
         while (true) {
             try {
-                String command = br.readLine();
+                command = br.readLine();
                 if (command != null) {
                     this.runCommand(command);
                 }
-            } catch (IOException ignored) {
+
+                Thread.sleep(1000);
+            } catch (Exception ignored) {
             }
         }
     }
