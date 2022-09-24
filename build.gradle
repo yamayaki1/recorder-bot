@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'me.yamayaki'
-version '0.2.0+' + getVersionMetadata()
+version getVersionMetadata()
 
 repositories {
     mavenCentral()

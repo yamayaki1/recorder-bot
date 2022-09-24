@@ -12,7 +12,7 @@ public record CmdLineHandler(MusicBot instance) implements Runnable {
 
     @Override
     public void run() {
-        while(true) {
+        while (true) {
             try {
                 String command = br.readLine();
                 if (command != null) {
@@ -32,10 +32,6 @@ public record CmdLineHandler(MusicBot instance) implements Runnable {
                 MusicBot.LOGGER.info("- GateWay-Ping: {}", this.instance.getAPI().getLatestGatewayLatency().getSeconds());
                 MusicBot.LOGGER.info("- Running Threads:");
                 threadSet.forEach(thread -> MusicBot.LOGGER.info(threadToString(thread)));
-            }
-            case "reload" -> {
-                MusicBot.CONFIG.reload();
-                this.instance.updatePresence();
             }
             case "reset_commands" -> {
                 MusicBot.LOGGER.info("deleting commands...");

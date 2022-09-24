@@ -79,12 +79,7 @@ public class Config {
 
         @SuppressWarnings({"CanBeFinal", "FieldMayBeFinal", "FieldCanBeLocal"})
         public static class BotOptions {
-            private String status = "ONLINE";
             private String token = "";
-
-            public String getStatus() {
-                return status;
-            }
 
             public String getToken() {
                 return token;

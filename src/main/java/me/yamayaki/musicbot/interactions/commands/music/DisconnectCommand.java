@@ -32,7 +32,7 @@ public class DisconnectCommand implements Command {
 
             try {
                 audioConnection.close();
-            } catch(NullPointerException e) {
+            } catch (NullPointerException e) {
                 interUpdater.setContent("Es ist ein Fehler aufgetreten, starte Bot neu!").update().join();
                 System.exit(-1);
             }

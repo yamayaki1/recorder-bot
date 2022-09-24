@@ -13,6 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
+import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.user.UserStatus;
 
@@ -81,7 +82,8 @@ public class MusicBot {
     }
 
     public void updatePresence() {
-        discordApi.updateStatus(UserStatus.fromString(CONFIG.get().getBot().getStatus()));
+        discordApi.updateStatus(UserStatus.ONLINE);
+        discordApi.updateActivity(ActivityType.PLAYING, "Recorder | " + CONFIG.getBotVersion());
     }
 
     public DiscordApi getAPI() {

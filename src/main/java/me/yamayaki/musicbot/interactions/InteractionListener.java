@@ -1,10 +1,11 @@
 package me.yamayaki.musicbot.interactions;
 
 import me.yamayaki.musicbot.MusicBot;
+import me.yamayaki.musicbot.interactions.commands.DebugCommands;
+import me.yamayaki.musicbot.interactions.commands.PingCommand;
 import me.yamayaki.musicbot.interactions.commands.channels.GhostCommand;
 import me.yamayaki.musicbot.interactions.commands.music.ClearCommand;
 import me.yamayaki.musicbot.interactions.commands.music.ConnectCommand;
-import me.yamayaki.musicbot.interactions.commands.DebugCommands;
 import me.yamayaki.musicbot.interactions.commands.music.DisconnectCommand;
 import me.yamayaki.musicbot.interactions.commands.music.HelpCommand;
 import me.yamayaki.musicbot.interactions.commands.music.LoopCommand;
@@ -27,13 +28,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class InteractionListener implements SlashCommandCreateListener {
     private final HashMap<String, Command> commands = new HashMap<>();
 
     public InteractionListener(DiscordApi discordApi) {
         registerCommands(discordApi,
-                new DebugCommands(),
                 new ConnectCommand(),
                 new DisconnectCommand(),
                 new PlayCommand(),
@@ -46,7 +47,9 @@ public class InteractionListener implements SlashCommandCreateListener {
                 new ResumeCommand(),
                 new HelpCommand(),
 
-                new GhostCommand()
+                new DebugCommands(),
+                new GhostCommand(),
+                new PingCommand()
         );
     }
 
@@ -76,7 +79,7 @@ public class InteractionListener implements SlashCommandCreateListener {
 
     @Override
     public void onSlashCommandCreate(SlashCommandCreateEvent event) {
-        MusicBot.THREAD_POOL.execute(() -> {
+        CompletableFuture.supplyAsync(() -> {
             SlashCommandInteraction interaction = event.getSlashCommandInteraction();
             this.printCommandUsed(interaction);
 
@@ -84,6 +87,15 @@ public class InteractionListener implements SlashCommandCreateListener {
             if (command != null) {
                 command.execute(new Either<>(interaction, interaction.getServer().orElse(null)));
             }
+
+            return null;
+        }, MusicBot.THREAD_POOL).exceptionally(throwable -> {
+            event.getSlashCommandInteraction().createFollowupMessageBuilder()
+                    .setContent("Beim Ausführen des Befehls ist ein Fehler aufgetreten:\n" + throwable.getMessage())
+                    .send();
+
+            MusicBot.LOGGER.error(throwable);
+            return 0;
         });
     }
 
