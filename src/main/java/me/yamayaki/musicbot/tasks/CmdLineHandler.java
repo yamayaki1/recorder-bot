@@ -12,12 +12,14 @@ public record CmdLineHandler(MusicBot instance) implements Runnable {
 
     @Override
     public void run() {
-        try {
-            String command = br.readLine();
-            if (command != null) {
-                this.runCommand(command);
+        while(true) {
+            try {
+                String command = br.readLine();
+                if (command != null) {
+                    this.runCommand(command);
+                }
+            } catch (IOException ignored) {
             }
-        } catch (IOException ignored) {
         }
     }
 

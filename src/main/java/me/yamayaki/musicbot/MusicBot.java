@@ -19,12 +19,8 @@ import org.javacord.api.entity.user.UserStatus;
 import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class MusicBot {
-    public static final boolean DEBUG = false;
-
     public static final Logger LOGGER = LogManager.getLogger(MusicBot.class);
     public static final Config CONFIG = new Config(new File(".", "config/"));
 
@@ -41,8 +37,6 @@ public class MusicBot {
     private static final SpotifyAccess spotifyAccess = new SpotifyAccess();
 
     private static ServerManager serverManager = null;
-
-    private final ScheduledExecutorService executorPool = Executors.newScheduledThreadPool(2);
     private DiscordApi discordApi;
 
     public static void main(String[] args) {
@@ -82,7 +76,7 @@ public class MusicBot {
     protected void runTasks() {
         LOGGER.info("starting tasks and commandline listener ...");
 
-        executorPool.scheduleAtFixedRate(new CmdLineHandler(this), 0, 1, TimeUnit.SECONDS);
+        THREAD_POOL.submit(new CmdLineHandler(this));
         Runtime.getRuntime().addShutdownHook(new ShutdownHandler(this));
     }
 
@@ -99,8 +93,8 @@ public class MusicBot {
         try {
             serverManager.shutdown();
             DATABASE.close();
+            THREAD_POOL.shutdown();
             this.discordApi.disconnect().join();
-            this.executorPool.shutdown();
         } catch (Exception e) {
             MusicBot.LOGGER.error(e);
         }
