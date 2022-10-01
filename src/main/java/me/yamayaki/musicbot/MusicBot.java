@@ -7,6 +7,7 @@ import me.yamayaki.musicbot.database.specs.DatabaseSpec;
 import me.yamayaki.musicbot.database.specs.impl.CacheSpecs;
 import me.yamayaki.musicbot.database.specs.impl.ChannelSpecs;
 import me.yamayaki.musicbot.interactions.InteractionListener;
+import me.yamayaki.musicbot.interactions.VoiceLeaveListener;
 import me.yamayaki.musicbot.tasks.CmdLineHandler;
 import me.yamayaki.musicbot.tasks.ShutdownHandler;
 import org.apache.logging.log4j.LogManager;
@@ -67,6 +68,7 @@ public class MusicBot {
 
         LOGGER.info("discord login successful, continuing ... ");
         discordApi.addListener(new InteractionListener(this.discordApi));
+        discordApi.addListener(new VoiceLeaveListener());
 
         serverManager = new ServerManager();
 
