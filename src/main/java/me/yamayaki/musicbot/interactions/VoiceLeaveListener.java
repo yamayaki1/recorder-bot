@@ -17,10 +17,13 @@ public class VoiceLeaveListener implements ServerVoiceChannelMemberLeaveListener
             return;
         }
 
+        long channelId = event.getChannel().getId();
+
         Optional<ChannelInfo> channelInfo = MusicBot.DATABASE
                 .getDatabase(ChannelSpecs.CHANNEL_SETTINGS)
-                .getValue(event.getChannel().getId());
+                .getValue(channelId);
 
         channelInfo.ifPresent(info -> ChannelUtilities.disableGhostChannel(info, event.getChannel()));
+        MusicBot.LOGGER.info("deactivating ghost-channel {}, as all users have leaved.", channelId);
     }
 }
