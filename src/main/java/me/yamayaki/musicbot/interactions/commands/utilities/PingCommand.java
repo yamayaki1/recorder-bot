@@ -1,4 +1,4 @@
-package me.yamayaki.musicbot.interactions.commands;
+package me.yamayaki.musicbot.interactions.commands.utilities;
 
 import me.yamayaki.musicbot.interactions.Command;
 import me.yamayaki.musicbot.utils.Either;

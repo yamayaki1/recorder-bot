@@ -31,6 +31,21 @@ public class ChannelUtilities {
         }, onError);
     }
 
+    public static void leaveVoiceChannel(Either<SlashCommandInteraction, Server> either, Runnable onSuccess, Runnable onError) {
+        var optConnection = either.getRight()
+                .getAudioConnection();
+
+        optConnection.ifPresentOrElse(audioConnection -> {
+            try {
+                audioConnection.close();
+                onSuccess.run();
+            } catch (NullPointerException e) {
+                onError.run();
+                System.exit(-1);
+            }
+        }, onError);
+    }
+
     public static void activateGhostChannel(ServerVoiceChannel voiceChannel) {
         var server = voiceChannel.getServer();
         var rolePermissions = voiceChannel.getOverwrittenRolePermissions();

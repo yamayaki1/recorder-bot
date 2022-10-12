@@ -15,7 +15,7 @@ public class TrackManager {
     private final LavaAudioSource audioSource;
     private final PlaylistManager playlistManager;
 
-    public String lastError = "";
+    public String lastError = "Kein Fehler.";
 
     public TrackManager(Server server) {
         this.server = server;
