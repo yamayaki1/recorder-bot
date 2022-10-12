@@ -30,7 +30,7 @@ public class PlayerCommand implements Command {
     public SlashCommandBuilder register(DiscordApi api) {
         return SlashCommand.with(getName(), "Ändere Einstellungen des Players.")
                 .setEnabledInDms(false)
-                .addOption(SlashCommandOption.createWithChoices(SlashCommandOptionType.SUB_COMMAND_GROUP, "action", "Aktion", true,
+                .addOption(SlashCommandOption.createWithChoices(SlashCommandOptionType.STRING, "action", "Aktion", true,
                         new SlashCommandOptionChoiceBuilder().setName("Pausieren").setValue(CMD_PAUSE),
                         new SlashCommandOptionChoiceBuilder().setName("Fortsetzen").setValue(CMD_RESUME),
                         new SlashCommandOptionChoiceBuilder().setName("Wiederholen").setValue(CMD_LOOP),
