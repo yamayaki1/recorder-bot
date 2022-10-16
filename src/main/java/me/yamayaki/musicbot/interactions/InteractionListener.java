@@ -1,9 +1,6 @@
 package me.yamayaki.musicbot.interactions;
 
 import me.yamayaki.musicbot.MusicBot;
-import me.yamayaki.musicbot.interactions.commands.utilities.AvatarCommand;
-import me.yamayaki.musicbot.interactions.commands.utilities.DebugCommands;
-import me.yamayaki.musicbot.interactions.commands.utilities.PingCommand;
 import me.yamayaki.musicbot.interactions.commands.channels.GhostCommand;
 import me.yamayaki.musicbot.interactions.commands.music.ClearCommand;
 import me.yamayaki.musicbot.interactions.commands.music.PlayCommand;
@@ -11,6 +8,9 @@ import me.yamayaki.musicbot.interactions.commands.music.PlayerCommand;
 import me.yamayaki.musicbot.interactions.commands.music.PlaylistCommand;
 import me.yamayaki.musicbot.interactions.commands.music.SkipCommand;
 import me.yamayaki.musicbot.interactions.commands.music.VolumeCommand;
+import me.yamayaki.musicbot.interactions.commands.utilities.AvatarCommand;
+import me.yamayaki.musicbot.interactions.commands.utilities.DebugCommands;
+import me.yamayaki.musicbot.interactions.commands.utilities.PingCommand;
 import me.yamayaki.musicbot.utils.Either;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.event.interaction.SlashCommandCreateEvent;
@@ -20,10 +20,10 @@ import org.javacord.api.interaction.SlashCommandInteraction;
 import org.javacord.api.interaction.SlashCommandInteractionOption;
 import org.javacord.api.listener.interaction.SlashCommandCreateListener;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class InteractionListener implements SlashCommandCreateListener {
@@ -48,14 +48,14 @@ public class InteractionListener implements SlashCommandCreateListener {
 
     private void registerCommands(DiscordApi discordApi, Command... commands) {
         MusicBot.LOGGER.info("registering {} commands, this may take a while ...", Arrays.stream(commands).count());
-        final List<SlashCommandBuilder> builders = new ArrayList<>();
+        final Set<SlashCommandBuilder> builderSet = new HashSet<>();
 
         for (Command clazz : commands) {
             this.commands.put(clazz.getName(), clazz);
-            builders.add(clazz.register(discordApi));
+            builderSet.add(clazz.register(discordApi));
         }
 
-        discordApi.bulkOverwriteGlobalApplicationCommands(builders).join();
+        discordApi.bulkOverwriteGlobalApplicationCommands(builderSet).join();
 
         //cleanup old commands
         discordApi.getGlobalSlashCommands().thenAccept(list -> {

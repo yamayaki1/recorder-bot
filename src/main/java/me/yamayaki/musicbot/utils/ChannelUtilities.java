@@ -4,7 +4,6 @@ import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.database.specs.impl.ChannelSpecs;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
-import org.javacord.api.entity.channel.VoiceChannel;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.PermissionsBuilder;
