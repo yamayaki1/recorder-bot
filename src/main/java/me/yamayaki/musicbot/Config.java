@@ -1,7 +1,6 @@
 package me.yamayaki.musicbot;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import me.yamayaki.musicbot.utils.GsonHolder;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -11,7 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Config {
-    private final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
     private final Path filePath;
 
     private JsonConfig config;
@@ -44,7 +42,7 @@ public class Config {
         this.config = null;
 
         try {
-            this.config = this.gson.fromJson(new String(Files.readAllBytes(this.filePath)), JsonConfig.class);
+            this.config = GsonHolder.getGson().fromJson(new String(Files.readAllBytes(this.filePath)), JsonConfig.class);
         } catch (IOException e) {
             MusicBot.LOGGER.error("error reading settings file, generating new one");
             this.config = new JsonConfig();
@@ -56,7 +54,7 @@ public class Config {
     public void save() {
         try {
             FileWriter writer = new FileWriter(this.filePath.toFile());
-            writer.write(this.gson.toJson(this.config));
+            writer.write(GsonHolder.getGson().toJson(this.config));
             writer.flush();
             writer.close();
         } catch (IOException e) {

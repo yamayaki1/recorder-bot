@@ -13,7 +13,7 @@ public class VoiceLeaveListener implements ServerVoiceChannelMemberLeaveListener
 
     @Override
     public void onServerVoiceChannelMemberLeave(ServerVoiceChannelMemberLeaveEvent event) {
-        if(event.getChannel().getConnectedUsers().size() != 0) {
+        if (event.getChannel().getConnectedUsers().size() != 0) {
             return;
         }
 
@@ -23,7 +23,9 @@ public class VoiceLeaveListener implements ServerVoiceChannelMemberLeaveListener
                 .getDatabase(ChannelSpecs.CHANNEL_SETTINGS)
                 .getValue(channelId);
 
-        channelInfo.ifPresent(info -> ChannelUtilities.disableGhostChannel(info, event.getChannel()));
-        MusicBot.LOGGER.info("deactivating ghost-channel {}, as all users have leaved.", channelId);
+        channelInfo.ifPresent(info -> {
+            MusicBot.LOGGER.info("deactivating ghost-channel {}, as all users have leaved.", channelId);
+            ChannelUtilities.disableGhostChannel(info, event.getChannel());
+        });
     }
 }

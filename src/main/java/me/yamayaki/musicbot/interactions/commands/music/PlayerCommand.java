@@ -1,10 +1,13 @@
 package me.yamayaki.musicbot.interactions.commands.music;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.interactions.Command;
 import me.yamayaki.musicbot.utils.ChannelUtilities;
 import me.yamayaki.musicbot.utils.Either;
+import me.yamayaki.musicbot.utils.YouTubeUtils;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandBuilder;
@@ -19,7 +22,7 @@ public class PlayerCommand implements Command {
     private final String CMD_LOOP = "loop";
     private final String CMD_CONNECT = "connect";
     private final String CMD_DISCONNECT = "disconnect";
-
+    private final String CMD_CURRENT = "current";
 
     @Override
     public String getName() {
@@ -31,6 +34,7 @@ public class PlayerCommand implements Command {
         return SlashCommand.with(getName(), "Ändere Einstellungen des Players.")
                 .setEnabledInDms(false)
                 .addOption(SlashCommandOption.createWithChoices(SlashCommandOptionType.STRING, "action", "Aktion", true,
+                        new SlashCommandOptionChoiceBuilder().setName("Aktuelles Lied").setValue(CMD_CURRENT),
                         new SlashCommandOptionChoiceBuilder().setName("Pausieren").setValue(CMD_PAUSE),
                         new SlashCommandOptionChoiceBuilder().setName("Fortsetzen").setValue(CMD_RESUME),
                         new SlashCommandOptionChoiceBuilder().setName("Wiederholen").setValue(CMD_LOOP),
@@ -83,6 +87,26 @@ public class PlayerCommand implements Command {
                     MusicBot.getAudioManager()
                             .removeTrackManager(either.getRight());
                 }, () -> interUpdater.setContent("Es ist ein Fehler aufgetreten!").update());
+            }
+            case CMD_CURRENT -> {
+                var trackManager = MusicBot.getAudioManager()
+                        .getTrackManager(either.getRight());
+
+                if (trackManager.hasFinished() || trackManager.getPlaylist().getCurrentTrack() == null) {
+                    interUpdater.setContent("Es spielt aktuell kein Lied.").update();
+                    return;
+                }
+
+                AudioTrack audioTrack = trackManager.getPlaylist()
+                        .getCurrentTrack();
+
+                EmbedBuilder replyEmbed = new EmbedBuilder()
+                        .setImage(YouTubeUtils.getThumbnail(audioTrack.getIdentifier()))
+                        .addField("Titel", audioTrack.getInfo().title)
+                        .addField("Künstler", audioTrack.getInfo().author)
+                        .setTimestampToNow();
+
+                interUpdater.addEmbed(replyEmbed).update();
             }
 
             default -> interUpdater.setContent("Unbekannte Aktion").update();

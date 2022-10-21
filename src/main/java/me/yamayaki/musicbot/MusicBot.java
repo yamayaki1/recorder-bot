@@ -26,7 +26,7 @@ public class MusicBot {
     public static final Logger LOGGER = LogManager.getLogger(MusicBot.class);
     public static final Config CONFIG = new Config(new File(".", "config/"));
 
-    public static final ExecutorService THREAD_POOL = Executors.newCachedThreadPool();
+    public static final ExecutorService THREAD_POOL = Executors.newWorkStealingPool(Math.max(Runtime.getRuntime().availableProcessors() / 2, 4));
 
     public static final RocksManager DATABASE = new RocksManager(new File(".", "database/"), new DatabaseSpec[]{
             CacheSpecs.SPOTIFY_CACHE,
@@ -48,10 +48,6 @@ public class MusicBot {
 
     public static ServerManager getAudioManager() {
         return serverManager;
-    }
-
-    public static SpotifyAccess getSpotifyAccess() {
-        return spotifyAccess;
     }
 
     protected void launch() {

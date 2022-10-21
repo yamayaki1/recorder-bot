@@ -73,7 +73,7 @@ public class SpotifySourceManager implements AudioSourceManager {
                     .getValue(trackId);
 
             if (spotifyTrack.isEmpty()) {
-                final Track track = MusicBot.getSpotifyAccess().getSpotifyApi()
+                final Track track = SpotifyAccess.getAPI()
                         .getTrack(trackId)
                         .build().execute();
                 spotifyTrack = Optional.of(new SpotifyTrack(track));
@@ -91,7 +91,7 @@ public class SpotifySourceManager implements AudioSourceManager {
 
     private SpotifyTrack[] buildFromAlbum(String albumId) {
         try {
-            final Album album = MusicBot.getSpotifyAccess().getSpotifyApi()
+            final Album album = SpotifyAccess.getAPI()
                     .getAlbum(albumId)
                     .build().execute();
 
@@ -108,8 +108,8 @@ public class SpotifySourceManager implements AudioSourceManager {
 
     private SpotifyTrack[] buildFromPlaylist(String playlistId) {
         try {
-            final Playlist playlist = MusicBot.getSpotifyAccess()
-                    .getSpotifyApi().getPlaylist(playlistId)
+            final Playlist playlist = SpotifyAccess.getAPI()
+                    .getPlaylist(playlistId)
                     .build().execute();
 
             SpotifyTrack[] tracks = new SpotifyTrack[playlist.getTracks().getItems().length];

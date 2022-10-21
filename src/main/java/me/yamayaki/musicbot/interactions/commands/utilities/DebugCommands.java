@@ -1,6 +1,5 @@
 package me.yamayaki.musicbot.interactions.commands.utilities;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.TrackManager;
 import me.yamayaki.musicbot.interactions.Command;
@@ -28,7 +27,6 @@ public class DebugCommands implements Command {
                 .setEnabledInDms(false)
                 .addOption(SlashCommandOption.createWithChoices(SlashCommandOptionType.STRING, "subcommand", "Unterbefehl", true,
                         new SlashCommandOptionChoiceBuilder().setName("Über den Bot").setValue("about"),
-                        new SlashCommandOptionChoiceBuilder().setName("Aktueller Song").setValue("current_song"),
                         new SlashCommandOptionChoiceBuilder().setName("Ausgabe fixen").setValue("reconnect"),
                         new SlashCommandOptionChoiceBuilder().setName("Letzte Fehler").setValue("last_errors")
                 ));
@@ -46,24 +44,6 @@ public class DebugCommands implements Command {
                         .addField("Entwickler", "Yamayaki (<@310370479380627458>)", true)
                         .addField("Betriebssystem", String.format("%s (%s) %s", System.getProperty("os.name"), System.getProperty("os.arch"), System.getProperty("os.version")), true)
                         .addField("Arbeitsspeicher", ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576) + "/" + (Runtime.getRuntime().totalMemory() / 1048576) + "MB", true);
-
-                interUpdater.addEmbed(embedBuilder).update();
-            }
-            case "current_song" -> {
-                AudioTrack audioTrack = MusicBot.getAudioManager()
-                        .getTrackManager(either.getRight())
-                        .getPlaylist()
-                        .getCurrentTrack();
-
-                if (audioTrack == null) {
-                    return;
-                }
-
-                EmbedBuilder embedBuilder = new EmbedBuilder().setTitle("track")
-                        .addField("title", audioTrack.getInfo().title)
-                        .addField("author", audioTrack.getInfo().author)
-                        .addField("source", audioTrack.getSourceManager().getSourceName())
-                        .addField("url", audioTrack.getInfo().uri);
 
                 interUpdater.addEmbed(embedBuilder).update();
             }

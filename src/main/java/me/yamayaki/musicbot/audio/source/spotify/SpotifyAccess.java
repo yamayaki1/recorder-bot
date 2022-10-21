@@ -12,44 +12,43 @@ import java.time.Instant;
 import java.util.regex.Pattern;
 
 public class SpotifyAccess {
-
     public static final Pattern SPOTIFY_PATTERN = Pattern.compile("(https?://)?(.*)?spotify\\.com.*");
 
     public static final Pattern TRACK_PATTERN = Pattern.compile("/tracks?/([^?/\\s]*)");
     public static final Pattern PLAYLIST_PATTERN = Pattern.compile("/playlists?/([^?/\\s]*)");
     public static final Pattern ALBUM_PATTERN = Pattern.compile("/albums?/([^?/\\s]*)");
 
-    private final SpotifyApi spotifyApi;
-    private final ClientCredentialsRequest clientCredentialsRequest;
-    private long tokenExpires = 0;
+    private static final SpotifyApi spotifyApi;
+    private static final ClientCredentialsRequest clientCredentialsRequest;
+    private static long tokenExpires = 0;
 
-    public SpotifyAccess() {
-        this.spotifyApi = new SpotifyApi.Builder()
+    static {
+        spotifyApi = new SpotifyApi.Builder()
                 .setClientId(MusicBot.CONFIG.get().getSpotify().getClientId())
                 .setClientSecret(MusicBot.CONFIG.get().getSpotify().getClientSecret())
                 .build();
 
-        this.clientCredentialsRequest = this.spotifyApi.clientCredentials()
+        clientCredentialsRequest = spotifyApi.clientCredentials()
                 .build();
     }
 
-    private void renewAccessToken() {
+    private static void renewAccessToken() {
         try {
-            if (this.tokenExpires >= Instant.now().getEpochSecond()) {
+            if (tokenExpires >= Instant.now().getEpochSecond()) {
                 return;
             }
 
-            final ClientCredentials clientCredentials = this.clientCredentialsRequest.execute();
-            this.spotifyApi.setAccessToken(clientCredentials.getAccessToken());
+            final ClientCredentials clientCredentials = clientCredentialsRequest.execute();
+            spotifyApi.setAccessToken(clientCredentials.getAccessToken());
 
-            this.tokenExpires = Instant.now().getEpochSecond() + clientCredentials.getExpiresIn();
+            tokenExpires = Instant.now().getEpochSecond() + clientCredentials.getExpiresIn();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public SpotifyApi getSpotifyApi() {
-        this.renewAccessToken();
+    public static SpotifyApi getAPI() {
+        renewAccessToken();
         return spotifyApi;
     }
 }
