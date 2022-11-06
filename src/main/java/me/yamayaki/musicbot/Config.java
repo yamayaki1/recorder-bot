@@ -10,6 +10,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Config {
+    public static String version = "unknown";
+
+    static {
+        try (InputStream inputStream = Config.class.getResourceAsStream("/version.txt")) {
+            assert inputStream != null;
+            version = new String(inputStream.readAllBytes());
+        } catch (IOException | NullPointerException ignored) {
+        }
+    }
+
     private final Path filePath;
 
     private JsonConfig config;
@@ -24,13 +34,8 @@ public class Config {
         this.reload();
     }
 
-    public String getBotVersion() {
-        try (InputStream inputStream = this.getClass().getResourceAsStream("/version.txt")) {
-            assert inputStream != null;
-            return new String(inputStream.readAllBytes());
-        } catch (IOException | NullPointerException e) {
-            return "unknown";
-        }
+    public static String getVersion() {
+        return version;
     }
 
     public JsonConfig get() {
@@ -46,9 +51,8 @@ public class Config {
         } catch (IOException e) {
             MusicBot.LOGGER.error("error reading settings file, generating new one");
             this.config = new JsonConfig();
+            this.save();
         }
-
-        this.save();
     }
 
     public void save() {

@@ -1,5 +1,6 @@
 package me.yamayaki.musicbot.interactions.commands.utilities;
 
+import me.yamayaki.musicbot.Config;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.TrackManager;
 import me.yamayaki.musicbot.interactions.Command;
@@ -39,7 +40,7 @@ public class DebugCommands implements Command {
         switch (either.getLeft().getOptionStringValueByName("subcommand").orElse("")) {
             case "about" -> {
                 EmbedBuilder embedBuilder = new EmbedBuilder()
-                        .addField("Version", MusicBot.CONFIG.getBotVersion())
+                        .addField("Version", Config.getVersion())
                         .addField("Repository", "https://github.com/yamayaki1/recorder-bot", true)
                         .addField("Entwickler", "Yamayaki (<@310370479380627458>)", true)
                         .addField("Betriebssystem", String.format("%s (%s) %s", System.getProperty("os.name"), System.getProperty("os.arch"), System.getProperty("os.version")), true)

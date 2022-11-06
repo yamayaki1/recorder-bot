@@ -21,9 +21,11 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 
 public class SpotifySourceManager implements AudioSourceManager {
@@ -60,7 +62,8 @@ public class SpotifySourceManager implements AudioSourceManager {
             }
 
             audioItem = this.getAudioItem(tracks);
-        } catch (MalformedURLException ignored) {
+        } catch (MalformedURLException | ExecutionException | InterruptedException exception) {
+            MusicBot.LOGGER.error(exception);
         }
 
         return audioItem;
@@ -123,46 +126,52 @@ public class SpotifySourceManager implements AudioSourceManager {
         }
     }
 
-    private AudioItem getAudioItem(final SpotifyTrack[] spotifyTracks) {
-        final List<AudioTrack> tracks = new ArrayList<>();
-
-        for (SpotifyTrack spotifyTrack : spotifyTracks) {
-            var ytIdent = MusicBot.DATABASE
-                    .getDatabase(CacheSpecs.YOUTUBE_CACHE)
-                    .getValue(spotifyTrack.getIdentifier());
-
-            if (ytIdent.isEmpty()) {
-                final String artist = spotifyTrack.getArtist();
-                final String title = spotifyTrack.getName();
-
-                final var reference = new AudioReference("ytmsearch:" + title.replaceAll("-", "") + " - " + artist, title);
-                final AudioItem youtubeMusicItem = LavaSourceManager.youtubeSource.loadItem(null, reference);
-                if (!(youtubeMusicItem instanceof AudioPlaylist playlistItem)) {
-                    continue;
-                }
-
-                final var weightedResult = WeightedTrackSelector
-                        .getWeightedTrack(spotifyTrack, playlistItem.getTracks());
-                tracks.add(weightedResult.getLeft());
-
-                if (weightedResult.getRight()) {
-                    MusicBot.DATABASE
-                            .getDatabase(CacheSpecs.YOUTUBE_CACHE)
-                            .putValue(spotifyTrack.getIdentifier(), weightedResult.getLeft().getIdentifier());
-                }
-
-                continue;
-            }
-
-            final var reference = new AudioReference("https://youtube.com/watch?v=" + ytIdent.get(), spotifyTrack.getName());
-            final AudioItem youtubeItem = LavaSourceManager.youtubeSource.loadItem(null, reference);
-
-            if (youtubeItem instanceof AudioTrack ytTrack) {
-                tracks.add(ytTrack);
-            }
-        }
+    private AudioItem getAudioItem(final SpotifyTrack[] spotifyTracks) throws ExecutionException, InterruptedException {
+        List<AudioTrack> tracks = MusicBot.THREAD_POOL.submit(()->
+                Arrays.stream(spotifyTracks).parallel()
+                        .map(this::fromYouTube)
+                        .filter(Objects::nonNull)
+                        .toList()
+        ).get();
 
         return new BasicAudioPlaylist("YouTube-List", tracks, null, false);
+    }
+
+    private AudioTrack fromYouTube(SpotifyTrack spotifyTrack) {
+        var ytIdent = MusicBot.DATABASE
+                .getDatabase(CacheSpecs.YOUTUBE_CACHE)
+                .getValue(spotifyTrack.getIdentifier());
+
+        if (ytIdent.isEmpty()) {
+            final String artist = spotifyTrack.getArtist();
+            final String title = spotifyTrack.getName();
+
+            final var reference = new AudioReference("ytmsearch:" + title.replaceAll("-", "") + " - " + artist, title);
+            final AudioItem youtubeMusicItem = LavaSourceManager.youtubeSource.loadItem(null, reference);
+            if (!(youtubeMusicItem instanceof AudioPlaylist playlistItem)) {
+                return null;
+            }
+
+            final var weightedResult = WeightedTrackSelector
+                    .getWeightedTrack(spotifyTrack, playlistItem.getTracks());
+
+            if (weightedResult.getRight()) {
+                MusicBot.DATABASE
+                        .getDatabase(CacheSpecs.YOUTUBE_CACHE)
+                        .putValue(spotifyTrack.getIdentifier(), weightedResult.getLeft().getIdentifier());
+            }
+
+            return weightedResult.getLeft();
+        }
+
+        final var reference = new AudioReference("https://youtube.com/watch?v=" + ytIdent.get(), spotifyTrack.getName());
+        final AudioItem youtubeItem = LavaSourceManager.youtubeSource.loadItem(null, reference);
+
+        if (youtubeItem instanceof AudioTrack ytTrack) {
+            return ytTrack;
+        }
+
+        return null;
     }
 
     @Override

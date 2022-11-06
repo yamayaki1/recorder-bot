@@ -1,7 +1,6 @@
 package me.yamayaki.musicbot;
 
 import me.yamayaki.musicbot.audio.ServerManager;
-import me.yamayaki.musicbot.audio.source.spotify.SpotifyAccess;
 import me.yamayaki.musicbot.database.RocksManager;
 import me.yamayaki.musicbot.database.specs.DatabaseSpec;
 import me.yamayaki.musicbot.database.specs.impl.CacheSpecs;
@@ -36,8 +35,6 @@ public class MusicBot {
             ChannelSpecs.CHANNEL_SETTINGS
     });
 
-    private static final SpotifyAccess spotifyAccess = new SpotifyAccess();
-
     private static ServerManager serverManager = null;
     private DiscordApi discordApi;
 
@@ -52,7 +49,7 @@ public class MusicBot {
 
     protected void launch() {
         //report version
-        LOGGER.info("starting music-bot ({}) ...", CONFIG.getBotVersion());
+        LOGGER.info("starting music-bot ({}) ...", Config.getVersion());
 
         //init api-builder
         LOGGER.info("initializing discord-api ...");
@@ -75,13 +72,13 @@ public class MusicBot {
     protected void runTasks() {
         LOGGER.info("starting tasks and commandline listener ...");
 
-        THREAD_POOL.submit(new CmdLineHandler(this));
+        Executors.newSingleThreadExecutor().submit(new CmdLineHandler(this));
         Runtime.getRuntime().addShutdownHook(new ShutdownHandler(this));
     }
 
     public void updatePresence() {
         discordApi.updateStatus(UserStatus.ONLINE);
-        discordApi.updateActivity(ActivityType.PLAYING, "Recorder | " + CONFIG.getBotVersion());
+        discordApi.updateActivity(ActivityType.PLAYING, "Recorder | " + Config.getVersion());
     }
 
     public DiscordApi getAPI() {
