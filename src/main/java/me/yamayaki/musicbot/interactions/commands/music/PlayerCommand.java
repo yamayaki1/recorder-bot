@@ -2,6 +2,7 @@ package me.yamayaki.musicbot.interactions.commands.music;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.MusicBot;
+import me.yamayaki.musicbot.audio.source.spotify.SpotifyTrack;
 import me.yamayaki.musicbot.interactions.Command;
 import me.yamayaki.musicbot.utils.ChannelUtilities;
 import me.yamayaki.musicbot.utils.Either;
@@ -100,8 +101,10 @@ public class PlayerCommand implements Command {
                 AudioTrack audioTrack = trackManager.getPlaylist()
                         .getCurrentTrack();
 
+                SpotifyTrack spotifyData = audioTrack.getUserData(SpotifyTrack.class);
+
                 EmbedBuilder replyEmbed = new EmbedBuilder()
-                        .setImage(YouTubeUtils.getThumbnail(audioTrack.getIdentifier()))
+                        .setImage(spotifyData != null ? spotifyData.getImage() : YouTubeUtils.getThumbnail(audioTrack.getIdentifier()))
                         .addField("Titel", audioTrack.getInfo().title)
                         .addField("Künstler", audioTrack.getInfo().author)
                         .setTimestampToNow();

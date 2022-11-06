@@ -7,6 +7,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.player.LavaPlayerManager;
 import me.yamayaki.musicbot.database.specs.impl.CacheSpecs;
+import me.yamayaki.musicbot.utils.TrackInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,10 +93,11 @@ public class PlaylistManager {
             return;
         }
 
-        for (String url : response.get()) {
-            LavaPlayerManager.getPlayerManager().loadItem(url, new AudioLoadResultHandler() {
+        for (TrackInfo trackInfo : response.get()) {
+            LavaPlayerManager.getPlayerManager().loadItem(trackInfo.uri, new AudioLoadResultHandler() {
                 @Override
                 public void trackLoaded(AudioTrack track) {
+                    track.setPosition(trackInfo.position);
                     trackList.add(track);
                 }
 
@@ -122,16 +124,16 @@ public class PlaylistManager {
     }
 
     public void store() {
-        final List<String> ids = new ArrayList<>();
+        final List<TrackInfo> ids = new ArrayList<>();
 
         //add currently playing track
-        ids.add(this.getCurrentTrack().getInfo().uri);
+        ids.add(TrackInfo.of(this.getCurrentTrack()));
 
         //add all remaining songs
-        trackList.forEach(track -> ids.add(track.getInfo().uri));
+        trackList.forEach(track -> ids.add(TrackInfo.of(track)));
 
         MusicBot.DATABASE
                 .getDatabase(CacheSpecs.PLAYLIST_CACHE)
-                .putValue(this.trackManager.getServerId(), ids.toArray(String[]::new));
+                .putValue(this.trackManager.getServerId(), ids.toArray(TrackInfo[]::new));
     }
 }

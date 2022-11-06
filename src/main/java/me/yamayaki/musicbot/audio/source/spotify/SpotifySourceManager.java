@@ -1,5 +1,6 @@
 package me.yamayaki.musicbot.audio.source.spotify;
 
+import com.neovisionaries.i18n.CountryCode;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
@@ -78,6 +79,7 @@ public class SpotifySourceManager implements AudioSourceManager {
             if (spotifyTrack.isEmpty()) {
                 final Track track = SpotifyAccess.getAPI()
                         .getTrack(trackId)
+                        .market(CountryCode.US)
                         .build().execute();
                 spotifyTrack = Optional.of(new SpotifyTrack(track));
 
@@ -138,7 +140,7 @@ public class SpotifySourceManager implements AudioSourceManager {
     }
 
     private AudioTrack fromYouTube(SpotifyTrack spotifyTrack) {
-        var ytIdent = MusicBot.DATABASE
+        Optional<String> ytIdent = MusicBot.DATABASE
                 .getDatabase(CacheSpecs.YOUTUBE_CACHE)
                 .getValue(spotifyTrack.getIdentifier());
 
@@ -161,6 +163,7 @@ public class SpotifySourceManager implements AudioSourceManager {
                         .putValue(spotifyTrack.getIdentifier(), weightedResult.getLeft().getIdentifier());
             }
 
+            weightedResult.getLeft().setUserData(spotifyTrack);
             return weightedResult.getLeft();
         }
 
@@ -168,6 +171,7 @@ public class SpotifySourceManager implements AudioSourceManager {
         final AudioItem youtubeItem = LavaSourceManager.youtubeSource.loadItem(null, reference);
 
         if (youtubeItem instanceof AudioTrack ytTrack) {
+            ytTrack.setUserData(spotifyTrack);
             return ytTrack;
         }
 

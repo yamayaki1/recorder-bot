@@ -1,24 +1,19 @@
 package me.yamayaki.musicbot.audio.source.spotify;
 
+import se.michaelthelin.spotify.model_objects.specification.Image;
 import se.michaelthelin.spotify.model_objects.specification.Track;
-import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
 
 public class SpotifyTrack {
-
     private final String identifier;
     private final String name;
+    private final String image;
     private final String artist;
 
 
     public SpotifyTrack(Track item) {
         this.identifier = item.getId();
         this.name = item.getName();
-        this.artist = item.getArtists()[0].getName();
-    }
-
-    public SpotifyTrack(TrackSimplified item) {
-        this.identifier = item.getId();
-        this.name = item.getName();
+        this.image = getOptimalImage(item.getAlbum().getImages());
         this.artist = item.getArtists()[0].getName();
     }
 
@@ -30,8 +25,27 @@ public class SpotifyTrack {
         return name;
     }
 
+    public String getImage() {
+        return image;
+    }
+
     public String getArtist() {
         return artist;
+    }
+
+    private String getOptimalImage(Image[] images) {
+        int index = 0;
+        int width = 0;
+
+        for (int i = 0; i < images.length; i++) {
+            Image image = images[i];
+
+            if(image.getWidth() > width) {
+                index = i;
+            }
+        }
+
+        return images[index].getUrl();
     }
 
     @Override
