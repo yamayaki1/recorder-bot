@@ -7,7 +7,7 @@ import me.yamayaki.musicbot.database.specs.impl.CacheSpecs;
 import me.yamayaki.musicbot.database.specs.impl.ChannelSpecs;
 import me.yamayaki.musicbot.interactions.InteractionListener;
 import me.yamayaki.musicbot.interactions.VoiceLeaveListener;
-import me.yamayaki.musicbot.tasks.CmdLineHandler;
+import me.yamayaki.musicbot.tasks.BackgroundTasks;
 import me.yamayaki.musicbot.tasks.ShutdownHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,14 +18,12 @@ import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.user.UserStatus;
 
 import java.io.File;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class MusicBot {
     public static final Logger LOGGER = LogManager.getLogger(MusicBot.class);
     public static final Config CONFIG = new Config(new File(".", "config/"));
-
-    public static final ExecutorService THREAD_POOL = Executors.newWorkStealingPool(Math.max(Runtime.getRuntime().availableProcessors() / 2, 4));
 
     public static final RocksManager DATABASE = new RocksManager(new File(".", "database/"), new DatabaseSpec[]{
             CacheSpecs.SPOTIFY_CACHE,
@@ -35,7 +33,7 @@ public class MusicBot {
             ChannelSpecs.CHANNEL_SETTINGS
     });
 
-    private static ServerManager serverManager = null;
+    private static final ServerManager serverManager = new ServerManager();
     private DiscordApi discordApi;
 
     public static void main(String[] args) {
@@ -63,8 +61,6 @@ public class MusicBot {
         discordApi.addListener(new InteractionListener(this.discordApi));
         discordApi.addListener(new VoiceLeaveListener());
 
-        serverManager = new ServerManager();
-
         this.updatePresence();
         this.runTasks();
     }
@@ -72,7 +68,7 @@ public class MusicBot {
     protected void runTasks() {
         LOGGER.info("starting tasks and commandline listener ...");
 
-        Executors.newSingleThreadExecutor().submit(new CmdLineHandler(this));
+        Executors.newSingleThreadScheduledExecutor().schedule(new BackgroundTasks(this), 1L, TimeUnit.SECONDS);
         Runtime.getRuntime().addShutdownHook(new ShutdownHandler(this));
     }
 
@@ -90,7 +86,6 @@ public class MusicBot {
         try {
             serverManager.shutdown();
             DATABASE.close();
-            THREAD_POOL.shutdown();
             this.discordApi.disconnect().join();
         } catch (Exception e) {
             MusicBot.LOGGER.error(e);

@@ -3,7 +3,7 @@ package me.yamayaki.musicbot.audio;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.audio.handler.AudioEventHandler;
 import me.yamayaki.musicbot.audio.handler.LoadResultHandler;
-import me.yamayaki.musicbot.audio.handler.LoaderResponse;
+import me.yamayaki.musicbot.audio.entities.LoaderResponse;
 import me.yamayaki.musicbot.audio.player.LavaAudioSource;
 import org.javacord.api.entity.server.Server;
 

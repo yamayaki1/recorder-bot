@@ -1,4 +1,4 @@
-package me.yamayaki.musicbot.audio.handler;
+package me.yamayaki.musicbot.audio.entities;
 
 public class LoaderResponse {
     private final boolean success;

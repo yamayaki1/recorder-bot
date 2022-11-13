@@ -2,7 +2,7 @@ package me.yamayaki.musicbot.database.specs.impl;
 
 import me.yamayaki.musicbot.audio.source.spotify.SpotifyTrack;
 import me.yamayaki.musicbot.database.specs.DatabaseSpec;
-import me.yamayaki.musicbot.utils.TrackInfo;
+import me.yamayaki.musicbot.audio.entities.TrackInfo;
 
 public class CacheSpecs {
     public static final DatabaseSpec<String, SpotifyTrack> SPOTIFY_CACHE =

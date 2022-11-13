@@ -13,6 +13,7 @@ import com.sedmelluq.discord.lavaplayer.track.BasicAudioPlaylist;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.player.LavaSourceManager;
 import me.yamayaki.musicbot.database.specs.impl.CacheSpecs;
+import me.yamayaki.musicbot.utils.Threads;
 import se.michaelthelin.spotify.model_objects.specification.Album;
 import se.michaelthelin.spotify.model_objects.specification.Playlist;
 import se.michaelthelin.spotify.model_objects.specification.Track;
@@ -129,7 +130,7 @@ public class SpotifySourceManager implements AudioSourceManager {
     }
 
     private AudioItem getAudioItem(final SpotifyTrack[] spotifyTracks) throws ExecutionException, InterruptedException {
-        List<AudioTrack> tracks = MusicBot.THREAD_POOL.submit(()->
+        List<AudioTrack> tracks = Threads.mainWorker().submit(()->
                 Arrays.stream(spotifyTracks).parallel()
                         .map(this::fromYouTube)
                         .filter(Objects::nonNull)

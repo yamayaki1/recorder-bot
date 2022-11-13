@@ -7,7 +7,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.player.LavaPlayerManager;
 import me.yamayaki.musicbot.database.specs.impl.CacheSpecs;
-import me.yamayaki.musicbot.utils.TrackInfo;
+import me.yamayaki.musicbot.audio.entities.TrackInfo;
 
 import java.util.ArrayList;
 import java.util.List;

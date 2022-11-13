@@ -6,6 +6,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.TrackManager;
+import me.yamayaki.musicbot.audio.entities.LoaderResponse;
 
 import java.util.function.Consumer;
 

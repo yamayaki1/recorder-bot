@@ -5,7 +5,7 @@ import me.yamayaki.musicbot.database.serializers.impl.LongSerializer;
 import me.yamayaki.musicbot.database.serializers.impl.ObjectSerializer;
 import me.yamayaki.musicbot.database.serializers.impl.StringSerializer;
 import me.yamayaki.musicbot.utils.ChannelInfo;
-import me.yamayaki.musicbot.utils.TrackInfo;
+import me.yamayaki.musicbot.audio.entities.TrackInfo;
 
 import java.util.HashMap;
 

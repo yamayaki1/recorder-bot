@@ -12,6 +12,7 @@ import me.yamayaki.musicbot.interactions.commands.utilities.AvatarCommand;
 import me.yamayaki.musicbot.interactions.commands.utilities.DebugCommands;
 import me.yamayaki.musicbot.interactions.commands.utilities.PingCommand;
 import me.yamayaki.musicbot.utils.Either;
+import me.yamayaki.musicbot.utils.Threads;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.event.interaction.SlashCommandCreateEvent;
 import org.javacord.api.interaction.SlashCommand;
@@ -65,7 +66,7 @@ public class InteractionListener implements SlashCommandCreateListener {
                 }
 
                 MusicBot.LOGGER.info("removing {} commands ...", slashCommand.getName());
-                slashCommand.deleteGlobal().join();
+                slashCommand.delete().join();
             }
         });
     }
@@ -82,7 +83,7 @@ public class InteractionListener implements SlashCommandCreateListener {
             }
 
             return null;
-        }, MusicBot.THREAD_POOL).exceptionally(throwable -> {
+        }, Threads.mainWorker()).exceptionally(throwable -> {
             event.getSlashCommandInteraction().createFollowupMessageBuilder()
                     .setContent("Beim Ausführen des Befehls ist ein Fehler aufgetreten:\n" + throwable.getMessage())
                     .send();
