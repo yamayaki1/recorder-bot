@@ -36,7 +36,7 @@ public class PlayCommand implements Command {
                 .getTrackManager(either.getRight());
 
         ChannelUtilities.joinVoiceChannel(either, () -> {
-            String song = either.getLeft().getOptionStringValueByName("query").orElse("");
+            String song = either.getLeft().getArgumentStringValueByName("query").orElse("");
             if (!StringTools.isURL(song) && !song.contains("ytmsearch:") && !song.contains("ytsearch:")) {
                 song = "ytmsearch:" + song;
             }

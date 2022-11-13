@@ -37,7 +37,7 @@ public class DebugCommands implements Command {
     public void execute(Either<SlashCommandInteraction, Server> either) {
         var interUpdater = either.getLeft().respondLater(true).join();
 
-        switch (either.getLeft().getOptionStringValueByName("subcommand").orElse("")) {
+        switch (either.getLeft().getArgumentStringValueByName("subcommand").orElse("")) {
             case "about" -> {
                 EmbedBuilder embedBuilder = new EmbedBuilder()
                         .addField("Version", Config.getVersion())

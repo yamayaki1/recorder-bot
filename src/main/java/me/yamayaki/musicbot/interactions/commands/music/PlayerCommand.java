@@ -48,7 +48,7 @@ public class PlayerCommand implements Command {
     public void execute(Either<SlashCommandInteraction, Server> either) {
         var interUpdater = either.getLeft().respondLater(true).join();
 
-        switch (either.getLeft().getOptionStringValueByName("action").orElse("")) {
+        switch (either.getLeft().getArgumentStringValueByName("action").orElse("")) {
             case CMD_PAUSE -> {
                 MusicBot.getAudioManager()
                         .getTrackManager(either.getRight())

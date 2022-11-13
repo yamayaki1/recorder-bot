@@ -28,7 +28,7 @@ public class VolumeCommand implements Command {
     @Override
     public void execute(Either<SlashCommandInteraction, Server> either) {
         var interUpdater = either.getLeft().respondLater(true).join();
-        int volume = either.getLeft().getOptionDecimalValueByName("volume").orElse(50.0).intValue();
+        int volume = either.getLeft().getArgumentDecimalValueByName("volume").orElse(50.0).intValue();
 
         MusicBot.getAudioManager()
                 .getTrackManager(either.getRight())

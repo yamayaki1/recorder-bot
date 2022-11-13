@@ -29,7 +29,7 @@ public class AvatarCommand implements Command {
     public void execute(Either<SlashCommandInteraction, Server> either) {
         var interUpdater = either.getLeft().respondLater(false).join();
 
-        either.getLeft().getOptionUserValueByName("user").ifPresentOrElse(user -> {
+        either.getLeft().getArgumentUserValueByName("user").ifPresentOrElse(user -> {
             EmbedBuilder embed = new EmbedBuilder().setColor(Color.GREEN)
                     .setAuthor(user)
                     .setImage(user.getAvatar());

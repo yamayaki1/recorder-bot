@@ -40,6 +40,7 @@ public class ChannelUtilities {
                 onSuccess.run();
             } catch (NullPointerException e) {
                 onError.run();
+                MusicBot.LOGGER.error(e);
                 System.exit(-1);
             }
         }, onError);

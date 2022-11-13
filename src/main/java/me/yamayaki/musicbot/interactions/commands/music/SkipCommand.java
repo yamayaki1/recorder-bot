@@ -63,7 +63,7 @@ public class SkipCommand implements Command {
     @Override
     public void execute(Either<SlashCommandInteraction, Server> either) {
         var interUpdater = either.getLeft().respondLater(true).join();
-        int amount = either.getLeft().getOptionDecimalValueByName("amount")
+        int amount = either.getLeft().getArgumentDecimalValueByName("amount")
                 .orElse(1.0).intValue();
 
         TrackManager manager = MusicBot.getAudioManager()
