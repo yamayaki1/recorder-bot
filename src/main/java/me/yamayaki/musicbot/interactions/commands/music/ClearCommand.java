@@ -25,8 +25,8 @@ public class ClearCommand implements Command {
     public void execute(Either<SlashCommandInteraction, Server> either) {
         var interUpdater = either.getLeft().respondLater(true).join();
 
-        MusicBot.getAudioManager()
-                .getTrackManager(either.getRight())
+        MusicBot.instance()
+                .getAudioManager(either.getRight())
                 .getPlaylist()
                 .clearList();
 

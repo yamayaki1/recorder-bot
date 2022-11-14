@@ -9,7 +9,7 @@ import org.javacord.api.entity.server.Server;
 
 import java.util.function.Consumer;
 
-public class TrackManager {
+public class ServerAudioManager {
     private final Server server;
 
     private final LavaAudioSource audioSource;
@@ -17,10 +17,10 @@ public class TrackManager {
 
     public String lastError = "Kein Fehler.";
 
-    public TrackManager(Server server) {
+    public ServerAudioManager(Server server) {
         this.server = server;
         this.audioSource = new LavaAudioSource(server.getApi(), new AudioEventHandler(this));
-        this.playlistManager = new PlaylistManager(this);
+        this.playlistManager = new PlaylistManager(this.server.getId());
         this.resumeOrNext();
     }
 

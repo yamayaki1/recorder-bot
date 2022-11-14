@@ -2,7 +2,7 @@ package me.yamayaki.musicbot.interactions.commands.utilities;
 
 import me.yamayaki.musicbot.Config;
 import me.yamayaki.musicbot.MusicBot;
-import me.yamayaki.musicbot.audio.TrackManager;
+import me.yamayaki.musicbot.audio.ServerAudioManager;
 import me.yamayaki.musicbot.interactions.Command;
 import me.yamayaki.musicbot.utils.Either;
 import org.javacord.api.DiscordApi;
@@ -61,8 +61,8 @@ public class DebugCommands implements Command {
                     optChannel.get().connect().thenAccept(audioConnection -> {
                         audioConnection.setSelfDeafened(true);
 
-                        MusicBot.getAudioManager()
-                                .getTrackManager(either.getRight())
+                        MusicBot.instance()
+                                .getAudioManager(either.getRight())
                                 .fixAudioSource();
 
                         interUpdater.setContent("Audioconnection wiederhergestellt").update();
@@ -75,7 +75,7 @@ public class DebugCommands implements Command {
             case "last_errors" -> {
                 EmbedBuilder embedBuilder = new EmbedBuilder();
 
-                for (TrackManager manager : MusicBot.getAudioManager().getAll()) {
+                for (ServerAudioManager manager :MusicBot.instance().getAllAudioManagers()) {
                     embedBuilder.addField(manager.getServerName(), manager.lastError);
                 }
 

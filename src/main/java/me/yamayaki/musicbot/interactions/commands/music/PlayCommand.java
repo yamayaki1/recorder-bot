@@ -1,7 +1,7 @@
 package me.yamayaki.musicbot.interactions.commands.music;
 
 import me.yamayaki.musicbot.MusicBot;
-import me.yamayaki.musicbot.audio.TrackManager;
+import me.yamayaki.musicbot.audio.ServerAudioManager;
 import me.yamayaki.musicbot.interactions.Command;
 import me.yamayaki.musicbot.utils.ChannelUtilities;
 import me.yamayaki.musicbot.utils.Either;
@@ -31,9 +31,8 @@ public class PlayCommand implements Command {
     @Override
     public void execute(Either<SlashCommandInteraction, Server> either) {
         var interUpdater = either.getLeft().respondLater(true).join();
-        TrackManager trackManager = MusicBot
-                .getAudioManager()
-                .getTrackManager(either.getRight());
+        ServerAudioManager serverAudioManager = MusicBot.instance()
+                .getAudioManager(either.getRight());
 
         ChannelUtilities.joinVoiceChannel(either, () -> {
             String song = either.getLeft().getArgumentStringValueByName("query").orElse("");
@@ -41,7 +40,7 @@ public class PlayCommand implements Command {
                 song = "ytmsearch:" + song;
             }
 
-            trackManager.tryLoadItems(song, playerResponse -> {
+            serverAudioManager.tryLoadItems(song, playerResponse -> {
                 String message;
                 if (playerResponse.isSuccess()) {
                     message = playerResponse.getCount() > 1

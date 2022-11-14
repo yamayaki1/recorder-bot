@@ -30,8 +30,8 @@ public class VolumeCommand implements Command {
         var interUpdater = either.getLeft().respondLater(true).join();
         int volume = either.getLeft().getArgumentDecimalValueByName("volume").orElse(50.0).intValue();
 
-        MusicBot.getAudioManager()
-                .getTrackManager(either.getRight())
+        MusicBot.instance()
+                .getAudioManager(either.getRight())
                 .setVolume(volume);
 
         interUpdater.setContent("Lautstärke angepasst.").update();

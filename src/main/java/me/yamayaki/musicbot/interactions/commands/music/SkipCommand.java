@@ -3,7 +3,7 @@ package me.yamayaki.musicbot.interactions.commands.music;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import me.yamayaki.musicbot.MusicBot;
-import me.yamayaki.musicbot.audio.TrackManager;
+import me.yamayaki.musicbot.audio.ServerAudioManager;
 import me.yamayaki.musicbot.interactions.Command;
 import me.yamayaki.musicbot.utils.Either;
 import org.javacord.api.DiscordApi;
@@ -38,8 +38,8 @@ public class SkipCommand implements Command {
                 return;
             }
 
-            List<AudioTrack> trackList = MusicBot.getAudioManager()
-                    .getTrackManager(event.getAutocompleteInteraction().getServer().orElse(null))
+            List<AudioTrack> trackList = MusicBot.instance()
+                    .getAudioManager(event.getAutocompleteInteraction().getServer().orElse(null))
                     .getPlaylist()
                     .getTracks(false);
 
@@ -66,8 +66,8 @@ public class SkipCommand implements Command {
         int amount = either.getLeft().getArgumentDecimalValueByName("amount")
                 .orElse(1.0).intValue();
 
-        TrackManager manager = MusicBot.getAudioManager()
-                .getTrackManager(either.getRight());
+        ServerAudioManager manager = MusicBot.instance()
+                .getAudioManager(either.getRight());
 
         int max_amount = manager.getPlaylist().getTracks(false).size() + 1;
 
@@ -79,8 +79,8 @@ public class SkipCommand implements Command {
             return;
         }
 
-        MusicBot.getAudioManager()
-                .getTrackManager(either.getRight())
+        MusicBot.instance()
+                .getAudioManager(either.getRight())
                 .skipTrack(amount);
 
         interUpdater.setContent(amount > 1 ? amount + " Lieder übersprungen." : "Ein Lied übersprungen.").update();

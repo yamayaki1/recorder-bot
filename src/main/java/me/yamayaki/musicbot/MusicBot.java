@@ -1,6 +1,6 @@
 package me.yamayaki.musicbot;
 
-import me.yamayaki.musicbot.audio.ServerManager;
+import me.yamayaki.musicbot.audio.ServerAudioManager;
 import me.yamayaki.musicbot.database.RocksManager;
 import me.yamayaki.musicbot.database.specs.DatabaseSpec;
 import me.yamayaki.musicbot.database.specs.impl.CacheSpecs;
@@ -15,13 +15,18 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.intent.Intent;
+import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.UserStatus;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class MusicBot {
+    private static MusicBot instance = null;
+
     public static final Logger LOGGER = LogManager.getLogger(MusicBot.class);
     public static final Config CONFIG = new Config(new File(".", "config/"));
 
@@ -33,7 +38,8 @@ public class MusicBot {
             ChannelSpecs.CHANNEL_SETTINGS
     });
 
-    private static final ServerManager serverManager = new ServerManager();
+    private final HashMap<Server, ServerAudioManager> serverAudioManagers = new HashMap<>();
+
     private DiscordApi discordApi;
 
     public static void main(String[] args) {
@@ -41,11 +47,17 @@ public class MusicBot {
         bot.launch();
     }
 
-    public static ServerManager getAudioManager() {
-        return serverManager;
+    public static MusicBot instance() {
+        if(instance == null) {
+            throw new RuntimeException("instance not initialized!");
+        }
+
+        return instance;
     }
 
     protected void launch() {
+        instance = this;
+
         //report version
         LOGGER.info("starting music-bot ({}) ...", Config.getVersion());
 
@@ -81,10 +93,27 @@ public class MusicBot {
         return this.discordApi;
     }
 
+    public ServerAudioManager getAudioManager(Server server) {
+        return this.serverAudioManagers.computeIfAbsent(server, ServerAudioManager::new);
+    }
+
+    public void removeAudioManager(Server server) {
+        this.serverAudioManagers.get(server).shutdown(false);
+        this.serverAudioManagers.remove(server);
+    }
+
+    public List<ServerAudioManager> getAllAudioManagers() {
+        return this.serverAudioManagers.values().stream().toList();
+    }
+
     public void shutdown() {
         MusicBot.LOGGER.info("shutting down ...");
         try {
-            serverManager.shutdown();
+            // shutdown audiomanagers
+            for (ServerAudioManager serverAudioManager : this.serverAudioManagers.values()) {
+                serverAudioManager.shutdown(true);
+            }
+
             DATABASE.close();
             this.discordApi.disconnect().join();
         } catch (Exception e) {

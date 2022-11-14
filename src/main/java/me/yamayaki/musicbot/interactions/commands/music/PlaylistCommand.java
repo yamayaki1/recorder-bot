@@ -31,8 +31,8 @@ public class PlaylistCommand implements Command {
         var interUpdater = either.getLeft().respondLater(true).join();
         EmbedBuilder embedBuilder = new EmbedBuilder().setTitle("Playlist");
 
-        List<AudioTrack> tracks = MusicBot.getAudioManager()
-                .getTrackManager(either.getRight())
+        List<AudioTrack> tracks = MusicBot.instance()
+                .getAudioManager(either.getRight())
                 .getPlaylist()
                 .getTracks(true);
 

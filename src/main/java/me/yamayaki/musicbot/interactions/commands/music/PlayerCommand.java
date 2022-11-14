@@ -50,22 +50,22 @@ public class PlayerCommand implements Command {
 
         switch (either.getLeft().getArgumentStringValueByName("action").orElse("")) {
             case CMD_PAUSE -> {
-                MusicBot.getAudioManager()
-                        .getTrackManager(either.getRight())
+                MusicBot.instance()
+                        .getAudioManager(either.getRight())
                         .setPaused(true);
 
                 interUpdater.setContent("Aktuelles Lied pausiert.").update();
             }
             case CMD_RESUME -> {
-                MusicBot.getAudioManager()
-                        .getTrackManager(either.getRight())
+                MusicBot.instance()
+                        .getAudioManager(either.getRight())
                         .setPaused(false);
 
                 interUpdater.setContent("Lied fortgesetzt.").update();
             }
             case CMD_LOOP -> {
-                boolean repeat = MusicBot.getAudioManager()
-                        .getTrackManager(either.getRight())
+                boolean repeat = MusicBot.instance()
+                        .getAudioManager(either.getRight())
                         .getPlaylist()
                         .toggleRepeat();
 
@@ -76,8 +76,8 @@ public class PlayerCommand implements Command {
                     interUpdater.setContent("Verbindung hergstellt.")
                             .update();
 
-                    MusicBot.getAudioManager()
-                            .getTrackManager(either.getRight())
+                    MusicBot.instance()
+                            .getAudioManager(either.getRight())
                             .resumeOrNext();
                 }, () -> interUpdater.setContent("Beim Beitreten des Sprachkanals ist ein Fehler aufgetreten. Befindest du dich in einen Kanal?").update());
             }
@@ -85,13 +85,13 @@ public class PlayerCommand implements Command {
                 ChannelUtilities.leaveVoiceChannel(either, () -> {
                     interUpdater.setContent("Verbindung getrennt.").update();
 
-                    MusicBot.getAudioManager()
-                            .removeTrackManager(either.getRight());
+                    MusicBot.instance()
+                            .removeAudioManager(either.getRight());
                 }, () -> interUpdater.setContent("Es ist ein Fehler aufgetreten!").update());
             }
             case CMD_CURRENT -> {
-                var trackManager = MusicBot.getAudioManager()
-                        .getTrackManager(either.getRight());
+                var trackManager = MusicBot.instance()
+                        .getAudioManager(either.getRight());
 
                 if (trackManager.hasFinished() || trackManager.getPlaylist().getCurrentTrack() == null) {
                     interUpdater.setContent("Es spielt aktuell kein Lied.").update();

@@ -6,27 +6,27 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import me.yamayaki.musicbot.MusicBot;
-import me.yamayaki.musicbot.audio.TrackManager;
+import me.yamayaki.musicbot.audio.ServerAudioManager;
 
 public class AudioEventHandler extends AudioEventAdapter {
-    private final TrackManager trackManager;
+    private final ServerAudioManager serverAudioManager;
 
-    public AudioEventHandler(TrackManager trackManager) {
-        this.trackManager = trackManager;
+    public AudioEventHandler(ServerAudioManager serverAudioManager) {
+        this.serverAudioManager = serverAudioManager;
     }
 
     /**
      * @param player Audio player
      */
     public void onPlayerPause(AudioPlayer player) {
-        MusicBot.LOGGER.debug("paused player in {}", this.trackManager.getServerName());
+        MusicBot.LOGGER.debug("paused player in {}", this.serverAudioManager.getServerName());
     }
 
     /**
      * @param player Audio player
      */
     public void onPlayerResume(AudioPlayer player) {
-        MusicBot.LOGGER.debug("resumed player in {}", this.trackManager.getServerName());
+        MusicBot.LOGGER.debug("resumed player in {}", this.serverAudioManager.getServerName());
     }
 
     /**
@@ -34,7 +34,7 @@ public class AudioEventHandler extends AudioEventAdapter {
      * @param track  Audio track that started
      */
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
-        MusicBot.LOGGER.debug("started track in {}", this.trackManager.getServerName());
+        MusicBot.LOGGER.debug("started track in {}", this.serverAudioManager.getServerName());
     }
 
     /**
@@ -43,12 +43,12 @@ public class AudioEventHandler extends AudioEventAdapter {
      * @param endReason The reason why the track stopped playing
      */
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-        if (!this.trackManager.getPlaylist().hasNext()) {
+        if (!this.serverAudioManager.getPlaylist().hasNext()) {
             return;
         }
 
         if (endReason.mayStartNext) {
-            this.trackManager.resumeOrNext();
+            this.serverAudioManager.resumeOrNext();
         }
     }
 
@@ -58,7 +58,7 @@ public class AudioEventHandler extends AudioEventAdapter {
      * @param exception The exception that occurred
      */
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
-        this.trackManager.lastError = exception.getMessage();
+        this.serverAudioManager.lastError = exception.getMessage();
     }
 
     /**
@@ -67,6 +67,6 @@ public class AudioEventHandler extends AudioEventAdapter {
      * @param thresholdMs The wait threshold that was exceeded for this event to trigger
      */
     public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
-        MusicBot.LOGGER.info("player in {} seems to be stuck", this.trackManager.getServerName());
+        MusicBot.LOGGER.info("player in {} seems to be stuck", this.serverAudioManager.getServerName());
     }
 }

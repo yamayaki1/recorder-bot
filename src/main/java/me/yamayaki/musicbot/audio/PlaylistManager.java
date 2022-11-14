@@ -14,15 +14,15 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class PlaylistManager {
-    private final TrackManager trackManager;
+    private final Long serverID;
     private final List<AudioTrack> trackList;
 
     private AudioTrack currentTrack = null;
 
     public boolean loop = false;
 
-    public PlaylistManager(TrackManager trackManager) {
-        this.trackManager = trackManager;
+    public PlaylistManager(Long serverID) {
+        this.serverID = serverID;
         this.trackList = new ArrayList<>();
 
         try {
@@ -87,7 +87,7 @@ public class PlaylistManager {
     public void restore() throws ExecutionException, InterruptedException {
         var response = MusicBot.DATABASE
                 .getDatabase(CacheSpecs.PLAYLIST_CACHE)
-                .getValue(this.trackManager.getServerId());
+                .getValue(this.serverID);
 
         if (response.isEmpty()) {
             return;
@@ -120,7 +120,7 @@ public class PlaylistManager {
 
         MusicBot.DATABASE
                 .getDatabase(CacheSpecs.PLAYLIST_CACHE)
-                .deleteValue(this.trackManager.getServerId());
+                .deleteValue(this.serverID);
     }
 
     public void store() {
@@ -134,6 +134,6 @@ public class PlaylistManager {
 
         MusicBot.DATABASE
                 .getDatabase(CacheSpecs.PLAYLIST_CACHE)
-                .putValue(this.trackManager.getServerId(), ids.toArray(TrackInfo[]::new));
+                .putValue(this.serverID, ids.toArray(TrackInfo[]::new));
     }
 }
