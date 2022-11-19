@@ -65,7 +65,7 @@ public class DebugCommands implements Command {
 
                         interUpdater.setContent("Audioconnection wiederhergestellt").update();
                     });
-                } catch (NullPointerException e) {
+                } catch (Exception e) {
                     interUpdater.setContent("Fehler im AudioWebSocketAdapter, starte Bot neu!").update().join();
                     System.exit(-1);
                 }

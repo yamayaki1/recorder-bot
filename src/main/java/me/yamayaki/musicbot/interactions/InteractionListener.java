@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 public class InteractionListener implements SlashCommandCreateListener {
     private final HashMap<String, Command> commands = new HashMap<>();
@@ -57,18 +58,6 @@ public class InteractionListener implements SlashCommandCreateListener {
         }
 
         discordApi.bulkOverwriteGlobalApplicationCommands(builderSet).join();
-
-        //cleanup old commands
-        discordApi.getGlobalSlashCommands().thenAccept(list -> {
-            for (SlashCommand slashCommand : list) {
-                if (this.commands.containsKey(slashCommand.getName())) {
-                    return;
-                }
-
-                MusicBot.LOGGER.info("removing {} commands ...", slashCommand.getName());
-                slashCommand.delete().join();
-            }
-        });
     }
 
     @Override
@@ -83,7 +72,7 @@ public class InteractionListener implements SlashCommandCreateListener {
             }
 
             return null;
-        }, Threads.mainWorker()).exceptionally(throwable -> {
+        }, Threads.mainWorker()).orTimeout(60L, TimeUnit.SECONDS).exceptionally(throwable -> {
             event.getSlashCommandInteraction().createFollowupMessageBuilder()
                     .setContent("Beim Ausführen des Befehls ist ein Fehler aufgetreten:\n" + throwable.getMessage())
                     .send();

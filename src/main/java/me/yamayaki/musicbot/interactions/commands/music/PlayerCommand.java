@@ -21,8 +21,6 @@ public class PlayerCommand implements Command {
     private final String CMD_PAUSE = "pause";
     private final String CMD_RESUME = "resume";
     private final String CMD_LOOP = "loop";
-    private final String CMD_CONNECT = "connect";
-    private final String CMD_DISCONNECT = "disconnect";
     private final String CMD_CURRENT = "current";
 
     @Override
@@ -38,9 +36,7 @@ public class PlayerCommand implements Command {
                         new SlashCommandOptionChoiceBuilder().setName("Aktuelles Lied").setValue(CMD_CURRENT),
                         new SlashCommandOptionChoiceBuilder().setName("Pausieren").setValue(CMD_PAUSE),
                         new SlashCommandOptionChoiceBuilder().setName("Fortsetzen").setValue(CMD_RESUME),
-                        new SlashCommandOptionChoiceBuilder().setName("Wiederholen").setValue(CMD_LOOP),
-                        new SlashCommandOptionChoiceBuilder().setName("Verbinden").setValue(CMD_CONNECT),
-                        new SlashCommandOptionChoiceBuilder().setName("Trennen").setValue(CMD_DISCONNECT)
+                        new SlashCommandOptionChoiceBuilder().setName("Wiederholen").setValue(CMD_LOOP)
                 ));
     }
 
@@ -59,7 +55,7 @@ public class PlayerCommand implements Command {
             case CMD_RESUME -> {
                 MusicBot.instance()
                         .getAudioManager(either.getRight())
-                        .setPaused(false);
+                        .startPlaying();
 
                 interUpdater.setContent("Lied fortgesetzt.").update();
             }
@@ -71,35 +67,17 @@ public class PlayerCommand implements Command {
 
                 interUpdater.setContent(repeat ? "Wiederholen eingeschaltet." : "Wiederholen ausgeschaltet.").update();
             }
-            case CMD_CONNECT -> {
-                ChannelUtilities.joinVoiceChannel(either, () -> {
-                    interUpdater.setContent("Verbindung hergstellt.")
-                            .update();
-
-                    MusicBot.instance()
-                            .getAudioManager(either.getRight())
-                            .resumeOrNext();
-                }, () -> interUpdater.setContent("Beim Beitreten des Sprachkanals ist ein Fehler aufgetreten. Befindest du dich in einen Kanal?").update());
-            }
-            case CMD_DISCONNECT -> {
-                ChannelUtilities.leaveVoiceChannel(either, () -> {
-                    interUpdater.setContent("Verbindung getrennt.").update();
-
-                    MusicBot.instance()
-                            .removeAudioManager(either.getRight());
-                }, () -> interUpdater.setContent("Es ist ein Fehler aufgetreten!").update());
-            }
             case CMD_CURRENT -> {
                 var trackManager = MusicBot.instance()
                         .getAudioManager(either.getRight());
 
-                if (trackManager.hasFinished() || trackManager.getPlaylist().getCurrentTrack() == null) {
+                if (trackManager.hasFinished() || trackManager.getPlaylist().current() == null) {
                     interUpdater.setContent("Es spielt aktuell kein Lied.").update();
                     return;
                 }
 
                 AudioTrack audioTrack = trackManager.getPlaylist()
-                        .getCurrentTrack();
+                        .current();
 
                 SpotifyTrack spotifyData = audioTrack.getUserData(SpotifyTrack.class);
 
@@ -111,7 +89,6 @@ public class PlayerCommand implements Command {
 
                 interUpdater.addEmbed(replyEmbed).update();
             }
-
             default -> interUpdater.setContent("Unbekannte Aktion").update();
         }
     }

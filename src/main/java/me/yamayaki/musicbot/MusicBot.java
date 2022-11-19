@@ -13,6 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
+import org.javacord.api.Javacord;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.server.Server;
@@ -20,7 +21,7 @@ import org.javacord.api.entity.user.UserStatus;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -38,7 +39,7 @@ public class MusicBot {
             ChannelSpecs.CHANNEL_SETTINGS
     });
 
-    private final HashMap<Server, ServerAudioManager> serverAudioManagers = new HashMap<>();
+    private final ConcurrentHashMap<Server, ServerAudioManager> serverAudioManagers = new ConcurrentHashMap<>();
 
     private DiscordApi discordApi;
 
@@ -62,14 +63,15 @@ public class MusicBot {
         LOGGER.info("starting music-bot ({}) ...", Config.getVersion());
 
         //init api-builder
-        LOGGER.info("initializing discord-api ...");
+        LOGGER.info("initializing discord-api ({}) ...", Javacord.DISPLAY_VERSION);
 
         discordApi = new DiscordApiBuilder()
                 .setToken(CONFIG.get().getBot().getToken())
-                .setIntents(Intent.GUILD_MESSAGE_REACTIONS, Intent.GUILD_MESSAGES, Intent.GUILD_VOICE_STATES)
+                .setIntents(Intent.GUILD_VOICE_STATES)
                 .login().join();
 
         LOGGER.info("discord login successful, continuing ... ");
+        discordApi.setMessageCacheSize(0, 0);
         discordApi.addListener(new InteractionListener(this.discordApi));
         discordApi.addListener(new VoiceLeaveListener());
 
@@ -80,7 +82,7 @@ public class MusicBot {
     protected void runTasks() {
         LOGGER.info("starting tasks and commandline listener ...");
 
-        Executors.newSingleThreadScheduledExecutor().schedule(new BackgroundTasks(this), 1L, TimeUnit.SECONDS);
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new BackgroundTasks(this),0L, 1L, TimeUnit.SECONDS);
         Runtime.getRuntime().addShutdownHook(new ShutdownHandler(this));
     }
 
@@ -102,8 +104,8 @@ public class MusicBot {
         this.serverAudioManagers.remove(server);
     }
 
-    public List<ServerAudioManager> getAllAudioManagers() {
-        return this.serverAudioManagers.values().stream().toList();
+    public ConcurrentHashMap<Server, ServerAudioManager> getAllAudioManagers() {
+        return this.serverAudioManagers;
     }
 
     public void shutdown() {

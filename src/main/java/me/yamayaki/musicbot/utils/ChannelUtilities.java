@@ -22,12 +22,7 @@ public class ChannelUtilities {
             return;
         }
 
-        optChannel.ifPresentOrElse(voiceChannel -> {
-            voiceChannel.connect().thenAccept(audioConnection -> {
-                audioConnection.setSelfDeafened(true);
-                onSuccess.run();
-            });
-        }, onError);
+        optChannel.ifPresentOrElse(voiceChannel -> voiceChannel.connect(false, false).thenAccept(audioConnection -> onSuccess.run()), onError);
     }
 
     public static void leaveVoiceChannel(Either<SlashCommandInteraction, Server> either, Runnable onSuccess, Runnable onError) {

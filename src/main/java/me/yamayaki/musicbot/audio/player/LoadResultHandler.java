@@ -1,4 +1,4 @@
-package me.yamayaki.musicbot.audio.handler;
+package me.yamayaki.musicbot.audio.player;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;

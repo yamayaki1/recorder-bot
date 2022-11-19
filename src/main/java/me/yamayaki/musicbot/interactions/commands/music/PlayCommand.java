@@ -45,7 +45,7 @@ public class PlayCommand implements Command {
                 if (playerResponse.isSuccess()) {
                     message = playerResponse.getCount() > 1
                             ? "Es wurden " + playerResponse.getCount() + " Lieder der Playlist hinzugefügt."
-                            : "Ein Lied der Playlist hinzugefügt.";
+                            : "Das Lied **" + playerResponse.getTitle() + "** wurde der Playlist hinzugefügt.";
                 } else {
                     message = "Beim Laden der Lieder ist ein Fehler aufgetreten: " + playerResponse.getMessage();
                 }

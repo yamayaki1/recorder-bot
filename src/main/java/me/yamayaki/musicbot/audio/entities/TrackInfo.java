@@ -2,16 +2,13 @@ package me.yamayaki.musicbot.audio.entities;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
-public class TrackInfo {
-    public String uri;
-    public long position;
-
+public record TrackInfo(String uri, long position) {
     public static TrackInfo of(AudioTrack audioTrack) {
-        TrackInfo trackInfo = new TrackInfo();
+        return new TrackInfo(audioTrack.getInfo().uri, audioTrack.getPosition());
+    }
 
-        trackInfo.uri = audioTrack.getInfo().uri;
-        trackInfo.position = audioTrack.getPosition();
-
-        return trackInfo;
+    @Override
+    public String toString() {
+        return "TrackInfo{" + "uri='" + uri + '\'' + ", position=" + position + '}';
     }
 }

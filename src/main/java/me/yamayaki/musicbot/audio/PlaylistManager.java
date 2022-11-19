@@ -3,15 +3,15 @@ package me.yamayaki.musicbot.audio;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.entities.TrackInfo;
-import me.yamayaki.musicbot.audio.handler.LoadResultHandler;
 import me.yamayaki.musicbot.audio.player.LavaManager;
+import me.yamayaki.musicbot.audio.player.LoadResultHandler;
 import me.yamayaki.musicbot.database.specs.impl.CacheSpecs;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class PlaylistManager {
     private final Long serverID;
@@ -19,24 +19,20 @@ public class PlaylistManager {
 
     private AudioTrack currentTrack = null;
 
-    public boolean loop = false;
+    private boolean loop = false;
 
     public PlaylistManager(Long serverID) {
         this.serverID = serverID;
-        this.trackList = new ArrayDeque<>();
+        this.trackList = new LinkedBlockingQueue<>();
 
-        try {
-            this.restore();
-        } catch (ExecutionException | InterruptedException e) {
-            MusicBot.LOGGER.error("failed to restore playlist:", e);
-        }
+        this.restore();
     }
 
-    public AudioTrack getCurrentTrack() {
-        return currentTrack;
+    public AudioTrack current() {
+        return this.currentTrack;
     }
 
-    public void addTrack(AudioTrack track) {
+    public void add(AudioTrack track) {
         if (track == null) {
             return;
         }
@@ -45,18 +41,17 @@ public class PlaylistManager {
     }
 
     public List<AudioTrack> getTracks(boolean inclCurrent) {
-        final ArrayList<AudioTrack> list = new ArrayList<>();
+        final ArrayList<AudioTrack> list = new ArrayList<>(this.trackList);
 
         if (inclCurrent && this.currentTrack != null) {
             list.add(this.currentTrack);
         }
 
-        list.addAll(this.trackList);
-
+        Collections.reverse(list);
         return list;
     }
 
-    public void clearList() {
+    public void clear() {
         this.trackList.clear();
     }
 
@@ -64,12 +59,12 @@ public class PlaylistManager {
         return this.trackList.size() > 0 || (this.currentTrack != null && this.loop);
     }
 
-    public AudioTrack getNext() {
+    public AudioTrack next() {
         if (!this.hasNext()) {
             return null;
         }
 
-        if (this.loop) {
+        if (this.loop && this.currentTrack != null) {
             this.trackList.add(this.currentTrack.makeClone());
         }
 
@@ -82,7 +77,7 @@ public class PlaylistManager {
         return this.loop;
     }
 
-    public void restore() throws ExecutionException, InterruptedException {
+    public void restore() {
         var response = MusicBot.DATABASE
                 .getDatabase(CacheSpecs.PLAYLIST_CACHE)
                 .getValue(this.serverID);
@@ -92,7 +87,11 @@ public class PlaylistManager {
         }
 
         for (TrackInfo trackInfo : response.get()) {
-            LavaManager.loadTrack(trackInfo.uri, new LoadResultHandler(this, trackInfo.position, null)).get();
+            try {
+                LavaManager.loadTrack(trackInfo.uri(), new LoadResultHandler(this, trackInfo.position(), null)).get();
+            } catch (Exception e) {
+                MusicBot.LOGGER.error("couldn't load track {}: {}", trackInfo, e);
+            }
         }
 
         MusicBot.DATABASE
@@ -101,16 +100,13 @@ public class PlaylistManager {
     }
 
     public void store() {
-        final List<TrackInfo> ids = new ArrayList<>();
-
-        //add currently playing track
-        ids.add(TrackInfo.of(this.getCurrentTrack()));
-
-        //add all remaining songs
-        trackList.forEach(track -> ids.add(TrackInfo.of(track)));
+        TrackInfo[] trackList = this.getTracks(true)
+                .stream()
+                .map(TrackInfo::of)
+                .toArray(TrackInfo[]::new);
 
         MusicBot.DATABASE
                 .getDatabase(CacheSpecs.PLAYLIST_CACHE)
-                .putValue(this.serverID, ids.toArray(TrackInfo[]::new));
+                .putValue(this.serverID, trackList);
     }
 }

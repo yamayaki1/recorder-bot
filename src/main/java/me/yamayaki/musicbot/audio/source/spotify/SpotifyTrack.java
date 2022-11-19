@@ -40,7 +40,7 @@ public class SpotifyTrack {
         for (int i = 0; i < images.length; i++) {
             Image image = images[i];
 
-            if(image.getWidth() > width) {
+            if (image.getWidth() > width) {
                 index = i;
             }
         }
@@ -50,6 +50,11 @@ public class SpotifyTrack {
 
     @Override
     public String toString() {
-        return "SpotifyTrack{" + "identifier='" + identifier + ", name='" + name + ", artist='" + artist + '}';
+        return "SpotifyTrack{" +
+                "identifier='" + identifier + '\'' +
+                ", name='" + name + '\'' +
+                ", image='" + image + '\'' +
+                ", artist='" + artist + '\'' +
+                '}';
     }
 }

@@ -28,7 +28,7 @@ public class ClearCommand implements Command {
         MusicBot.instance()
                 .getAudioManager(either.getRight())
                 .getPlaylist()
-                .clearList();
+                .clear();
 
         interUpdater.setContent("Alle Lieder aus der Playlist entfernt.").update();
     }

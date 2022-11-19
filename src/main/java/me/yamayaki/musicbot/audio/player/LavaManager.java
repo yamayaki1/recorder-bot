@@ -1,18 +1,17 @@
 package me.yamayaki.musicbot.audio.player;
 
+import com.sedmelluq.discord.lavaplayer.filter.equalizer.EqualizerFactory;
 import com.sedmelluq.discord.lavaplayer.player.AudioConfiguration;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.source.bandcamp.BandcampAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
-import me.yamayaki.musicbot.audio.handler.AudioEventHandler;
-import me.yamayaki.musicbot.audio.handler.LoadResultHandler;
 import me.yamayaki.musicbot.audio.source.spotify.SpotifySourceManager;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 public class LavaManager {
@@ -22,6 +21,8 @@ public class LavaManager {
     public static final SoundCloudAudioSourceManager soundcloudSource;
     public static final TwitchStreamAudioSourceManager twitchSource;
 
+    public static final EqualizerFactory equalizerFactory;
+
     private static final AudioPlayerManager audioPlayerManager;
 
     static {
@@ -30,6 +31,8 @@ public class LavaManager {
         bandcampSource = new BandcampAudioSourceManager();
         soundcloudSource = SoundCloudAudioSourceManager.createDefault();
         twitchSource = new TwitchStreamAudioSourceManager();
+
+        equalizerFactory = new EqualizerFactory();
 
         audioPlayerManager = createPlayerManager();
     }
@@ -52,7 +55,7 @@ public class LavaManager {
         return audioPlayerManager;
     }
 
-    public static AudioPlayer getPlayer(final AudioEventHandler audioEventHandler) {
+    public static AudioPlayer getPlayer(final AudioEventAdapter audioEventHandler) {
         AudioPlayer audioPlayer = audioPlayerManager.createPlayer();
         audioPlayer.addListener(audioEventHandler);
 

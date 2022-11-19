@@ -10,9 +10,21 @@ import org.javacord.api.listener.channel.server.voice.ServerVoiceChannelMemberLe
 import java.util.Optional;
 
 public class VoiceLeaveListener implements ServerVoiceChannelMemberLeaveListener {
-
     @Override
     public void onServerVoiceChannelMemberLeave(ServerVoiceChannelMemberLeaveEvent event) {
+        this.handleBotLeave(event);
+        this.handleGhostChannel(event);
+    }
+
+    private void handleBotLeave(ServerVoiceChannelMemberLeaveEvent event) {
+        if(!(event.getUser().equals(event.getApi().getYourself()))) {
+            return;
+        }
+
+        MusicBot.instance().getAudioManager(event.getServer()).shutdown(false);
+    }
+
+    private void handleGhostChannel(ServerVoiceChannelMemberLeaveEvent event) {
         if (event.getChannel().getConnectedUsers().size() != 0) {
             return;
         }
