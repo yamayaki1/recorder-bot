@@ -20,17 +20,13 @@ import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.UserStatus;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class MusicBot {
-    private static MusicBot instance = null;
-
     public static final Logger LOGGER = LogManager.getLogger(MusicBot.class);
     public static final Config CONFIG = new Config(new File(".", "config/"));
-
     public static final RocksManager DATABASE = new RocksManager(new File(".", "database/"), new DatabaseSpec[]{
             CacheSpecs.SPOTIFY_CACHE,
             CacheSpecs.YOUTUBE_CACHE,
@@ -38,7 +34,7 @@ public class MusicBot {
 
             ChannelSpecs.CHANNEL_SETTINGS
     });
-
+    private static MusicBot instance = null;
     private final ConcurrentHashMap<Server, ServerAudioManager> serverAudioManagers = new ConcurrentHashMap<>();
 
     private DiscordApi discordApi;
@@ -49,7 +45,7 @@ public class MusicBot {
     }
 
     public static MusicBot instance() {
-        if(instance == null) {
+        if (instance == null) {
             throw new RuntimeException("instance not initialized!");
         }
 
@@ -66,7 +62,7 @@ public class MusicBot {
         LOGGER.info("initializing discord-api ({}) ...", Javacord.DISPLAY_VERSION);
 
         discordApi = new DiscordApiBuilder()
-                .setToken(CONFIG.get().getBot().getToken())
+                .setToken(CONFIG.getSetting("discord.token"))
                 .setIntents(Intent.GUILD_VOICE_STATES)
                 .login().join();
 
@@ -82,7 +78,7 @@ public class MusicBot {
     protected void runTasks() {
         LOGGER.info("starting tasks and commandline listener ...");
 
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new BackgroundTasks(this),0L, 1L, TimeUnit.SECONDS);
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new BackgroundTasks(this), 0L, 1L, TimeUnit.SECONDS);
         Runtime.getRuntime().addShutdownHook(new ShutdownHandler(this));
     }
 

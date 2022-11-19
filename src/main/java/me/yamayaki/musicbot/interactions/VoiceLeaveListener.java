@@ -17,7 +17,7 @@ public class VoiceLeaveListener implements ServerVoiceChannelMemberLeaveListener
     }
 
     private void handleBotLeave(ServerVoiceChannelMemberLeaveEvent event) {
-        if(!(event.getUser().equals(event.getApi().getYourself()))) {
+        if (!(event.getUser().equals(event.getApi().getYourself()))) {
             return;
         }
 

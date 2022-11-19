@@ -4,7 +4,6 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.source.spotify.SpotifyTrack;
 import me.yamayaki.musicbot.interactions.Command;
-import me.yamayaki.musicbot.utils.ChannelUtilities;
 import me.yamayaki.musicbot.utils.Either;
 import me.yamayaki.musicbot.utils.YouTubeUtils;
 import org.javacord.api.DiscordApi;

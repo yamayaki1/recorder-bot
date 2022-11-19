@@ -2,7 +2,6 @@ package me.yamayaki.musicbot.tasks;
 
 import me.yamayaki.musicbot.Config;
 import me.yamayaki.musicbot.MusicBot;
-import me.yamayaki.musicbot.utils.ChannelUtilities;
 import me.yamayaki.musicbot.utils.Threads;
 
 import java.io.BufferedReader;
@@ -16,7 +15,7 @@ public record BackgroundTasks(MusicBot instance) implements Runnable {
     @Override
     public void run() {
         try {
-            if(Config.isDevBuild()) {
+            if (Config.isDevBuild()) {
                 this.readCommandLine();
             }
 
@@ -28,7 +27,7 @@ public record BackgroundTasks(MusicBot instance) implements Runnable {
 
     private void cleanupAudioManager() {
         this.instance.getAllAudioManagers().forEach((server, serverAudioManager) -> {
-            if(!serverAudioManager.isInactive()) {
+            if (!serverAudioManager.isInactive()) {
                 return;
             }
 

@@ -15,7 +15,6 @@ import me.yamayaki.musicbot.utils.Either;
 import me.yamayaki.musicbot.utils.Threads;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.event.interaction.SlashCommandCreateEvent;
-import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
 import org.javacord.api.interaction.SlashCommandInteractionOption;

@@ -60,14 +60,14 @@ public class ServerAudioManager extends AudioEventAdapter {
                 .hasFinished();
     }
 
-    public void setPaused(boolean bool) {
-        this.audioSource.getAudioPlayer()
-                .setPaused(bool);
-    }
-
     public boolean isPaused() {
         return this.audioSource.getAudioPlayer()
                 .isPaused();
+    }
+
+    public void setPaused(boolean bool) {
+        this.audioSource.getAudioPlayer()
+                .setPaused(bool);
     }
 
     public void setVolume(int volume) {

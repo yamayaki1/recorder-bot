@@ -1,17 +1,16 @@
 package me.yamayaki.musicbot;
 
-import me.yamayaki.musicbot.utils.GsonHolder;
-
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Properties;
 
 public class Config {
     private static final Properties internalValues = new Properties();
+    private static final Properties userDefined = new Properties();
 
     static {
         try (InputStream inputStream = Config.class.getResourceAsStream("/recorderbot.properties")) {
@@ -21,9 +20,11 @@ public class Config {
         }
     }
 
-    private final Path filePath;
-
-    private JsonConfig config;
+    private final String[] availableSettings = new String[]{
+            "discord.token",
+            "spotify.id",
+            "spotify.secret"
+    };
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public Config(File file) {
@@ -31,8 +32,10 @@ public class Config {
             file.mkdirs();
         }
 
-        this.filePath = new File(file, "settings.json").toPath();
-        this.reload();
+        final File settingsFile = new File(file, "settings.properties");
+
+        this.load(settingsFile);
+        this.write(settingsFile);
     }
 
     public static String getVersion() {
@@ -40,71 +43,32 @@ public class Config {
     }
 
     public static boolean isDevBuild() {
-        return (boolean) internalValues.getOrDefault("devbuild", true);
+        return Boolean.parseBoolean((String) internalValues.getOrDefault("devbuild", "true"));
     }
 
-    public JsonConfig get() {
-        return this.config;
-    }
+    private void load(File settingsFile) {
+        try (InputStream inputStream = new FileInputStream(settingsFile)) {
+            userDefined.load(inputStream);
+        } catch (Exception ignored) {
+        }
 
-    public void reload() {
-        MusicBot.LOGGER.info("reloading config...");
-        this.config = null;
-
-        try {
-            this.config = GsonHolder.getGson().fromJson(new String(Files.readAllBytes(this.filePath)), JsonConfig.class);
-        } catch (IOException e) {
-            MusicBot.LOGGER.error("error reading settings file, generating new one");
-            this.config = new JsonConfig();
-            this.save();
+        for (String availableSetting : availableSettings) {
+            userDefined.putIfAbsent(availableSetting, "");
         }
     }
 
-    public void save() {
-        try {
-            FileWriter writer = new FileWriter(this.filePath.toFile());
-            writer.write(GsonHolder.getGson().toJson(this.config));
-            writer.flush();
-            writer.close();
-        } catch (IOException e) {
-            MusicBot.LOGGER.error("error writing config file", e);
+    private void write(File settingsFile) {
+        try (FileWriter fileWriter = new FileWriter(settingsFile)) {
+            userDefined.store(fileWriter, "");
+        } catch (Exception ignored) {
         }
     }
 
-    @SuppressWarnings({"CanBeFinal", "FieldMayBeFinal"})
-    public static class JsonConfig {
-        private BotOptions bot = new BotOptions();
-        private SpotifyConfig spotify = new SpotifyConfig();
-
-        public BotOptions getBot() {
-            return bot;
+    public String getSetting(String key) {
+        if (Arrays.stream(availableSettings).noneMatch(key::equalsIgnoreCase)) {
+            throw new IllegalArgumentException("unknown setting key " + key);
         }
 
-        public SpotifyConfig getSpotify() {
-            return this.spotify;
-        }
-
-        @SuppressWarnings({"CanBeFinal", "FieldMayBeFinal", "FieldCanBeLocal"})
-        public static class BotOptions {
-            private String token = "";
-
-            public String getToken() {
-                return token;
-            }
-        }
-
-        @SuppressWarnings({"CanBeFinal", "FieldMayBeFinal", "FieldCanBeLocal"})
-        public static class SpotifyConfig {
-            private String client_id = "";
-            private String client_secret = "";
-
-            public String getClientId() {
-                return this.client_id;
-            }
-
-            public String getClientSecret() {
-                return this.client_secret;
-            }
-        }
+        return userDefined.getProperty(key);
     }
 }

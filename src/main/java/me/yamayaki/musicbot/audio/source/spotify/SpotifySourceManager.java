@@ -130,7 +130,7 @@ public class SpotifySourceManager implements AudioSourceManager {
     }
 
     private AudioItem getAudioItem(final SpotifyTrack[] spotifyTracks) throws ExecutionException, InterruptedException {
-        List<AudioTrack> tracks = Threads.mainWorker().submit(()->
+        List<AudioTrack> tracks = Threads.mainWorker().submit(() ->
                 Arrays.stream(spotifyTracks).parallel()
                         .map(this::fromYouTube)
                         .filter(Objects::nonNull)
