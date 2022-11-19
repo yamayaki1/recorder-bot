@@ -2,7 +2,6 @@ package me.yamayaki.musicbot.interactions.commands.utilities;
 
 import me.yamayaki.musicbot.Config;
 import me.yamayaki.musicbot.MusicBot;
-import me.yamayaki.musicbot.audio.ServerAudioManager;
 import me.yamayaki.musicbot.interactions.Command;
 import me.yamayaki.musicbot.utils.Either;
 import org.javacord.api.DiscordApi;
@@ -28,8 +27,7 @@ public class DebugCommands implements Command {
                 .setEnabledInDms(false)
                 .addOption(SlashCommandOption.createWithChoices(SlashCommandOptionType.STRING, "subcommand", "Unterbefehl", true,
                         new SlashCommandOptionChoiceBuilder().setName("Über den Bot").setValue("about"),
-                        new SlashCommandOptionChoiceBuilder().setName("Ausgabe fixen").setValue("reconnect"),
-                        new SlashCommandOptionChoiceBuilder().setName("Letzte Fehler").setValue("last_errors")
+                        new SlashCommandOptionChoiceBuilder().setName("Ausgabe fixen").setValue("reconnect")
                 ));
     }
 
@@ -71,15 +69,6 @@ public class DebugCommands implements Command {
                     interUpdater.setContent("Fehler im AudioWebSocketAdapter, starte Bot neu!").update().join();
                     System.exit(-1);
                 }
-            }
-            case "last_errors" -> {
-                EmbedBuilder embedBuilder = new EmbedBuilder();
-
-                for (ServerAudioManager manager :MusicBot.instance().getAllAudioManagers()) {
-                    embedBuilder.addField(manager.getServerName(), manager.lastError);
-                }
-
-                interUpdater.addEmbed(embedBuilder).update();
             }
             default -> interUpdater.setContent("Unbekannter Unterbefehl").update();
         }

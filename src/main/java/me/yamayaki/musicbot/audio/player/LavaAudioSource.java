@@ -10,8 +10,6 @@ import org.javacord.api.audio.AudioSourceBase;
 
 public class LavaAudioSource extends AudioSourceBase {
     private final AudioEventHandler audioEventHandler;
-
-    private final AudioPlayerManager playerManager;
     private final AudioPlayer audioPlayer;
 
     private AudioFrame lastFrame;
@@ -20,8 +18,7 @@ public class LavaAudioSource extends AudioSourceBase {
         super(api);
 
         this.audioEventHandler = audioEventHandler;
-        this.playerManager = LavaPlayerManager.getPlayerManager();
-        this.audioPlayer = LavaPlayerManager.getPlayer(this.playerManager, audioEventHandler);
+        this.audioPlayer = LavaManager.getPlayer(audioEventHandler);
     }
 
     @Override
@@ -47,10 +44,6 @@ public class LavaAudioSource extends AudioSourceBase {
     @Override
     public AudioSource copy() {
         return new LavaAudioSource(getApi(), this.audioEventHandler);
-    }
-
-    public AudioPlayerManager getPlayerManager() {
-        return this.playerManager;
     }
 
     public AudioPlayer getAudioPlayer() {

@@ -20,7 +20,7 @@ public class Threads {
 
     private static ExecutorService getPool(final int threadCount, final String poolName) {
         return Executors.newFixedThreadPool(threadCount, new ThreadFactory() {
-            AtomicInteger atomicInteger;
+            final AtomicInteger atomicInteger = new AtomicInteger(1);
 
             @Override
             public Thread newThread(Runnable runnable) {

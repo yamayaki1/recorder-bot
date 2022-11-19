@@ -8,14 +8,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Properties;
 
 public class Config {
-    public static String version = "unknown";
+    private static final Properties internalValues = new Properties();
 
     static {
-        try (InputStream inputStream = Config.class.getResourceAsStream("/version.txt")) {
+        try (InputStream inputStream = Config.class.getResourceAsStream("/recorderbot.properties")) {
             assert inputStream != null;
-            version = new String(inputStream.readAllBytes());
+            internalValues.load(inputStream);
         } catch (IOException | NullPointerException ignored) {
         }
     }
@@ -35,7 +36,11 @@ public class Config {
     }
 
     public static String getVersion() {
-        return version;
+        return internalValues.getProperty("version", "unknown");
+    }
+
+    public static boolean isDevBuild() {
+        return (boolean) internalValues.getOrDefault("devbuild", true);
     }
 
     public JsonConfig get() {

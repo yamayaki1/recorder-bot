@@ -1,21 +1,21 @@
 package me.yamayaki.musicbot.audio;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
-import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
-import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.MusicBot;
-import me.yamayaki.musicbot.audio.player.LavaPlayerManager;
-import me.yamayaki.musicbot.database.specs.impl.CacheSpecs;
 import me.yamayaki.musicbot.audio.entities.TrackInfo;
+import me.yamayaki.musicbot.audio.handler.LoadResultHandler;
+import me.yamayaki.musicbot.audio.player.LavaManager;
+import me.yamayaki.musicbot.database.specs.impl.CacheSpecs;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.ExecutionException;
 
 public class PlaylistManager {
     private final Long serverID;
-    private final List<AudioTrack> trackList;
+    private final Queue<AudioTrack> trackList;
 
     private AudioTrack currentTrack = null;
 
@@ -23,7 +23,7 @@ public class PlaylistManager {
 
     public PlaylistManager(Long serverID) {
         this.serverID = serverID;
-        this.trackList = new ArrayList<>();
+        this.trackList = new ArrayDeque<>();
 
         try {
             this.restore();
@@ -73,9 +73,7 @@ public class PlaylistManager {
             this.trackList.add(this.currentTrack.makeClone());
         }
 
-        this.currentTrack = this.trackList.get(0);
-        this.trackList.remove(0);
-
+        this.currentTrack = this.trackList.poll();
         return this.currentTrack;
     }
 
@@ -94,28 +92,7 @@ public class PlaylistManager {
         }
 
         for (TrackInfo trackInfo : response.get()) {
-            LavaPlayerManager.getPlayerManager().loadItem(trackInfo.uri, new AudioLoadResultHandler() {
-                @Override
-                public void trackLoaded(AudioTrack track) {
-                    track.setPosition(trackInfo.position);
-                    trackList.add(track);
-                }
-
-                @Override
-                public void playlistLoaded(AudioPlaylist playlist) {
-                    trackList.addAll(playlist.getTracks());
-                }
-
-                @Override
-                public void noMatches() {
-                    //do nothing
-                }
-
-                @Override
-                public void loadFailed(FriendlyException exception) {
-                    MusicBot.LOGGER.error(exception);
-                }
-            }).get();
+            LavaManager.loadTrack(trackInfo.uri, new LoadResultHandler(this, trackInfo.position, null)).get();
         }
 
         MusicBot.DATABASE

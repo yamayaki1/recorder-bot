@@ -11,7 +11,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import com.sedmelluq.discord.lavaplayer.track.BasicAudioPlaylist;
 import me.yamayaki.musicbot.MusicBot;
-import me.yamayaki.musicbot.audio.player.LavaSourceManager;
+import me.yamayaki.musicbot.audio.player.LavaManager;
 import me.yamayaki.musicbot.database.specs.impl.CacheSpecs;
 import me.yamayaki.musicbot.utils.Threads;
 import se.michaelthelin.spotify.model_objects.specification.Album;
@@ -150,7 +150,7 @@ public class SpotifySourceManager implements AudioSourceManager {
             final String title = spotifyTrack.getName();
 
             final var reference = new AudioReference("ytmsearch:" + title.replaceAll("-", "") + " - " + artist, title);
-            final AudioItem youtubeMusicItem = LavaSourceManager.youtubeSource.loadItem(null, reference);
+            final AudioItem youtubeMusicItem = LavaManager.youtubeSource.loadItem(null, reference);
             if (!(youtubeMusicItem instanceof AudioPlaylist playlistItem)) {
                 return null;
             }
@@ -169,7 +169,7 @@ public class SpotifySourceManager implements AudioSourceManager {
         }
 
         final var reference = new AudioReference("https://youtube.com/watch?v=" + ytIdent.get(), spotifyTrack.getName());
-        final AudioItem youtubeItem = LavaSourceManager.youtubeSource.loadItem(null, reference);
+        final AudioItem youtubeItem = LavaManager.youtubeSource.loadItem(null, reference);
 
         if (youtubeItem instanceof AudioTrack ytTrack) {
             ytTrack.setUserData(spotifyTrack);

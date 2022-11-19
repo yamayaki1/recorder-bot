@@ -1,10 +1,10 @@
 package me.yamayaki.musicbot.audio;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import me.yamayaki.musicbot.audio.entities.LoaderResponse;
 import me.yamayaki.musicbot.audio.handler.AudioEventHandler;
 import me.yamayaki.musicbot.audio.handler.LoadResultHandler;
-import me.yamayaki.musicbot.audio.entities.LoaderResponse;
 import me.yamayaki.musicbot.audio.player.LavaAudioSource;
+import me.yamayaki.musicbot.audio.player.LavaManager;
 import org.javacord.api.entity.server.Server;
 
 import java.util.function.Consumer;
@@ -15,8 +15,6 @@ public class ServerAudioManager {
     private final LavaAudioSource audioSource;
     private final PlaylistManager playlistManager;
 
-    public String lastError = "Kein Fehler.";
-
     public ServerAudioManager(Server server) {
         this.server = server;
         this.audioSource = new LavaAudioSource(server.getApi(), new AudioEventHandler(this));
@@ -25,13 +23,7 @@ public class ServerAudioManager {
     }
 
     public void tryLoadItems(String song, Consumer<LoaderResponse> consumer) {
-        this.audioSource.getPlayerManager()
-                .loadItem(song, new LoadResultHandler(this, consumer));
-    }
-
-    public void addTrack(AudioTrack track) {
-        this.playlistManager.addTrack(track);
-        this.resumeOrNext();
+        LavaManager.loadTrack(song, new LoadResultHandler(this.getPlaylist(), 0L, consumer));
     }
 
     public void skipTrack(int count) {
@@ -84,10 +76,6 @@ public class ServerAudioManager {
 
     public PlaylistManager getPlaylist() {
         return this.playlistManager;
-    }
-
-    public Long getServerId() {
-        return this.server.getId();
     }
 
     public String getServerName() {

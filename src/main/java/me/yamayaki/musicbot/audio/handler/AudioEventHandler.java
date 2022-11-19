@@ -58,7 +58,7 @@ public class AudioEventHandler extends AudioEventAdapter {
      * @param exception The exception that occurred
      */
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
-        this.serverAudioManager.lastError = exception.getMessage();
+        MusicBot.LOGGER.error("exception while playing track {} in {}", track.getIdentifier(), this.serverAudioManager.getServerName());
     }
 
     /**
