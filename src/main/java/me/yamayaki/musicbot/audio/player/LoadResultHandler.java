@@ -6,7 +6,6 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.PlaylistManager;
-import me.yamayaki.musicbot.audio.ServerAudioManager;
 import me.yamayaki.musicbot.audio.entities.LoaderResponse;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,7 +26,7 @@ public class LoadResultHandler implements AudioLoadResultHandler {
     public void trackLoaded(AudioTrack track) {
         track.setPosition(this.position);
 
-        this.playlistManager.addTrack(track);
+        this.playlistManager.add(track);
 
         assert this.consumer != null;
         this.consumer.accept(new LoaderResponse(true, 1, "", track.getInfo().title));
@@ -36,25 +35,32 @@ public class LoadResultHandler implements AudioLoadResultHandler {
     @Override
     public void playlistLoaded(AudioPlaylist playlist) {
         if (playlist.isSearchResult()) {
-            this.playlistManager.addTrack(playlist.getTracks().get(0));
+            this.playlistManager.add(playlist.getTracks().get(0));
+
+            assert this.consumer != null;
             this.consumer.accept(new LoaderResponse(true, 1));
             return;
         }
 
         for (AudioTrack track : playlist.getTracks()) {
-            this.playlistManager.addTrack(track);
+            this.playlistManager.add(track);
+
+            assert this.consumer != null;
             this.consumer.accept(new LoaderResponse(true, playlist.getTracks().size()));
         }
     }
 
     @Override
     public void noMatches() {
+        assert this.consumer != null;
         this.consumer.accept(new LoaderResponse(false, 0, "Keine Ergebnisse."));
     }
 
     @Override
     public void loadFailed(FriendlyException exception) {
         MusicBot.LOGGER.error("Failed to load track: {}", exception.getMessage(), exception);
+
+        assert this.consumer != null;
         this.consumer.accept(new LoaderResponse(false, 0, exception.getMessage()));
     }
 }
