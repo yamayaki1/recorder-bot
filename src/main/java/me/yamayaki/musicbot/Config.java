@@ -1,5 +1,8 @@
 package me.yamayaki.musicbot;
 
+import org.javacord.api.Javacord;
+import org.rocksdb.RocksDB;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -44,6 +47,22 @@ public class Config {
 
     public static boolean isDevBuild() {
         return Boolean.parseBoolean((String) internalValues.getOrDefault("devbuild", "true"));
+    }
+
+    public static String getDiscordVersion() {
+        return "JavaCord-v" + Javacord.VERSION + "+rev." + Javacord.COMMIT_ID;
+    }
+
+    public static String getOsInfo() {
+        return String.format("%s (%s) %s", System.getProperty("os.name"), System.getProperty("os.arch"), System.getProperty("os.version"));
+    }
+
+    public static String getRamInfo() {
+        return ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1048576) + "/" + (Runtime.getRuntime().totalMemory() / 1048576) + "MB";
+    }
+
+    public static String getDatabaseVersion() {
+        return "RocksDB-v" + RocksDB.rocksdbVersion().toString();
     }
 
     private void load(File settingsFile) {

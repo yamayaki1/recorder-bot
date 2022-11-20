@@ -1,5 +1,6 @@
 package me.yamayaki.musicbot.database;
 
+import me.yamayaki.musicbot.Config;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.database.specs.DatabaseSpec;
 import org.rocksdb.ColumnFamilyDescriptor;
@@ -30,7 +31,7 @@ public class RocksManager {
         }
 
         if (!shownStats) {
-            MusicBot.LOGGER.info("using rocksdb ({}) as database backend ...", RocksDB.rocksdbVersion());
+            MusicBot.LOGGER.info("using rocksdb ({}) as database backend ...", Config.getDatabaseVersion());
             shownStats = true;
         }
 

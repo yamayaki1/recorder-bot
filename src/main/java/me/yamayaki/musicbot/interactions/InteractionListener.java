@@ -7,9 +7,7 @@ import me.yamayaki.musicbot.interactions.commands.music.PlayCommand;
 import me.yamayaki.musicbot.interactions.commands.music.PlayerCommand;
 import me.yamayaki.musicbot.interactions.commands.music.PlaylistCommand;
 import me.yamayaki.musicbot.interactions.commands.music.SkipCommand;
-import me.yamayaki.musicbot.interactions.commands.music.VolumeCommand;
-import me.yamayaki.musicbot.interactions.commands.utilities.AvatarCommand;
-import me.yamayaki.musicbot.interactions.commands.utilities.DebugCommands;
+import me.yamayaki.musicbot.interactions.commands.utilities.AboutCommand;
 import me.yamayaki.musicbot.interactions.commands.utilities.PingCommand;
 import me.yamayaki.musicbot.utils.Either;
 import me.yamayaki.musicbot.utils.Threads;
@@ -39,10 +37,8 @@ public class InteractionListener implements SlashCommandCreateListener {
                 new PlayerCommand(),
                 new PlaylistCommand(),
                 new SkipCommand(),
-                new VolumeCommand(),
 
-                new AvatarCommand(),
-                new DebugCommands(),
+                new AboutCommand(),
                 new PingCommand()
         );
     }

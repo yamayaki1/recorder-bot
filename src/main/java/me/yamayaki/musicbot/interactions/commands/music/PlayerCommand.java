@@ -16,11 +16,14 @@ import org.javacord.api.interaction.SlashCommandOption;
 import org.javacord.api.interaction.SlashCommandOptionChoiceBuilder;
 import org.javacord.api.interaction.SlashCommandOptionType;
 
+import java.util.List;
+
 public class PlayerCommand implements Command {
     private final String CMD_PAUSE = "pause";
     private final String CMD_RESUME = "resume";
     private final String CMD_LOOP = "loop";
     private final String CMD_CURRENT = "current";
+    private final String CMD_VOLUME = "volume";
 
     @Override
     public String getName() {
@@ -31,12 +34,16 @@ public class PlayerCommand implements Command {
     public SlashCommandBuilder register(DiscordApi api) {
         return SlashCommand.with(getName(), "Ändere Einstellungen des Players.")
                 .setEnabledInDms(false)
-                .addOption(SlashCommandOption.createWithChoices(SlashCommandOptionType.STRING, "action", "Aktion", true,
-                        new SlashCommandOptionChoiceBuilder().setName("Aktuelles Lied").setValue(CMD_CURRENT),
-                        new SlashCommandOptionChoiceBuilder().setName("Pausieren").setValue(CMD_PAUSE),
-                        new SlashCommandOptionChoiceBuilder().setName("Fortsetzen").setValue(CMD_RESUME),
-                        new SlashCommandOptionChoiceBuilder().setName("Wiederholen").setValue(CMD_LOOP)
-                ));
+                .addOption(SlashCommandOption.createSubcommand("action", "Aktion", List.of(
+                        SlashCommandOption.createWithChoices(SlashCommandOptionType.STRING, "action", "Aktion", true,
+                                new SlashCommandOptionChoiceBuilder().setName("Aktuelles Lied").setValue(CMD_CURRENT),
+                                new SlashCommandOptionChoiceBuilder().setName("Pausieren").setValue(CMD_PAUSE),
+                                new SlashCommandOptionChoiceBuilder().setName("Fortsetzen").setValue(CMD_RESUME),
+                                new SlashCommandOptionChoiceBuilder().setName("Wiederholen").setValue(CMD_LOOP)
+                        )
+                ))).addOption(SlashCommandOption.createSubcommand("volume", "Lautstärke", List.of(
+                        SlashCommandOption.createDecimalOption(CMD_VOLUME, "Lautstärke", true)
+                )));
     }
 
     @Override
@@ -87,6 +94,15 @@ public class PlayerCommand implements Command {
                         .setTimestampToNow();
 
                 interUpdater.addEmbed(replyEmbed).update();
+            }
+            case CMD_VOLUME -> {
+                int volume = either.getLeft().getArgumentDecimalValueByName("volume").orElse(50.0).intValue();
+
+                MusicBot.instance()
+                        .getAudioManager(either.getRight())
+                        .setVolume(volume);
+
+                interUpdater.setContent("Lautstärke angepasst.").update();
             }
             default -> interUpdater.setContent("Unbekannte Aktion").update();
         }

@@ -13,7 +13,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
-import org.javacord.api.Javacord;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.intent.Intent;
 import org.javacord.api.entity.server.Server;
@@ -59,7 +58,7 @@ public class MusicBot {
         LOGGER.info("starting music-bot ({}) ...", Config.getVersion());
 
         //init api-builder
-        LOGGER.info("initializing discord-api ({}) ...", Javacord.DISPLAY_VERSION);
+        LOGGER.info("initializing discord-api ({}) ...", Config.getDiscordVersion());
 
         discordApi = new DiscordApiBuilder()
                 .setToken(CONFIG.getSetting("discord.token"))
