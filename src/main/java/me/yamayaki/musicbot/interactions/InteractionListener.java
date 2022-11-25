@@ -13,10 +13,15 @@ import me.yamayaki.musicbot.interactions.commands.utilities.PingCommand;
 import me.yamayaki.musicbot.utils.Either;
 import me.yamayaki.musicbot.utils.Threads;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.message.MessageFlag;
+import org.javacord.api.event.interaction.ButtonClickEvent;
+import org.javacord.api.event.interaction.ModalSubmitEvent;
 import org.javacord.api.event.interaction.SlashCommandCreateEvent;
 import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
 import org.javacord.api.interaction.SlashCommandInteractionOption;
+import org.javacord.api.listener.interaction.ButtonClickListener;
+import org.javacord.api.listener.interaction.ModalSubmitListener;
 import org.javacord.api.listener.interaction.SlashCommandCreateListener;
 
 import java.util.Arrays;
@@ -26,7 +31,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-public class InteractionListener implements SlashCommandCreateListener {
+public class InteractionListener implements SlashCommandCreateListener, ButtonClickListener, ModalSubmitListener {
     private final HashMap<String, Command> commands = new HashMap<>();
 
     public InteractionListener(DiscordApi discordApi) {
@@ -88,5 +93,24 @@ public class InteractionListener implements SlashCommandCreateListener {
         builder.append("'");
 
         MusicBot.LOGGER.info(builder);
+    }
+
+    @Override
+    public void onButtonClick(ButtonClickEvent event) {
+        event.getButtonInteraction().getServer().ifPresent(server -> {
+            MusicBot.instance().getAudioManager(server)
+                    .onButtonClick(event);
+        });
+    }
+
+    @Override
+    public void onModalSubmit(ModalSubmitEvent event) {
+        event.getModalInteraction().createImmediateResponder().respond();
+
+        event.getModalInteraction().getTextInputValueByCustomId("query").ifPresent(query -> {
+            MusicBot.instance()
+                    .getAudioManager(event.getModalInteraction().getServer().get())
+                    .tryLoadItems(query, null);
+        });
     }
 }

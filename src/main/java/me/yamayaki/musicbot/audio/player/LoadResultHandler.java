@@ -34,11 +34,11 @@ public class LoadResultHandler implements AudioLoadResultHandler {
 
     @Override
     public void playlistLoaded(AudioPlaylist playlist) {
-        if (playlist.isSearchResult()) {
+        if (playlist.isSearchResult() || playlist.getTracks().size() == 1) {
             this.playlistManager.add(playlist.getTracks().get(0));
 
             assert this.consumer != null;
-            this.consumer.accept(new LoaderResponse(true, 1));
+            this.consumer.accept(new LoaderResponse(true, 1, "", playlist.getTracks().get(0).getInfo().title));
             return;
         }
 

@@ -1,6 +1,7 @@
 package me.yamayaki.musicbot.audio;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import com.sedmelluq.discord.lavaplayer.player.event.AudioEvent;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
@@ -17,9 +18,13 @@ import org.javacord.api.entity.Deletable;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.component.*;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.server.Server;
+import org.javacord.api.event.interaction.ButtonClickEvent;
+import org.javacord.api.listener.interaction.ButtonClickListener;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -47,6 +52,7 @@ public class ServerAudioManager extends AudioEventAdapter {
         try {
             LavaManager.loadTrack(song, new LoadResultHandler(this.getPlaylist(), 0L, consumer)).get();
             this.startPlaying();
+            this.updateMessage();
         } catch (Exception ignored) {
         }
     }
@@ -119,7 +125,7 @@ public class ServerAudioManager extends AudioEventAdapter {
     }
 
     @Override
-    public void onTrackStart(AudioPlayer player, AudioTrack track) {
+    public void onEvent(AudioEvent event) {
         this.updateMessage();
         this.lastActiveTime = System.currentTimeMillis();
     }
@@ -150,19 +156,30 @@ public class ServerAudioManager extends AudioEventAdapter {
     }
 
     private void updateMessage() {
-        if(this.skipping) {
-            return;
-        }
+        playerMessage.ifPresent(message -> {
+            try {
+                message.createUpdater()
+                        .setContent("")
+                        .setEmbed(this.getEmbed())
+                        .addComponents(this.getComponents())
+                        .applyChanges().join();
+            }catch (Exception e) {
+                MusicBot.LOGGER.error(e);
+            }
+        });
+    }
 
-        playerMessage.ifPresent(message -> message.createUpdater()
-                .setContent("")
-                .setEmbed(this.getEmbed())
-                .applyChanges().join()
+    private ActionRow getComponents() {
+        return ActionRow.of(
+                //Button.success("add", "+"),
+                Button.danger("stop", "", "⏹️"),
+                Button.primary("pause", "", "⏯️"),
+                Button.primary("skip", "", "⏭️")
         );
     }
 
     private EmbedBuilder getEmbed() {
-        AudioTrack currentTrack = this.playlist.current();
+        AudioTrack currentTrack = this.audioSource.getAudioPlayer().getPlayingTrack();
         AudioTrack nextTrack = this.playlist.peekNext();
 
         EmbedBuilder embedBuilder = new EmbedBuilder();
@@ -171,13 +188,20 @@ public class ServerAudioManager extends AudioEventAdapter {
             SpotifyTrack spotifyData = currentTrack.getUserData(SpotifyTrack.class);
 
             embedBuilder.setThumbnail(spotifyData != null ? spotifyData.getImage() : YouTubeUtils.getThumbnail(currentTrack.getIdentifier()))
-                    .addField("Aktuelles Lied", currentTrack.getInfo().title + "\n"+currentTrack.getInfo().author);
+                    .addField("Aktuelles Lied"+(this.isPaused() ? " (pausiert)" : ""), currentTrack.getInfo().title + "\n"+currentTrack.getInfo().author);
         } else {
-            embedBuilder.addField("Aktuelles Lied", "-- \n --");
+            embedBuilder.addField("Aktuelles Lied", "Aktuell Spielt kein Lied!");
         }
 
         if(nextTrack != null) {
             embedBuilder.addField("Nächstes Lied", nextTrack.getInfo().title + "\n"+nextTrack.getInfo().author);
+        }
+
+        List<AudioTrack> list = this.playlist.getTracks(false);
+        if(list.size() > 0) {
+            embedBuilder.addField("Warteschlange", list.size() > 1 ? list.size()+" Lieder" : "Ein Lied");
+        } else {
+            embedBuilder.addField("Warteschlange", "Keine Lieder");
         }
 
         embedBuilder.setTimestampToNow();
@@ -214,12 +238,45 @@ public class ServerAudioManager extends AudioEventAdapter {
         });
     }
 
+    public void onButtonClick(ButtonClickEvent event) {
+        if(!event.getButtonInteraction().getMessage().equals(this.playerMessage.orElse(null))) {
+            return;
+        }
+
+        switch (event.getButtonInteraction().getCustomId()) {
+            case "add"-> event.getButtonInteraction().respondWithModal("add_song", "Lied oder Playlist hinzufügen.", ActionRow.of(
+                    TextInput.create(
+                            TextInputStyle.SHORT, "query", "Link zum Lied oder zur Playlist", true
+                    )
+            )).join();
+            case "stop"-> {
+                this.playlist.clear();
+                this.audioSource.getAudioPlayer().stopTrack();
+                event.getButtonInteraction().acknowledge();
+            }
+            case "pause"-> {
+                this.setPaused(!this.isPaused());
+                event.getButtonInteraction().acknowledge();
+            }
+            case "skip"-> {
+                this.skipTrack(1);
+                event.getButtonInteraction().acknowledge();
+            }
+            default -> event.getButtonInteraction().acknowledge();
+        }
+    }
+
     public void shutdown(boolean save) {
         this.audioSource.getAudioPlayer().destroy();
         this.savePlayerMessage();
         this.server.getAudioConnection().ifPresent(audioConnection -> {
             audioConnection.removeAudioSource();
             audioConnection.getChannel().disconnect();
+        });
+
+        this.playerMessage.ifPresent(message -> {
+            message.getButtonClickListeners().clear();
+            message.createUpdater().removeAllComponents().applyChanges();
         });
 
         if (save) {
