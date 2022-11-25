@@ -40,9 +40,9 @@ public class LavaManager {
     private static void registerSources(final AudioPlayerManager audioPlayerManager) {
         audioPlayerManager.registerSourceManager(spotifySource);
         audioPlayerManager.registerSourceManager(youtubeSource);
-        audioPlayerManager.registerSourceManager(bandcampSource);
-        audioPlayerManager.registerSourceManager(soundcloudSource);
-        audioPlayerManager.registerSourceManager(twitchSource);
+        //audioPlayerManager.registerSourceManager(bandcampSource);
+        //audioPlayerManager.registerSourceManager(soundcloudSource);
+        //audioPlayerManager.registerSourceManager(twitchSource);
     }
 
     private static AudioPlayerManager createPlayerManager() {

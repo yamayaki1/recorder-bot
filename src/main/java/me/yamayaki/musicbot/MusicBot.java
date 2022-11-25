@@ -31,7 +31,8 @@ public class MusicBot {
             CacheSpecs.YOUTUBE_CACHE,
             CacheSpecs.PLAYLIST_CACHE,
 
-            ChannelSpecs.CHANNEL_SETTINGS
+            ChannelSpecs.CHANNEL_SETTINGS,
+            ChannelSpecs.SERVER_PLAYERCHANNEL
     });
     private static MusicBot instance = null;
     private final ConcurrentHashMap<Server, ServerAudioManager> serverAudioManagers = new ConcurrentHashMap<>();

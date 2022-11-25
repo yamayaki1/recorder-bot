@@ -41,6 +41,7 @@ public class SpotifyTrack {
             Image image = images[i];
 
             if (image.getWidth() > width) {
+                width = image.getWidth();
                 index = i;
             }
         }

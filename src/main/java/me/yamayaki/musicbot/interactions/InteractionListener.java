@@ -2,6 +2,7 @@ package me.yamayaki.musicbot.interactions;
 
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.interactions.commands.channels.GhostCommand;
+import me.yamayaki.musicbot.interactions.commands.channels.PlayerChannelCommand;
 import me.yamayaki.musicbot.interactions.commands.music.ClearCommand;
 import me.yamayaki.musicbot.interactions.commands.music.PlayCommand;
 import me.yamayaki.musicbot.interactions.commands.music.PlayerCommand;
@@ -31,6 +32,7 @@ public class InteractionListener implements SlashCommandCreateListener {
     public InteractionListener(DiscordApi discordApi) {
         registerCommands(discordApi,
                 new GhostCommand(),
+                new PlayerChannelCommand(),
 
                 new ClearCommand(),
                 new PlayCommand(),

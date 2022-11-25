@@ -47,7 +47,6 @@ public class PlaylistManager {
             list.add(this.currentTrack);
         }
 
-        Collections.reverse(list);
         return list;
     }
 
@@ -70,6 +69,14 @@ public class PlaylistManager {
 
         this.currentTrack = this.trackList.poll();
         return this.currentTrack;
+    }
+
+    public AudioTrack peekNext() {
+        if (!this.hasNext()) {
+            return null;
+        }
+
+        return this.trackList.peek();
     }
 
     public boolean toggleRepeat() {
