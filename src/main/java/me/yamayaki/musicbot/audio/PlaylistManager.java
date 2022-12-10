@@ -8,7 +8,6 @@ import me.yamayaki.musicbot.audio.player.LoadResultHandler;
 import me.yamayaki.musicbot.database.specs.impl.CacheSpecs;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;

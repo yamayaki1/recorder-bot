@@ -13,7 +13,6 @@ import me.yamayaki.musicbot.interactions.commands.utilities.PingCommand;
 import me.yamayaki.musicbot.utils.Either;
 import me.yamayaki.musicbot.utils.Threads;
 import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.event.interaction.ButtonClickEvent;
 import org.javacord.api.event.interaction.ModalSubmitEvent;
 import org.javacord.api.event.interaction.SlashCommandCreateEvent;
@@ -84,6 +83,22 @@ public class InteractionListener implements SlashCommandCreateListener, ButtonCl
         });
     }
 
+    @Override
+    public void onButtonClick(ButtonClickEvent event) {
+        CompletableFuture.supplyAsync(() -> {
+            event.getButtonInteraction().getServer().ifPresent(server -> {
+                MusicBot.instance().getAudioManager(server)
+                        .getPlayerControl()
+                        .onButtonClick(event);
+            });
+
+            return null;
+        }, Threads.mainWorker()).orTimeout(60L, TimeUnit.SECONDS).exceptionally(throwable -> {
+            MusicBot.LOGGER.error(throwable);
+            return 0;
+        });
+    }
+
     private void printCommandUsed(SlashCommandInteraction interaction) {
         StringBuilder builder = new StringBuilder(interaction.getUser().getDiscriminatedName() + " using '/");
         builder.append(interaction.getCommandName());
@@ -93,14 +108,6 @@ public class InteractionListener implements SlashCommandCreateListener, ButtonCl
         builder.append("'");
 
         MusicBot.LOGGER.info(builder);
-    }
-
-    @Override
-    public void onButtonClick(ButtonClickEvent event) {
-        event.getButtonInteraction().getServer().ifPresent(server -> {
-            MusicBot.instance().getAudioManager(server)
-                    .onButtonClick(event);
-        });
     }
 
     @Override

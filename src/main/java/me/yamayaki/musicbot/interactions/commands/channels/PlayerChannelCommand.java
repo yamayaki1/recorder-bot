@@ -1,13 +1,10 @@
 package me.yamayaki.musicbot.interactions.commands.channels;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.interactions.Command;
 import me.yamayaki.musicbot.utils.Either;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ChannelType;
-import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.SlashCommand;
@@ -37,6 +34,7 @@ public class PlayerChannelCommand implements Command {
         var interUpdater = either.getLeft().respondLater(true).join();
 
         boolean success = MusicBot.instance().getAudioManager(either.getRight())
+                .getPlayerControl()
                 .setPlayerChannel(either.getLeft().getArgumentChannelValueByName("channel").get());
 
         String content = success ? "Kanal erfolgreich gesetzt." : "Beim setzen des Kanals ist ein Fehler aufgetreten!";
