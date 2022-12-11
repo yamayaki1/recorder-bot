@@ -29,7 +29,7 @@ public class LoadResultHandler implements AudioLoadResultHandler {
         this.playlistManager.add(track);
 
         assert this.consumer != null;
-        this.consumer.accept(new LoaderResponse(true, 1, "", track.getInfo().title));
+        this.consumer.accept(new LoaderResponse(track));
     }
 
     @Override
@@ -38,7 +38,7 @@ public class LoadResultHandler implements AudioLoadResultHandler {
             this.playlistManager.add(playlist.getTracks().get(0));
 
             assert this.consumer != null;
-            this.consumer.accept(new LoaderResponse(true, 1, "", playlist.getTracks().get(0).getInfo().title));
+            this.consumer.accept(new LoaderResponse(playlist.getTracks().get(0)));
             return;
         }
 
@@ -46,14 +46,14 @@ public class LoadResultHandler implements AudioLoadResultHandler {
             this.playlistManager.add(track);
 
             assert this.consumer != null;
-            this.consumer.accept(new LoaderResponse(true, playlist.getTracks().size()));
+            this.consumer.accept(new LoaderResponse(playlist));
         }
     }
 
     @Override
     public void noMatches() {
         assert this.consumer != null;
-        this.consumer.accept(new LoaderResponse(false, 0, "Keine Ergebnisse."));
+        this.consumer.accept(new LoaderResponse(null));
     }
 
     @Override
@@ -61,6 +61,6 @@ public class LoadResultHandler implements AudioLoadResultHandler {
         MusicBot.LOGGER.error("Failed to load track: {}", exception.getMessage(), exception);
 
         assert this.consumer != null;
-        this.consumer.accept(new LoaderResponse(false, 0, exception.getMessage()));
+        this.consumer.accept(new LoaderResponse(null));
     }
 }

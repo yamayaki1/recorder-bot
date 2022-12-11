@@ -42,11 +42,15 @@ public class Config {
     }
 
     public static String getVersion() {
-        return internalValues.getProperty("version", "unknown");
+        return internalValues.getProperty("bot.version", "unknown");
     }
 
     public static boolean isDevBuild() {
-        return Boolean.parseBoolean((String) internalValues.getOrDefault("devbuild", "true"));
+        return Boolean.parseBoolean((String) internalValues.getOrDefault("git.clean", "true"));
+    }
+
+    public static String getBranch() {
+        return internalValues.getProperty("git.branch", "unknown");
     }
 
     public static String getDiscordVersion() {

@@ -5,6 +5,7 @@ import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.source.spotify.SpotifyTrack;
 import me.yamayaki.musicbot.database.specs.impl.ChannelSpecs;
 import me.yamayaki.musicbot.utils.Pair;
+import me.yamayaki.musicbot.utils.Threads;
 import me.yamayaki.musicbot.utils.YouTubeUtils;
 import org.javacord.api.entity.Deletable;
 import org.javacord.api.entity.channel.ServerChannel;
@@ -12,13 +13,12 @@ import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.component.ActionRow;
 import org.javacord.api.entity.message.component.Button;
-import org.javacord.api.entity.message.component.TextInput;
-import org.javacord.api.entity.message.component.TextInputStyle;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.event.interaction.ButtonClickEvent;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public class PlayerControl {
@@ -97,20 +97,21 @@ public class PlayerControl {
             return;
         }
 
-        try {
+        CompletableFuture.supplyAsync(() -> {
             this.controllerMessage.getMessage().createUpdater()
                     .setContent("")
                     .setEmbed(this.getEmbed())
                     .addComponents(this.getComponents())
-                    .applyChanges().join();
-        } catch (Exception e) {
-            MusicBot.LOGGER.error(e);
-        }
+                    .applyChanges();
+            return null;
+        }, Threads.mainWorker()).exceptionally(throwable -> {
+            MusicBot.LOGGER.error(throwable);
+            return null;
+        }).join();
     }
 
     private ActionRow getComponents() {
         return ActionRow.of(
-                //Button.success("add", "+"),
                 Button.danger("stop", "", "⏹️"),
                 Button.primary("pause", "", "⏯️"),
                 Button.primary("skip", "", "⏭️"),
@@ -155,12 +156,6 @@ public class PlayerControl {
         }
 
         switch (event.getButtonInteraction().getCustomId()) {
-            case "add" ->
-                    event.getButtonInteraction().respondWithModal("add_song", "Lied oder Playlist hinzufügen.", ActionRow.of(
-                            TextInput.create(
-                                    TextInputStyle.SHORT, "query", "Link zum Lied oder zur Playlist", true
-                            )
-                    )).join();
             case "stop" -> {
                 this.audioManager.getPlaylist().clear();
                 this.audioManager.stopTrack();
@@ -175,11 +170,11 @@ public class PlayerControl {
                 event.getButtonInteraction().acknowledge();
             }
             case "vol_down" -> {
-                this.audioManager.setVolume(this.audioManager.getVolume()-15);
+                this.audioManager.setVolume(this.audioManager.getVolume() - 15);
                 event.getButtonInteraction().acknowledge();
             }
             case "vol_up" -> {
-                this.audioManager.setVolume(this.audioManager.getVolume()+15);
+                this.audioManager.setVolume(this.audioManager.getVolume() + 15);
                 event.getButtonInteraction().acknowledge();
             }
             default -> event.getButtonInteraction().acknowledge();

@@ -1,45 +1,37 @@
 package me.yamayaki.musicbot.audio.entities;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioItem;
+import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+
 public class LoaderResponse {
-    private final boolean success;
-    private final int count;
-    private final String message;
-    private final String title;
+    private final AudioItem loadedItem;
 
-    public LoaderResponse(boolean success, int count) {
-        this.success = success;
-        this.count = count;
-        this.message = "";
-        this.title = "";
-    }
-
-    public LoaderResponse(boolean success, int count, String message) {
-        this.success = success;
-        this.count = count;
-        this.message = message;
-        this.title = "";
-    }
-
-    public LoaderResponse(boolean success, int count, String message, String title) {
-        this.success = success;
-        this.count = count;
-        this.message = message;
-        this.title = title;
+    public LoaderResponse(AudioItem audioItem) {
+        this.loadedItem = audioItem;
     }
 
     public boolean isSuccess() {
-        return this.success;
+        return this.loadedItem != null;
     }
 
     public int getCount() {
-        return this.count;
-    }
+        if (this.loadedItem instanceof AudioPlaylist playlist) {
+            return playlist.getTracks().size();
+        }
 
-    public String getMessage() {
-        return this.message;
+        if (this.loadedItem instanceof AudioTrack) {
+            return 1;
+        }
+
+        return 0;
     }
 
     public String getTitle() {
-        return this.title;
+        if (this.loadedItem instanceof AudioTrack track) {
+            return track.getInfo().title;
+        }
+
+        return "";
     }
 }

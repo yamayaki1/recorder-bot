@@ -78,7 +78,7 @@ public class MusicBot {
     protected void runTasks() {
         LOGGER.info("starting tasks and commandline listener ...");
 
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new BackgroundTasks(this), 0L, 1L, TimeUnit.SECONDS);
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new BackgroundTasks(this), 0L, 5L, TimeUnit.SECONDS);
         Runtime.getRuntime().addShutdownHook(new ShutdownHandler(this));
     }
 

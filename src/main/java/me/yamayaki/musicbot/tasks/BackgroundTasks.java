@@ -16,7 +16,7 @@ public record BackgroundTasks(MusicBot instance) implements Runnable {
     @Override
     public void run() {
         try {
-            CompletableFuture.supplyAsync(()-> {
+            CompletableFuture.supplyAsync(() -> {
                 try {
                     this.readCommandLine();
                 } catch (IOException e) {

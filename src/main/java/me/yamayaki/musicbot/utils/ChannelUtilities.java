@@ -7,10 +7,6 @@ import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.PermissionsBuilder;
-import org.javacord.api.entity.server.Server;
-import org.javacord.api.interaction.SlashCommandInteraction;
-
-import java.util.Optional;
 
 public class ChannelUtilities {
     public static void activateGhostChannel(ServerVoiceChannel voiceChannel) {

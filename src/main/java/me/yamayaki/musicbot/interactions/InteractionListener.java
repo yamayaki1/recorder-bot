@@ -13,13 +13,11 @@ import me.yamayaki.musicbot.interactions.commands.utilities.PingCommand;
 import me.yamayaki.musicbot.utils.Threads;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.event.interaction.ButtonClickEvent;
-import org.javacord.api.event.interaction.ModalSubmitEvent;
 import org.javacord.api.event.interaction.SlashCommandCreateEvent;
 import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
 import org.javacord.api.interaction.SlashCommandInteractionOption;
 import org.javacord.api.listener.interaction.ButtonClickListener;
-import org.javacord.api.listener.interaction.ModalSubmitListener;
 import org.javacord.api.listener.interaction.SlashCommandCreateListener;
 
 import java.util.Arrays;
@@ -29,7 +27,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-public class InteractionListener implements SlashCommandCreateListener, ButtonClickListener, ModalSubmitListener {
+public class InteractionListener implements SlashCommandCreateListener, ButtonClickListener {
     private final HashMap<String, Command> commands = new HashMap<>();
 
     public InteractionListener(DiscordApi discordApi) {
@@ -93,7 +91,7 @@ public class InteractionListener implements SlashCommandCreateListener, ButtonCl
             });
 
             return null;
-        }, Threads.mainWorker()).orTimeout(3L, TimeUnit.SECONDS).exceptionally(throwable -> {
+        }, Threads.mainWorker()).orTimeout(60L, TimeUnit.SECONDS).exceptionally(throwable -> {
             MusicBot.LOGGER.error(throwable);
             throwable.printStackTrace();
             return 0;
@@ -109,16 +107,5 @@ public class InteractionListener implements SlashCommandCreateListener, ButtonCl
         builder.append("'");
 
         MusicBot.LOGGER.info(builder);
-    }
-
-    @Override
-    public void onModalSubmit(ModalSubmitEvent event) {
-        event.getModalInteraction().createImmediateResponder().respond();
-
-        event.getModalInteraction().getTextInputValueByCustomId("query").ifPresent(query -> {
-            MusicBot.instance()
-                    .getAudioManager(event.getModalInteraction().getServer().get())
-                    .tryLoadItems(query, null);
-        });
     }
 }

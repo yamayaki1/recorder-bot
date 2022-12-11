@@ -84,15 +84,15 @@ public class ServerAudioManager extends AudioEventAdapter {
                 .setPaused(bool);
     }
 
-    public void setVolume(int volume) {
-        int vol = Math.max(0, Math.min(volume, 150));
-        this.audioSource.getAudioPlayer()
-                .setVolume(vol);
-    }
-
     public int getVolume() {
         return this.audioSource.getAudioPlayer()
                 .getVolume();
+    }
+
+    public void setVolume(int volume) {
+        int vol = Math.max(0, Math.min(volume, 100));
+        this.audioSource.getAudioPlayer()
+                .setVolume(vol);
     }
 
     public void fixAudioSource() {

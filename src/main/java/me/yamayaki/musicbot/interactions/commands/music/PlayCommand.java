@@ -3,7 +3,6 @@ package me.yamayaki.musicbot.interactions.commands.music;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.ServerAudioManager;
 import me.yamayaki.musicbot.interactions.Command;
-import me.yamayaki.musicbot.utils.ChannelUtilities;
 import me.yamayaki.musicbot.utils.StringTools;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
@@ -36,12 +35,16 @@ public class PlayCommand implements Command {
         Optional<ServerVoiceChannel> userChannel = interaction.getUser()
                 .getConnectedVoiceChannel(interaction.getServer().orElseThrow());
 
-        if(userChannel.isEmpty()) {
+        if (userChannel.isEmpty()) {
             interUpdater.setContent("Beim Beitreten des Sprachkanals ist ein Fehler aufgetreten. Befindest du dich in einem Kanal?").update();
             return;
         }
 
-        userChannel.get().connect(false, false);
+        interaction.getServer().orElseThrow().getAudioConnection().ifPresentOrElse(audioConnection -> {
+            if (!audioConnection.getChannel().equals(userChannel.get())) {
+                userChannel.get().connect(false, false).join();
+            }
+        }, () -> userChannel.get().connect(false, false).join());
 
         String song = interaction.getArgumentStringValueByName("query").orElse("");
         if (!StringTools.isURL(song) && !song.contains("ytmsearch:") && !song.contains("ytsearch:")) {
@@ -49,7 +52,7 @@ public class PlayCommand implements Command {
         }
 
         ServerAudioManager serverAudioManager = MusicBot.instance()
-                .getAudioManager(interaction.getRegisteredCommandServer().orElseThrow());
+                .getAudioManager(interaction.getServer().orElseThrow());
 
         serverAudioManager.tryLoadItems(song, playerResponse -> {
             String message;
@@ -58,7 +61,7 @@ public class PlayCommand implements Command {
                         ? "Es wurden " + playerResponse.getCount() + " Lieder der Playlist hinzugefügt."
                         : "Das Lied **" + playerResponse.getTitle() + "** wurde der Playlist hinzugefügt.";
             } else {
-                message = "Beim Laden der Lieder ist ein Fehler aufgetreten: " + playerResponse.getMessage();
+                message = "Beim Laden der Lieder ist ein Fehler aufgetreten.";
             }
 
             interUpdater.setContent(message).update();
