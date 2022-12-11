@@ -4,10 +4,8 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.interactions.Command;
-import me.yamayaki.musicbot.utils.Either;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
-import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
@@ -27,12 +25,12 @@ public class PlaylistCommand implements Command {
     }
 
     @Override
-    public void execute(Either<SlashCommandInteraction, Server> either) {
-        var interUpdater = either.getLeft().respondLater(true).join();
+    public void execute(SlashCommandInteraction interaction) {
+        var interUpdater = interaction.respondLater(true).join();
         EmbedBuilder embedBuilder = new EmbedBuilder().setTitle("Playlist");
 
         List<AudioTrack> tracks = MusicBot.instance()
-                .getAudioManager(either.getRight())
+                .getAudioManager(interaction.getServer().orElseThrow())
                 .getPlaylist()
                 .getTracks(true);
 

@@ -4,10 +4,8 @@ import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.database.specs.impl.ChannelSpecs;
 import me.yamayaki.musicbot.interactions.Command;
 import me.yamayaki.musicbot.utils.ChannelUtilities;
-import me.yamayaki.musicbot.utils.Either;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.permission.PermissionType;
-import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
@@ -25,9 +23,9 @@ public class GhostCommand implements Command {
     }
 
     @Override
-    public void execute(Either<SlashCommandInteraction, Server> either) {
-        var interUpdater = either.getLeft().respondLater(true).join();
-        var userChannel = either.getLeft().getUser().getConnectedVoiceChannel(either.getRight());
+    public void execute(SlashCommandInteraction interaction) {
+        var interUpdater = interaction.respondLater(true).join();
+        var userChannel = interaction.getUser().getConnectedVoiceChannel(interaction.getServer().orElseThrow());
 
         userChannel.ifPresentOrElse(voiceChannel -> {
             var channelInfoOpt = MusicBot.DATABASE

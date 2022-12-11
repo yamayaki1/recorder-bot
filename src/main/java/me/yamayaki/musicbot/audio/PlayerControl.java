@@ -4,7 +4,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.source.spotify.SpotifyTrack;
 import me.yamayaki.musicbot.database.specs.impl.ChannelSpecs;
-import me.yamayaki.musicbot.utils.ChannelMessagePair;
+import me.yamayaki.musicbot.utils.Pair;
 import me.yamayaki.musicbot.utils.YouTubeUtils;
 import org.javacord.api.entity.Deletable;
 import org.javacord.api.entity.channel.ServerChannel;
@@ -31,14 +31,14 @@ public class PlayerControl {
     }
 
     private void loadData() {
-        Optional<ChannelMessagePair> pair = MusicBot.DATABASE.getDatabase(ChannelSpecs.SERVER_PLAYERCHANNEL)
+        Optional<Pair<String, String>> pair = MusicBot.DATABASE.getDatabase(ChannelSpecs.SERVER_PLAYERCHANNEL)
                 .getValue(this.audioManager.getServer().getId());
 
         if (pair.isEmpty()) {
             return;
         }
 
-        Optional<ServerTextChannel> textChannel = this.audioManager.getServer().getTextChannelById(pair.get().channelId());
+        Optional<ServerTextChannel> textChannel = this.audioManager.getServer().getTextChannelById(pair.get().getLeft());
 
         if (textChannel.isEmpty()) {
             return;
@@ -46,7 +46,7 @@ public class PlayerControl {
 
         try {
             this.controllerMessage.setMessage(
-                    textChannel.get().getMessageById(pair.get().messageId()).join().getLatestInstance().join()
+                    textChannel.get().getMessageById(pair.get().getRight()).join().getLatestInstance().join()
             );
         } catch (Exception e) {
             MusicBot.LOGGER.error(e);
@@ -61,7 +61,7 @@ public class PlayerControl {
 
         MusicBot.LOGGER.info("saving playerchannel for server {}", this.audioManager.getServer().getName());
         MusicBot.DATABASE.getDatabase(ChannelSpecs.SERVER_PLAYERCHANNEL)
-                .putValue(this.audioManager.getServer().getId(), new ChannelMessagePair(this.controllerMessage.getMessage().getChannel().getId(), this.controllerMessage.getMessage().getId()));
+                .putValue(this.audioManager.getServer().getId(), new Pair<>(this.controllerMessage.getMessage().getChannel().getIdAsString(), this.controllerMessage.getMessage().getIdAsString()));
     }
 
     private void deleteData() {

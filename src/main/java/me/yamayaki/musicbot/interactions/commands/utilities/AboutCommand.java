@@ -2,10 +2,8 @@ package me.yamayaki.musicbot.interactions.commands.utilities;
 
 import me.yamayaki.musicbot.Config;
 import me.yamayaki.musicbot.interactions.Command;
-import me.yamayaki.musicbot.utils.Either;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
-import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
@@ -23,8 +21,8 @@ public class AboutCommand implements Command {
     }
 
     @Override
-    public void execute(Either<SlashCommandInteraction, Server> either) {
-        var interUpdater = either.getLeft().respondLater(true).join();
+    public void execute(SlashCommandInteraction interaction) {
+        var interUpdater = interaction.respondLater(true).join();
 
         EmbedBuilder embedBuilder = new EmbedBuilder()
                 .setTitle("Über diesen Bot").setUrl("https://github.com/yamayaki1/recorder-bot")

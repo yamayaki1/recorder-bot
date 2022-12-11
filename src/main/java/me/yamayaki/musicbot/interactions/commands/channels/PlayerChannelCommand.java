@@ -2,11 +2,9 @@ package me.yamayaki.musicbot.interactions.commands.channels;
 
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.interactions.Command;
-import me.yamayaki.musicbot.utils.Either;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.permission.PermissionType;
-import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
@@ -30,12 +28,12 @@ public class PlayerChannelCommand implements Command {
     }
 
     @Override
-    public void execute(Either<SlashCommandInteraction, Server> either) {
-        var interUpdater = either.getLeft().respondLater(true).join();
+    public void execute(SlashCommandInteraction interaction) {
+        var interUpdater = interaction.respondLater(true).join();
 
-        boolean success = MusicBot.instance().getAudioManager(either.getRight())
+        boolean success = MusicBot.instance().getAudioManager(interaction.getServer().orElseThrow())
                 .getPlayerControl()
-                .setPlayerChannel(either.getLeft().getArgumentChannelValueByName("channel").get());
+                .setPlayerChannel(interaction.getArgumentChannelValueByName("channel").get());
 
         String content = success ? "Kanal erfolgreich gesetzt." : "Beim setzen des Kanals ist ein Fehler aufgetreten!";
         interUpdater.setContent(content).update();

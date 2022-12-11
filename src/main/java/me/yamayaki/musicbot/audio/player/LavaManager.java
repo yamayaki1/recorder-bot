@@ -6,9 +6,6 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
-import com.sedmelluq.discord.lavaplayer.source.bandcamp.BandcampAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import me.yamayaki.musicbot.audio.source.spotify.SpotifySourceManager;
 
@@ -17,9 +14,6 @@ import java.util.concurrent.Future;
 public class LavaManager {
     public static final SpotifySourceManager spotifySource;
     public static final YoutubeAudioSourceManager youtubeSource;
-    public static final BandcampAudioSourceManager bandcampSource;
-    public static final SoundCloudAudioSourceManager soundcloudSource;
-    public static final TwitchStreamAudioSourceManager twitchSource;
 
     public static final EqualizerFactory equalizerFactory;
 
@@ -28,9 +22,6 @@ public class LavaManager {
     static {
         spotifySource = new SpotifySourceManager();
         youtubeSource = new YoutubeAudioSourceManager();
-        bandcampSource = new BandcampAudioSourceManager();
-        soundcloudSource = SoundCloudAudioSourceManager.createDefault();
-        twitchSource = new TwitchStreamAudioSourceManager();
 
         equalizerFactory = new EqualizerFactory();
 
@@ -40,9 +31,6 @@ public class LavaManager {
     private static void registerSources(final AudioPlayerManager audioPlayerManager) {
         audioPlayerManager.registerSourceManager(spotifySource);
         audioPlayerManager.registerSourceManager(youtubeSource);
-        //audioPlayerManager.registerSourceManager(bandcampSource);
-        //audioPlayerManager.registerSourceManager(soundcloudSource);
-        //audioPlayerManager.registerSourceManager(twitchSource);
     }
 
     private static AudioPlayerManager createPlayerManager() {

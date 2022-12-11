@@ -10,7 +10,6 @@ import me.yamayaki.musicbot.interactions.commands.music.PlaylistCommand;
 import me.yamayaki.musicbot.interactions.commands.music.SkipCommand;
 import me.yamayaki.musicbot.interactions.commands.utilities.AboutCommand;
 import me.yamayaki.musicbot.interactions.commands.utilities.PingCommand;
-import me.yamayaki.musicbot.utils.Either;
 import me.yamayaki.musicbot.utils.Threads;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.event.interaction.ButtonClickEvent;
@@ -69,7 +68,7 @@ public class InteractionListener implements SlashCommandCreateListener, ButtonCl
 
             Command command = this.commands.getOrDefault(interaction.getCommandName(), null);
             if (command != null) {
-                command.execute(new Either<>(interaction, interaction.getServer().orElse(null)));
+                command.execute(interaction);
             }
 
             return null;
@@ -79,6 +78,7 @@ public class InteractionListener implements SlashCommandCreateListener, ButtonCl
                     .send();
 
             MusicBot.LOGGER.error(throwable);
+            throwable.printStackTrace();
             return 0;
         });
     }
@@ -93,8 +93,9 @@ public class InteractionListener implements SlashCommandCreateListener, ButtonCl
             });
 
             return null;
-        }, Threads.mainWorker()).orTimeout(60L, TimeUnit.SECONDS).exceptionally(throwable -> {
+        }, Threads.mainWorker()).orTimeout(3L, TimeUnit.SECONDS).exceptionally(throwable -> {
             MusicBot.LOGGER.error(throwable);
+            throwable.printStackTrace();
             return 0;
         });
     }

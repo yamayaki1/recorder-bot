@@ -1,6 +1,5 @@
 package me.yamayaki.musicbot.tasks;
 
-import me.yamayaki.musicbot.Config;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.utils.Threads;
 
@@ -8,6 +7,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 public record BackgroundTasks(MusicBot instance) implements Runnable {
     public static final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -15,9 +16,15 @@ public record BackgroundTasks(MusicBot instance) implements Runnable {
     @Override
     public void run() {
         try {
-            if (Config.isDevBuild()) {
-                this.readCommandLine();
-            }
+            CompletableFuture.supplyAsync(()-> {
+                try {
+                    this.readCommandLine();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                return null;
+            }).orTimeout(1L, TimeUnit.SECONDS);
 
             this.cleanupAudioManager();
         } catch (Exception e) {

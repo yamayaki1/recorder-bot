@@ -2,9 +2,7 @@ package me.yamayaki.musicbot.interactions.commands.music;
 
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.interactions.Command;
-import me.yamayaki.musicbot.utils.Either;
 import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
@@ -22,11 +20,11 @@ public class ClearCommand implements Command {
     }
 
     @Override
-    public void execute(Either<SlashCommandInteraction, Server> either) {
-        var interUpdater = either.getLeft().respondLater(true).join();
+    public void execute(SlashCommandInteraction interaction) {
+        var interUpdater = interaction.respondLater(true).join();
 
         MusicBot.instance()
-                .getAudioManager(either.getRight())
+                .getAudioManager(interaction.getServer().orElseThrow())
                 .getPlaylist()
                 .clear();
 

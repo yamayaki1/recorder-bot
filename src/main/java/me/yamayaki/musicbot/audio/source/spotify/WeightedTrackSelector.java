@@ -2,7 +2,7 @@ package me.yamayaki.musicbot.audio.source.spotify;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.MusicBot;
-import me.yamayaki.musicbot.utils.Either;
+import me.yamayaki.musicbot.utils.Pair;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -26,12 +26,12 @@ public class WeightedTrackSelector {
         this.youtubeTracks = youtubeTracks;
     }
 
-    public static Either<AudioTrack, Boolean> getWeightedTrack(SpotifyTrack spotifyTrack, List<AudioTrack> youtubeTracks) {
+    public static Pair<AudioTrack, Boolean> getWeightedTrack(SpotifyTrack spotifyTrack, List<AudioTrack> youtubeTracks) {
         WeightedTrackSelector weightedTrackSelector = new WeightedTrackSelector(spotifyTrack, youtubeTracks);
         weightedTrackSelector.runPreFilter();
         weightedTrackSelector.runSelector();
 
-        return new Either<>(weightedTrackSelector.getSelectedTrack(), weightedTrackSelector.isPerfectMatch());
+        return new Pair<>(weightedTrackSelector.getSelectedTrack(), weightedTrackSelector.isPerfectMatch());
     }
 
     private Boolean isPerfectMatch() {

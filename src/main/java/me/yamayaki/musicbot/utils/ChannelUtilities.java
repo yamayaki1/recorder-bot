@@ -10,37 +10,9 @@ import org.javacord.api.entity.permission.PermissionsBuilder;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.interaction.SlashCommandInteraction;
 
+import java.util.Optional;
+
 public class ChannelUtilities {
-    public static void joinVoiceChannel(Either<SlashCommandInteraction, Server> either, Runnable onSuccess, Runnable onError) {
-        var optChannel = either.getLeft().getUser()
-                .getConnectedVoiceChannel(either.getRight());
-        var curChannel = either.getRight()
-                .getAudioConnection();
-
-        if (curChannel.isPresent() && curChannel.get().getChannel().equals(optChannel.orElse(null))) {
-            onSuccess.run();
-            return;
-        }
-
-        optChannel.ifPresentOrElse(voiceChannel -> voiceChannel.connect(false, false).thenAccept(audioConnection -> onSuccess.run()), onError);
-    }
-
-    public static void leaveVoiceChannel(Either<SlashCommandInteraction, Server> either, Runnable onSuccess, Runnable onError) {
-        var optConnection = either.getRight()
-                .getAudioConnection();
-
-        optConnection.ifPresentOrElse(audioConnection -> {
-            try {
-                audioConnection.close();
-                onSuccess.run();
-            } catch (NullPointerException e) {
-                onError.run();
-                MusicBot.LOGGER.error(e);
-                System.exit(-1);
-            }
-        }, onError);
-    }
-
     public static void activateGhostChannel(ServerVoiceChannel voiceChannel) {
         var server = voiceChannel.getServer();
         var rolePermissions = voiceChannel.getOverwrittenRolePermissions();
@@ -59,7 +31,7 @@ public class ChannelUtilities {
         //save original channel-data
         MusicBot.DATABASE
                 .getDatabase(ChannelSpecs.CHANNEL_SETTINGS)
-                .putValue(voiceChannel.getId(), new ChannelInfo(newChannel.getId(), rolePermissions, userPermissions, voiceChannel.getName(), voiceChannel.getUserLimit()));
+                .putValue(voiceChannel.getId(), new ChannelInfo(newChannel.getId(), rolePermissions, userPermissions, voiceChannel.getName(), voiceChannel.getUserLimit().orElse(0)));
 
         //update original channel
         var originalUpdater = voiceChannel.createUpdater();
