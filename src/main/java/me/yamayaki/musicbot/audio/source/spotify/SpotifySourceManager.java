@@ -130,7 +130,10 @@ public class SpotifySourceManager implements AudioSourceManager {
     private AudioItem getAudioItem(final SpotifyTrack[] spotifyTracks) throws ExecutionException, InterruptedException {
         List<AudioTrack> tracks = new ArrayList<>(spotifyTracks.length);
         for (SpotifyTrack spotifyTrack : spotifyTracks) {
-            tracks.add(this.fromYouTube(spotifyTrack));
+            var audioTrack = this.fromYouTube(spotifyTrack);
+            if (audioTrack != null) {
+                tracks.add(audioTrack);
+            }
         }
 
         return new BasicAudioPlaylist("YouTube-List", tracks, null, false);
