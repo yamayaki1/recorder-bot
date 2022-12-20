@@ -12,8 +12,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import com.sedmelluq.discord.lavaplayer.track.BasicAudioPlaylist;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.player.LavaManager;
-import me.yamayaki.musicbot.database.specs.impl.CacheSpecs;
-import me.yamayaki.musicbot.utils.Threads;
+import me.yamayaki.musicbot.storage.database.specs.impl.CacheSpecs;
 import se.michaelthelin.spotify.model_objects.specification.Album;
 import se.michaelthelin.spotify.model_objects.specification.Playlist;
 import se.michaelthelin.spotify.model_objects.specification.Track;
@@ -23,9 +22,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
@@ -130,12 +128,10 @@ public class SpotifySourceManager implements AudioSourceManager {
     }
 
     private AudioItem getAudioItem(final SpotifyTrack[] spotifyTracks) throws ExecutionException, InterruptedException {
-        List<AudioTrack> tracks = Threads.mainWorker().submit(() ->
-                Arrays.stream(spotifyTracks).parallel()
-                        .map(this::fromYouTube)
-                        .filter(Objects::nonNull)
-                        .toList()
-        ).get();
+        List<AudioTrack> tracks = new ArrayList<>(spotifyTracks.length);
+        for (SpotifyTrack spotifyTrack : spotifyTracks) {
+            tracks.add(this.fromYouTube(spotifyTrack));
+        }
 
         return new BasicAudioPlaylist("YouTube-List", tracks, null, false);
     }

@@ -42,7 +42,7 @@ public class ServerAudioManager extends AudioEventAdapter {
         try {
             LavaManager.loadTrack(song, new LoadResultHandler(this.getPlaylist(), 0L, consumer)).get();
             this.startPlaying();
-            this.playerControl.updateMessage();
+            this.playerControl.setDirty();
         } catch (Exception ignored) {
         }
     }
@@ -119,7 +119,7 @@ public class ServerAudioManager extends AudioEventAdapter {
 
     @Override
     public void onEvent(AudioEvent event) {
-        this.playerControl.updateMessage();
+        this.playerControl.setDirty();
         this.lastActiveTime = System.currentTimeMillis();
     }
 

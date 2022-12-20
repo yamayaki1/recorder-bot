@@ -3,9 +3,8 @@ package me.yamayaki.musicbot.audio;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.source.spotify.SpotifyTrack;
-import me.yamayaki.musicbot.database.specs.impl.ChannelSpecs;
+import me.yamayaki.musicbot.storage.database.specs.impl.ChannelSpecs;
 import me.yamayaki.musicbot.utils.Pair;
-import me.yamayaki.musicbot.utils.Threads;
 import me.yamayaki.musicbot.utils.YouTubeUtils;
 import org.javacord.api.entity.Deletable;
 import org.javacord.api.entity.channel.ServerChannel;
@@ -18,12 +17,13 @@ import org.javacord.api.event.interaction.ButtonClickEvent;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public class PlayerControl {
     private final ServerAudioManager audioManager;
     private final Holder controllerMessage = new Holder();
+
+    private boolean isDirty = true;
 
     public PlayerControl(ServerAudioManager audioManager) {
         this.audioManager = audioManager;
@@ -87,27 +87,27 @@ public class PlayerControl {
 
         this.controllerMessage.setMessage(message);
         this.saveData();
-        this.updateMessage();
+        this.setDirty();
 
         return true;
     }
 
+    public void setDirty() {
+        this.isDirty = true;
+    }
+
     public void updateMessage() {
-        if (!this.controllerMessage.isSet()) {
+        if (!this.controllerMessage.isSet() || !this.isDirty) {
             return;
         }
 
-        CompletableFuture.supplyAsync(() -> {
-            this.controllerMessage.getMessage().createUpdater()
-                    .setContent("")
-                    .setEmbed(this.getEmbed())
-                    .addComponents(this.getComponents())
-                    .applyChanges();
-            return null;
-        }, Threads.mainWorker()).exceptionally(throwable -> {
-            MusicBot.LOGGER.error(throwable);
-            return null;
-        }).join();
+        this.isDirty = false;
+
+        this.controllerMessage.getMessage().createUpdater()
+                .setContent("")
+                .setEmbed(this.getEmbed())
+                .addComponents(this.getComponents())
+                .applyChanges().join();
     }
 
     private ActionRow getComponents() {
@@ -159,26 +159,14 @@ public class PlayerControl {
             case "stop" -> {
                 this.audioManager.getPlaylist().clear();
                 this.audioManager.stopTrack();
-                event.getButtonInteraction().acknowledge();
             }
-            case "pause" -> {
-                this.audioManager.setPaused(!this.audioManager.isPaused());
-                event.getButtonInteraction().acknowledge();
-            }
-            case "skip" -> {
-                this.audioManager.skipTrack(1);
-                event.getButtonInteraction().acknowledge();
-            }
-            case "vol_down" -> {
-                this.audioManager.setVolume(this.audioManager.getVolume() - 15);
-                event.getButtonInteraction().acknowledge();
-            }
-            case "vol_up" -> {
-                this.audioManager.setVolume(this.audioManager.getVolume() + 15);
-                event.getButtonInteraction().acknowledge();
-            }
-            default -> event.getButtonInteraction().acknowledge();
+            case "pause" -> this.audioManager.setPaused(!this.audioManager.isPaused());
+            case "skip" -> this.audioManager.skipTrack(1);
+            case "vol_down" -> this.audioManager.setVolume(this.audioManager.getVolume() - 15);
+            case "vol_up" -> this.audioManager.setVolume(this.audioManager.getVolume() + 15);
         }
+
+        event.getButtonInteraction().acknowledge();
     }
 
     public void shutdown() {

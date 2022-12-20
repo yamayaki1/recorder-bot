@@ -1,6 +1,6 @@
-package me.yamayaki.musicbot.database.serializers.impl;
+package me.yamayaki.musicbot.storage.database.serializers.impl;
 
-import me.yamayaki.musicbot.database.serializers.Serializer;
+import me.yamayaki.musicbot.storage.database.serializers.Serializer;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

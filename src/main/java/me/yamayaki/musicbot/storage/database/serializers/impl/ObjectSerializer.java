@@ -1,7 +1,7 @@
-package me.yamayaki.musicbot.database.serializers.impl;
+package me.yamayaki.musicbot.storage.database.serializers.impl;
 
-import me.yamayaki.musicbot.database.serializers.DefaultSerializers;
-import me.yamayaki.musicbot.database.serializers.Serializer;
+import me.yamayaki.musicbot.storage.database.serializers.DefaultSerializers;
+import me.yamayaki.musicbot.storage.database.serializers.Serializer;
 import me.yamayaki.musicbot.utils.GsonHolder;
 
 import java.io.IOException;

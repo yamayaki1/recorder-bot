@@ -1,4 +1,4 @@
-package me.yamayaki.musicbot.database.serializers;
+package me.yamayaki.musicbot.storage.database.serializers;
 
 import java.io.IOException;
 

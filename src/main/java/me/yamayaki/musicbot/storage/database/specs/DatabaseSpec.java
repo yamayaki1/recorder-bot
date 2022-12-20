@@ -1,4 +1,4 @@
-package me.yamayaki.musicbot.database.specs;
+package me.yamayaki.musicbot.storage.database.specs;
 
 public class DatabaseSpec<K, V> {
     public final String name;

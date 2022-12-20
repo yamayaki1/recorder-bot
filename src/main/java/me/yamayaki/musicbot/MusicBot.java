@@ -1,12 +1,12 @@
 package me.yamayaki.musicbot;
 
 import me.yamayaki.musicbot.audio.ServerAudioManager;
-import me.yamayaki.musicbot.database.RocksManager;
-import me.yamayaki.musicbot.database.specs.DatabaseSpec;
-import me.yamayaki.musicbot.database.specs.impl.CacheSpecs;
-import me.yamayaki.musicbot.database.specs.impl.ChannelSpecs;
 import me.yamayaki.musicbot.interactions.InteractionListener;
 import me.yamayaki.musicbot.interactions.VoiceLeaveListener;
+import me.yamayaki.musicbot.storage.database.DBInstance;
+import me.yamayaki.musicbot.storage.database.specs.DatabaseSpec;
+import me.yamayaki.musicbot.storage.database.specs.impl.CacheSpecs;
+import me.yamayaki.musicbot.storage.database.specs.impl.ChannelSpecs;
 import me.yamayaki.musicbot.tasks.BackgroundTasks;
 import me.yamayaki.musicbot.tasks.ShutdownHandler;
 import org.apache.logging.log4j.LogManager;
@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 public class MusicBot {
     public static final Logger LOGGER = LogManager.getLogger(MusicBot.class);
     public static final Config CONFIG = new Config(new File(".", "config/"));
-    public static final RocksManager DATABASE = new RocksManager(new File(".", "database/"), new DatabaseSpec[]{
+    public static final DBInstance DATABASE = new DBInstance(new File(".", "database/"), new DatabaseSpec[]{
             CacheSpecs.SPOTIFY_CACHE,
             CacheSpecs.YOUTUBE_CACHE,
             CacheSpecs.PLAYLIST_CACHE,
@@ -78,17 +78,13 @@ public class MusicBot {
     protected void runTasks() {
         LOGGER.info("starting tasks and commandline listener ...");
 
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new BackgroundTasks(this), 0L, 5L, TimeUnit.SECONDS);
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new BackgroundTasks(this), 0L, 2L, TimeUnit.SECONDS);
         Runtime.getRuntime().addShutdownHook(new ShutdownHandler(this));
     }
 
     public void updatePresence() {
         discordApi.updateStatus(UserStatus.ONLINE);
         discordApi.updateActivity(ActivityType.PLAYING, "Recorder | " + Config.getVersion());
-    }
-
-    public DiscordApi getAPI() {
-        return this.discordApi;
     }
 
     public ServerAudioManager getAudioManager(Server server) {

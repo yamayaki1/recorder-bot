@@ -1,13 +1,13 @@
-package me.yamayaki.musicbot.database;
+package me.yamayaki.musicbot.storage.database;
 
-import me.yamayaki.musicbot.Config;
-import me.yamayaki.musicbot.MusicBot;
-import me.yamayaki.musicbot.database.specs.DatabaseSpec;
+import me.yamayaki.musicbot.storage.database.specs.DatabaseSpec;
 import org.rocksdb.ColumnFamilyDescriptor;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.DBOptions;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
+import org.rocksdb.TransactionDB;
+import org.rocksdb.TransactionDBOptions;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -17,22 +17,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class RocksManager {
-    private static boolean shownStats = false;
-
+public class DBInstance {
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    private final RocksDB database;
+    private final TransactionDB database;
 
-    private final HashMap<DatabaseSpec<?, ?>, DatabaseInstance<?, ?>> databases = new HashMap<>();
+    private final HashMap<DatabaseSpec<?, ?>, DBFamily<?, ?>> databases = new HashMap<>();
 
-    public RocksManager(File file, DatabaseSpec<?, ?>[] specs) {
+    public DBInstance(File file, DatabaseSpec<?, ?>[] specs) {
         if (file.mkdirs() && !file.isDirectory()) {
             throw new RuntimeException("Couldn't create directory: " + file);
-        }
-
-        if (!shownStats) {
-            MusicBot.LOGGER.info("using rocksdb ({}) as database backend ...", Config.getDatabaseVersion());
-            shownStats = true;
         }
 
         final List<ColumnFamilyDescriptor> familyDescriptors = new ArrayList<>();
@@ -48,9 +41,10 @@ public class RocksManager {
                 DBOptions options = new DBOptions()
                         .setCreateIfMissing(true)
                         .setKeepLogFileNum(2)
-                        .setCreateMissingColumnFamilies(true)
+                        .setCreateMissingColumnFamilies(true);
+                TransactionDBOptions transactionOptions = new TransactionDBOptions()
         ) {
-            this.database = RocksDB.open(options, file.getPath(), familyDescriptors, familyHandles);
+            this.database = TransactionDB.open(options, transactionOptions, file.getPath(), familyDescriptors, familyHandles);
 
             for (DatabaseSpec<?, ?> spec : specs) {
                 ColumnFamilyHandle handle = null;
@@ -61,7 +55,7 @@ public class RocksManager {
                     }
                 }
 
-                this.databases.put(spec, new DatabaseInstance<>(spec, this, handle));
+                this.databases.put(spec, new DBFamily<>(spec, this, handle));
             }
         } catch (RocksDBException e) {
             throw new RuntimeException("Failed to open database: ", e);
@@ -69,17 +63,17 @@ public class RocksManager {
     }
 
     @SuppressWarnings("unchecked")
-    public <K, V> DatabaseInstance<K, V> getDatabase(DatabaseSpec<K, V> spec) {
-        DatabaseInstance<?, ?> instance = this.databases.get(spec);
+    public <K, V> DBFamily<K, V> getDatabase(DatabaseSpec<K, V> spec) {
+        DBFamily<?, ?> instance = this.databases.get(spec);
 
         if (instance == null) {
             throw new NullPointerException("No database is registered for spec " + spec);
         }
 
-        return (DatabaseInstance<K, V>) instance;
+        return (DBFamily<K, V>) instance;
     }
 
-    public RocksDB getRocks() {
+    public TransactionDB getRocks() {
         return this.database;
     }
 
@@ -87,8 +81,16 @@ public class RocksManager {
         return this.lock;
     }
 
+    public void flush() {
+        for (DBFamily<?, ?> database : this.databases.values()) {
+            database.commit();
+        }
+    }
+
     public void close() throws RocksDBException {
-        for (DatabaseInstance<?, ?> database : this.databases.values()) {
+        this.flush();
+
+        for (DBFamily<?, ?> database : this.databases.values()) {
             database.close();
         }
 

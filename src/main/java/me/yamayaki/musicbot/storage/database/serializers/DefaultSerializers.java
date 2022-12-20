@@ -1,10 +1,10 @@
-package me.yamayaki.musicbot.database.serializers;
+package me.yamayaki.musicbot.storage.database.serializers;
 
 import me.yamayaki.musicbot.audio.entities.TrackInfo;
 import me.yamayaki.musicbot.audio.source.spotify.SpotifyTrack;
-import me.yamayaki.musicbot.database.serializers.impl.LongSerializer;
-import me.yamayaki.musicbot.database.serializers.impl.ObjectSerializer;
-import me.yamayaki.musicbot.database.serializers.impl.StringSerializer;
+import me.yamayaki.musicbot.storage.database.serializers.impl.LongSerializer;
+import me.yamayaki.musicbot.storage.database.serializers.impl.ObjectSerializer;
+import me.yamayaki.musicbot.storage.database.serializers.impl.StringSerializer;
 import me.yamayaki.musicbot.utils.ChannelInfo;
 import me.yamayaki.musicbot.utils.Pair;
 

@@ -5,7 +5,7 @@ import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.entities.TrackInfo;
 import me.yamayaki.musicbot.audio.player.LavaManager;
 import me.yamayaki.musicbot.audio.player.LoadResultHandler;
-import me.yamayaki.musicbot.database.specs.impl.CacheSpecs;
+import me.yamayaki.musicbot.storage.database.specs.impl.CacheSpecs;
 
 import java.util.ArrayList;
 import java.util.List;

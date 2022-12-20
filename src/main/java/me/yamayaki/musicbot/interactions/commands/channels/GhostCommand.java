@@ -1,8 +1,8 @@
 package me.yamayaki.musicbot.interactions.commands.channels;
 
 import me.yamayaki.musicbot.MusicBot;
-import me.yamayaki.musicbot.database.specs.impl.ChannelSpecs;
 import me.yamayaki.musicbot.interactions.Command;
+import me.yamayaki.musicbot.storage.database.specs.impl.ChannelSpecs;
 import me.yamayaki.musicbot.utils.ChannelUtilities;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.permission.PermissionType;
