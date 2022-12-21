@@ -1,9 +1,7 @@
 package me.yamayaki.musicbot.audio.source.spotify;
 
-import com.neovisionaries.i18n.CountryCode;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioItem;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioReference;
@@ -13,9 +11,6 @@ import com.sedmelluq.discord.lavaplayer.track.BasicAudioPlaylist;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.player.LavaManager;
 import me.yamayaki.musicbot.storage.database.specs.impl.CacheSpecs;
-import se.michaelthelin.spotify.model_objects.specification.Album;
-import se.michaelthelin.spotify.model_objects.specification.Playlist;
-import se.michaelthelin.spotify.model_objects.specification.Track;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -48,17 +43,17 @@ public class SpotifySourceManager implements AudioSourceManager {
 
             final Matcher trackMatcher = SpotifyAccess.TRACK_PATTERN.matcher(url);
             if (trackMatcher.find()) {
-                tracks = this.buildFromTrack(trackMatcher.group(1));
+                tracks = SpotifyAccess.getByTrack(trackMatcher.group(1));
             }
 
             final Matcher albumMatcher = SpotifyAccess.ALBUM_PATTERN.matcher(url);
             if (albumMatcher.find()) {
-                tracks = this.buildFromAlbum(albumMatcher.group(1));
+                tracks = SpotifyAccess.getByAlbum(albumMatcher.group(1));
             }
 
             final Matcher playlistMatcher = SpotifyAccess.PLAYLIST_PATTERN.matcher(url);
             if (playlistMatcher.find()) {
-                tracks = this.buildFromPlaylist(playlistMatcher.group(1));
+                tracks = SpotifyAccess.getByPlaylist(playlistMatcher.group(1));
             }
 
             audioItem = this.getAudioItem(tracks);
@@ -67,64 +62,6 @@ public class SpotifySourceManager implements AudioSourceManager {
         }
 
         return audioItem;
-    }
-
-    private SpotifyTrack[] buildFromTrack(String trackId) {
-        try {
-            var spotifyTrack = MusicBot.DATABASE
-                    .getDatabase(CacheSpecs.SPOTIFY_CACHE)
-                    .getValue(trackId);
-
-            if (spotifyTrack.isEmpty()) {
-                final Track track = SpotifyAccess.getAPI()
-                        .getTrack(trackId)
-                        .market(CountryCode.US)
-                        .build().execute();
-                spotifyTrack = Optional.of(new SpotifyTrack(track));
-
-                MusicBot.DATABASE
-                        .getDatabase(CacheSpecs.SPOTIFY_CACHE)
-                        .putValue(trackId, spotifyTrack.get());
-            }
-
-            return new SpotifyTrack[]{spotifyTrack.get()};
-        } catch (Exception exception) {
-            throw new FriendlyException(exception.getMessage(), FriendlyException.Severity.FAULT, exception);
-        }
-    }
-
-    private SpotifyTrack[] buildFromAlbum(String albumId) {
-        try {
-            final Album album = SpotifyAccess.getAPI()
-                    .getAlbum(albumId)
-                    .build().execute();
-
-            SpotifyTrack[] tracks = new SpotifyTrack[album.getTracks().getItems().length];
-            for (int i = 0; i < album.getTracks().getItems().length; i++) {
-                tracks[i] = this.buildFromTrack(album.getTracks().getItems()[i].getId())[0];
-            }
-
-            return tracks;
-        } catch (Exception exception) {
-            throw new FriendlyException(exception.getMessage(), FriendlyException.Severity.FAULT, exception);
-        }
-    }
-
-    private SpotifyTrack[] buildFromPlaylist(String playlistId) {
-        try {
-            final Playlist playlist = SpotifyAccess.getAPI()
-                    .getPlaylist(playlistId)
-                    .build().execute();
-
-            SpotifyTrack[] tracks = new SpotifyTrack[playlist.getTracks().getItems().length];
-            for (int i = 0; i < playlist.getTracks().getItems().length; i++) {
-                tracks[i] = this.buildFromTrack(playlist.getTracks().getItems()[i].getTrack().getId())[0];
-            }
-
-            return tracks;
-        } catch (Exception exception) {
-            throw new FriendlyException(exception.getMessage(), FriendlyException.Severity.FAULT, exception);
-        }
     }
 
     private AudioItem getAudioItem(final SpotifyTrack[] spotifyTracks) throws ExecutionException, InterruptedException {

@@ -4,6 +4,7 @@ import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.storage.database.serializers.DefaultSerializers;
 import me.yamayaki.musicbot.storage.database.serializers.Serializer;
 import me.yamayaki.musicbot.storage.database.specs.DatabaseSpec;
+import me.yamayaki.musicbot.utils.CheckedFunction;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksDBException;
@@ -66,6 +67,19 @@ public class DBFamily<K, V> {
             MusicBot.LOGGER.error("Error while reading from transaction: ", e);
             return Optional.empty();
         }
+    }
+
+    public V getOrPut(K key, CheckedFunction<K, V> mappingFunction) throws Exception {
+        Optional<V> optionalValue = this.getValue(key);
+
+        if (optionalValue.isPresent()) {
+            return optionalValue.get();
+        }
+
+        V functionResult = mappingFunction.apply(key);
+        this.putValue(key, functionResult);
+
+        return functionResult;
     }
 
     public void deleteValue(K key) {
