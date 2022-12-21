@@ -4,7 +4,7 @@ import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.storage.database.serializers.DefaultSerializers;
 import me.yamayaki.musicbot.storage.database.serializers.Serializer;
 import me.yamayaki.musicbot.storage.database.specs.DatabaseSpec;
-import me.yamayaki.musicbot.utils.CheckedFunction;
+import me.yamayaki.musicbot.utilities.CheckedFunction;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksDBException;

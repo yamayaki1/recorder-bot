@@ -1,4 +1,4 @@
-package me.yamayaki.musicbot.utils;
+package me.yamayaki.musicbot.utilities;
 
 import org.jetbrains.annotations.NotNull;
 

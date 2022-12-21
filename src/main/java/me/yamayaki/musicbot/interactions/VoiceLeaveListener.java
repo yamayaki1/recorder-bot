@@ -2,8 +2,8 @@ package me.yamayaki.musicbot.interactions;
 
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.storage.database.specs.impl.ChannelSpecs;
-import me.yamayaki.musicbot.utils.ChannelInfo;
-import me.yamayaki.musicbot.utils.ChannelUtilities;
+import me.yamayaki.musicbot.utilities.ChannelInfo;
+import me.yamayaki.musicbot.utilities.ChannelUtilities;
 import org.javacord.api.event.channel.server.voice.ServerVoiceChannelMemberLeaveEvent;
 import org.javacord.api.listener.channel.server.voice.ServerVoiceChannelMemberLeaveListener;
 

@@ -2,7 +2,7 @@ package me.yamayaki.musicbot.audio.source.spotify;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.MusicBot;
-import me.yamayaki.musicbot.utils.Pair;
+import me.yamayaki.musicbot.utilities.Pair;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;

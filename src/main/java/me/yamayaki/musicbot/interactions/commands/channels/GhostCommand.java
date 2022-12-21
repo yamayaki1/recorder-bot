@@ -3,7 +3,7 @@ package me.yamayaki.musicbot.interactions.commands.channels;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.interactions.Command;
 import me.yamayaki.musicbot.storage.database.specs.impl.ChannelSpecs;
-import me.yamayaki.musicbot.utils.ChannelUtilities;
+import me.yamayaki.musicbot.utilities.ChannelUtilities;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.interaction.SlashCommand;

@@ -85,8 +85,8 @@ public class MusicBot {
     public void updateBotInfo() {
         discordApi.updateStatus(UserStatus.ONLINE);
 
-        if(Config.isDevBuild()) {
-            discordApi.updateActivity(ActivityType.PLAYING, Config.getBranch() +"@" + Config.getVersion());
+        if (Config.isDevBuild()) {
+            discordApi.updateActivity(ActivityType.PLAYING, Config.getBranch() + "@" + Config.getVersion());
         } else {
             discordApi.updateActivity(ActivityType.PLAYING, "Recorder | " + Config.getVersion());
         }

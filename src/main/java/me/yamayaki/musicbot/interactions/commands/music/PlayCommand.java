@@ -3,7 +3,7 @@ package me.yamayaki.musicbot.interactions.commands.music;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.ServerAudioManager;
 import me.yamayaki.musicbot.interactions.Command;
-import me.yamayaki.musicbot.utils.StringTools;
+import me.yamayaki.musicbot.utilities.CommonUtils;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.interaction.SlashCommand;
@@ -47,7 +47,7 @@ public class PlayCommand implements Command {
         }, () -> userChannel.get().connect(false, false).join());
 
         String song = interaction.getArgumentStringValueByName("query").orElse("");
-        if (!StringTools.isURL(song) && !song.contains("ytmsearch:") && !song.contains("ytsearch:")) {
+        if (!CommonUtils.isURL(song) && !song.contains("ytmsearch:") && !song.contains("ytsearch:")) {
             song = "ytmsearch:" + song;
         }
 

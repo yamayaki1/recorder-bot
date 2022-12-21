@@ -1,4 +1,4 @@
-package me.yamayaki.musicbot.utils;
+package me.yamayaki.musicbot.utilities;
 
 public class Pair<L, R> {
     private final Single<L> left;

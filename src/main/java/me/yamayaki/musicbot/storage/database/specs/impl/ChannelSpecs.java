@@ -1,8 +1,8 @@
 package me.yamayaki.musicbot.storage.database.specs.impl;
 
 import me.yamayaki.musicbot.storage.database.specs.DatabaseSpec;
-import me.yamayaki.musicbot.utils.ChannelInfo;
-import me.yamayaki.musicbot.utils.Pair;
+import me.yamayaki.musicbot.utilities.ChannelInfo;
+import me.yamayaki.musicbot.utilities.Pair;
 
 public class ChannelSpecs {
     public static final DatabaseSpec<Long, ChannelInfo> CHANNEL_SETTINGS =

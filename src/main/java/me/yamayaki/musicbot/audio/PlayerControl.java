@@ -4,8 +4,8 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.source.spotify.SpotifyTrack;
 import me.yamayaki.musicbot.storage.database.specs.impl.ChannelSpecs;
-import me.yamayaki.musicbot.utils.Pair;
-import me.yamayaki.musicbot.utils.YouTubeUtils;
+import me.yamayaki.musicbot.utilities.CommonUtils;
+import me.yamayaki.musicbot.utilities.Pair;
 import org.javacord.api.entity.Deletable;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
@@ -129,7 +129,7 @@ public class PlayerControl {
         if (currentTrack != null) {
             SpotifyTrack spotifyData = currentTrack.getUserData(SpotifyTrack.class);
 
-            embedBuilder.setThumbnail(spotifyData != null ? spotifyData.getImage() : YouTubeUtils.getThumbnail(currentTrack.getIdentifier()))
+            embedBuilder.setThumbnail(spotifyData != null ? spotifyData.getImage() : CommonUtils.getThumbnail(currentTrack.getIdentifier()))
                     .addField("Aktuelles Lied" + (this.audioManager.isPaused() ? " (pausiert)" : ""), currentTrack.getInfo().title + "\n" + currentTrack.getInfo().author);
         } else {
             embedBuilder.addField("Aktuelles Lied", "Aktuell Spielt kein Lied!");

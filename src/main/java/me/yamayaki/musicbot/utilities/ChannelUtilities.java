@@ -1,4 +1,4 @@
-package me.yamayaki.musicbot.utils;
+package me.yamayaki.musicbot.utilities;
 
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.storage.database.specs.impl.ChannelSpecs;
@@ -48,8 +48,16 @@ public class ChannelUtilities {
         //update original channel
         var originalUpdater = voiceChannel.createUpdater();
         voiceChannel.getOverwrittenUserPermissions().forEach((userId, permissions) -> originalUpdater.removePermissionOverwrite(server.getMemberById(userId).orElse(null)));
-        channelInfo.userPermissions.forEach((userId, permissions) -> originalUpdater.addPermissionOverwrite(server.getMemberById(userId).orElse(null), Permissions.fromBitmask(permissions[0], permissions[1])));
-        channelInfo.rolePermissions.forEach((roleId, permissions) -> originalUpdater.addPermissionOverwrite(server.getRoleById(roleId).orElse(null), Permissions.fromBitmask(permissions[0], permissions[1])));
+
+        for (int i = 0; i < channelInfo.userPermissions.length; i++) {
+            long[] data = channelInfo.userPermissions[i];
+            originalUpdater.addPermissionOverwrite(server.getMemberById(data[0]).orElse(null), Permissions.fromBitmask(data[1], data[2]));
+        }
+
+        for (int i = 0; i < channelInfo.rolePermissions.length; i++) {
+            long[] data = channelInfo.rolePermissions[i];
+            originalUpdater.addPermissionOverwrite(server.getRoleById(data[0]).orElse(null), Permissions.fromBitmask(data[1], data[2]));
+        }
 
         originalUpdater.update().join();
 

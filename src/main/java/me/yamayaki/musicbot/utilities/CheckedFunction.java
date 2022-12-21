@@ -1,4 +1,4 @@
-package me.yamayaki.musicbot.utils;
+package me.yamayaki.musicbot.utilities;
 
 @FunctionalInterface
 public interface CheckedFunction<T, R> {

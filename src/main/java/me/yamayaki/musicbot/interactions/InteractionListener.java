@@ -10,7 +10,7 @@ import me.yamayaki.musicbot.interactions.commands.music.PlaylistCommand;
 import me.yamayaki.musicbot.interactions.commands.music.SkipCommand;
 import me.yamayaki.musicbot.interactions.commands.utilities.AboutCommand;
 import me.yamayaki.musicbot.interactions.commands.utilities.PingCommand;
-import me.yamayaki.musicbot.utils.Threads;
+import me.yamayaki.musicbot.utilities.Threads;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.event.interaction.ButtonClickEvent;
 import org.javacord.api.event.interaction.SlashCommandCreateEvent;

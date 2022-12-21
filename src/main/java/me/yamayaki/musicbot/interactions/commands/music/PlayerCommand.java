@@ -4,7 +4,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.source.spotify.SpotifyTrack;
 import me.yamayaki.musicbot.interactions.Command;
-import me.yamayaki.musicbot.utils.YouTubeUtils;
+import me.yamayaki.musicbot.utilities.CommonUtils;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.interaction.SlashCommand;
@@ -86,7 +86,7 @@ public class PlayerCommand implements Command {
                 SpotifyTrack spotifyData = audioTrack.getUserData(SpotifyTrack.class);
 
                 EmbedBuilder replyEmbed = new EmbedBuilder()
-                        .setImage(spotifyData != null ? spotifyData.getImage() : YouTubeUtils.getThumbnail(audioTrack.getIdentifier()))
+                        .setImage(spotifyData != null ? spotifyData.getImage() : CommonUtils.getThumbnail(audioTrack.getIdentifier()))
                         .addField("Titel", audioTrack.getInfo().title)
                         .addField("Künstler", audioTrack.getInfo().author)
                         .setTimestampToNow();
