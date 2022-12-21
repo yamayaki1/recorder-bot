@@ -119,6 +119,8 @@ public class ServerAudioManager extends AudioEventAdapter {
 
     @Override
     public void onEvent(AudioEvent event) {
+        super.onEvent(event);
+
         this.playerControl.setDirty();
         this.lastActiveTime = System.currentTimeMillis();
     }
