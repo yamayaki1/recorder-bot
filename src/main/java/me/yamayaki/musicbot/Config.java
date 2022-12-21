@@ -46,7 +46,7 @@ public class Config {
     }
 
     public static boolean isDevBuild() {
-        return Boolean.parseBoolean((String) internalValues.getOrDefault("git.clean", "true"));
+        return !Boolean.parseBoolean(internalValues.getProperty("git.clean", "false"));
     }
 
     public static String getBranch() {

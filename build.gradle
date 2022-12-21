@@ -39,7 +39,8 @@ processResources {
     filesMatching('recorderbot.properties') {
         expand 'bot_version': project.version,
                 'git_clean': grgit.status().clean,
-                'git_branch': grgit.branch.current().name
+                'git_branch': grgit.branch.current().name,
+                'compile_time': new Date().toInstant().toEpochMilli()
     }
 }
 

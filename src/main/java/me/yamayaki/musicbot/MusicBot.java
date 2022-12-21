@@ -71,7 +71,7 @@ public class MusicBot {
         discordApi.addListener(new InteractionListener(this.discordApi));
         discordApi.addListener(new VoiceLeaveListener());
 
-        this.updatePresence();
+        this.updateBotInfo();
         this.runTasks();
     }
 
@@ -82,9 +82,14 @@ public class MusicBot {
         Runtime.getRuntime().addShutdownHook(new ShutdownHandler(this));
     }
 
-    public void updatePresence() {
+    public void updateBotInfo() {
         discordApi.updateStatus(UserStatus.ONLINE);
-        discordApi.updateActivity(ActivityType.PLAYING, "Recorder | " + Config.getVersion());
+
+        if(Config.isDevBuild()) {
+            discordApi.updateActivity(ActivityType.PLAYING, Config.getBranch() +"@" + Config.getVersion());
+        } else {
+            discordApi.updateActivity(ActivityType.PLAYING, "Recorder | " + Config.getVersion());
+        }
     }
 
     public ServerAudioManager getAudioManager(Server server) {
