@@ -15,12 +15,9 @@ import me.yamayaki.musicbot.storage.database.specs.impl.CacheSpecs;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 
 public class SpotifySourceManager implements AudioSourceManager {
@@ -57,14 +54,14 @@ public class SpotifySourceManager implements AudioSourceManager {
             }
 
             audioItem = this.getAudioItem(tracks);
-        } catch (MalformedURLException | ExecutionException | InterruptedException exception) {
+        } catch (Exception exception) {
             MusicBot.LOGGER.error(exception);
         }
 
         return audioItem;
     }
 
-    private AudioItem getAudioItem(final SpotifyTrack[] spotifyTracks) throws ExecutionException, InterruptedException {
+    private AudioItem getAudioItem(final SpotifyTrack[] spotifyTracks) throws Exception {
         List<AudioTrack> tracks = new ArrayList<>(spotifyTracks.length);
         for (SpotifyTrack spotifyTrack : spotifyTracks) {
             var audioTrack = this.fromYouTube(spotifyTrack);
@@ -76,40 +73,33 @@ public class SpotifySourceManager implements AudioSourceManager {
         return new BasicAudioPlaylist("YouTube-List", tracks, null, false);
     }
 
-    private AudioTrack fromYouTube(SpotifyTrack spotifyTrack) {
-        Optional<String> ytIdent = MusicBot.DATABASE
-                .getDatabase(CacheSpecs.YOUTUBE_CACHE)
-                .getValue(spotifyTrack.getIdentifier());
+    private AudioTrack fromYouTube(SpotifyTrack spotifyTrack) throws Exception {
+        String ytId = MusicBot.DATABASE.getDatabase(CacheSpecs.YOUTUBE_CACHE).getOrPut(spotifyTrack.getIdentifier(), spotTrack -> {
+            final AudioReference reference = new AudioReference(
+                    "ytmsearch:" +
+                            spotifyTrack.getName().replaceAll("-", "") +
+                            " - " +
+                            spotifyTrack.getArtist(),
+                    ""
+            );
 
-        if (ytIdent.isEmpty()) {
-            final String artist = spotifyTrack.getArtist();
-            final String title = spotifyTrack.getName();
-
-            final var reference = new AudioReference("ytmsearch:" + title.replaceAll("-", "") + " - " + artist, title);
             final AudioItem youtubeMusicItem = LavaManager.youtubeSource.loadItem(null, reference);
             if (!(youtubeMusicItem instanceof AudioPlaylist playlistItem)) {
                 return null;
             }
 
-            final var weightedResult = WeightedTrackSelector
-                    .getWeightedTrack(spotifyTrack, playlistItem.getTracks());
+            return WeightedTrackSelector.getWeightedTrack(spotifyTrack, playlistItem.getTracks())
+                    .getLeft().getIdentifier();
+        });
 
-            if (weightedResult.getRight()) {
-                MusicBot.DATABASE
-                        .getDatabase(CacheSpecs.YOUTUBE_CACHE)
-                        .putValue(spotifyTrack.getIdentifier(), weightedResult.getLeft().getIdentifier());
+        try {
+            final AudioItem youtubeItem = LavaManager.youtubeSource.loadTrackWithVideoId(ytId, true);
+            if (youtubeItem instanceof AudioTrack ytTrack) {
+                ytTrack.setUserData(spotifyTrack);
+                return ytTrack;
             }
-
-            weightedResult.getLeft().setUserData(spotifyTrack);
-            return weightedResult.getLeft();
-        }
-
-        final var reference = new AudioReference("https://youtube.com/watch?v=" + ytIdent.get(), spotifyTrack.getName());
-        final AudioItem youtubeItem = LavaManager.youtubeSource.loadItem(null, reference);
-
-        if (youtubeItem instanceof AudioTrack ytTrack) {
-            ytTrack.setUserData(spotifyTrack);
-            return ytTrack;
+        } catch (Exception e) {
+            return null;
         }
 
         return null;

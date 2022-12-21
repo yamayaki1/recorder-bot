@@ -77,7 +77,9 @@ public class DBFamily<K, V> {
         }
 
         V functionResult = mappingFunction.apply(key);
-        this.putValue(key, functionResult);
+        if (functionResult != null) {
+            this.putValue(key, functionResult);
+        }
 
         return functionResult;
     }
