@@ -130,13 +130,13 @@ public class PlayerControl {
             SpotifyTrack spotifyData = currentTrack.getUserData(SpotifyTrack.class);
 
             embedBuilder.setThumbnail(spotifyData != null ? spotifyData.getImage() : CommonUtils.getThumbnail(currentTrack.getIdentifier()))
-                    .addField("Aktuelles Lied" + (this.audioManager.isPaused() ? " (pausiert)" : ""), currentTrack.getInfo().title + "\n" + currentTrack.getInfo().author);
+                    .addField("Aktuelles Lied" + (this.audioManager.isPaused() ? " (pausiert)" : ""), currentTrack.getInfo().title + "\n" + currentTrack.getInfo().author.replaceAll("- Topic", ""));
         } else {
             embedBuilder.addField("Aktuelles Lied", "Aktuell Spielt kein Lied!");
         }
 
         if (nextTrack != null) {
-            embedBuilder.addField("Nächstes Lied", nextTrack.getInfo().title + "\n" + nextTrack.getInfo().author);
+            embedBuilder.addField("Nächstes Lied", nextTrack.getInfo().title + "\n" + nextTrack.getInfo().author.replaceAll("- Topic", ""));
         }
 
         List<AudioTrack> list = this.audioManager.getPlaylist().getTracks(false);
