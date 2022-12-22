@@ -7,6 +7,7 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
+import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 
 public class AboutCommand implements Command {
     @Override
@@ -21,9 +22,7 @@ public class AboutCommand implements Command {
     }
 
     @Override
-    public void execute(SlashCommandInteraction interaction) {
-        var interUpdater = interaction.respondLater(true).join();
-
+    public void execute(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
         EmbedBuilder embedBuilder = new EmbedBuilder()
                 .setTitle("Über diesen Bot").setUrl("https://github.com/yamayaki1/recorder-bot")
 
@@ -35,6 +34,6 @@ public class AboutCommand implements Command {
                 .addField("Betriebssystem", Config.getOsInfo(), true)
                 .addField("Arbeitsspeicher", Config.getRamInfo(), true);
 
-        interUpdater.addEmbed(embedBuilder).update();
+        updater.addEmbed(embedBuilder).update();
     }
 }

@@ -9,6 +9,7 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
+import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 
 import java.util.List;
 
@@ -25,8 +26,7 @@ public class PlaylistCommand implements Command {
     }
 
     @Override
-    public void execute(SlashCommandInteraction interaction) {
-        var interUpdater = interaction.respondLater(true).join();
+    public void execute(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
         EmbedBuilder embedBuilder = new EmbedBuilder().setTitle("Playlist");
 
         List<AudioTrack> tracks = MusicBot.instance()
@@ -43,6 +43,6 @@ public class PlaylistCommand implements Command {
             embedBuilder.setDescription("Die Playlist ist leer.");
         }
 
-        interUpdater.addEmbed(embedBuilder).update();
+        updater.addEmbed(embedBuilder).update();
     }
 }

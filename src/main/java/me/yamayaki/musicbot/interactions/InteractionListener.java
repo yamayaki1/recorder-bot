@@ -60,24 +60,22 @@ public class InteractionListener implements SlashCommandCreateListener, ButtonCl
 
     @Override
     public void onSlashCommandCreate(SlashCommandCreateEvent event) {
-        CompletableFuture.supplyAsync(() -> {
+        event.getSlashCommandInteraction().respondLater(true).thenAcceptAsync(updater -> {
             SlashCommandInteraction interaction = event.getSlashCommandInteraction();
-            this.printCommandUsed(interaction);
+            printCommandUsed(interaction);
 
-            Command command = this.commands.getOrDefault(interaction.getCommandName(), null);
-            if (command != null) {
-                command.execute(interaction);
+            if (this.commands.containsKey(interaction.getCommandName())) {
+                this.commands.get(interaction.getCommandName()).execute(interaction, updater);
+            } else {
+                updater.setContent("Unbekannter Befehl!");
             }
-
-            return null;
-        }, Threads.mainWorker()).orTimeout(60L, TimeUnit.SECONDS).exceptionally(throwable -> {
+        }, Threads.mainWorker()).orTimeout(120L, TimeUnit.SECONDS).exceptionally(throwable -> {
             event.getSlashCommandInteraction().createFollowupMessageBuilder()
                     .setContent("Beim Ausführen des Befehls ist ein Fehler aufgetreten:\n" + throwable.getMessage())
                     .send();
 
-            MusicBot.LOGGER.error(throwable);
-            throwable.printStackTrace();
-            return 0;
+            MusicBot.LOGGER.fatal(throwable);
+            return null;
         });
     }
 

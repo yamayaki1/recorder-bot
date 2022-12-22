@@ -6,6 +6,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
+import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 
 public class ClearCommand implements Command {
     @Override
@@ -20,14 +21,12 @@ public class ClearCommand implements Command {
     }
 
     @Override
-    public void execute(SlashCommandInteraction interaction) {
-        var interUpdater = interaction.respondLater(true).join();
-
+    public void execute(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
         MusicBot.instance()
                 .getAudioManager(interaction.getServer().orElseThrow())
                 .getPlaylist()
                 .clear();
 
-        interUpdater.setContent("Alle Lieder aus der Playlist entfernt.").update();
+        updater.setContent("Alle Lieder aus der Playlist entfernt.").update();
     }
 }

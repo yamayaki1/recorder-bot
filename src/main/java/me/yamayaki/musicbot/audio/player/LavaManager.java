@@ -7,6 +7,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
+import me.yamayaki.musicbot.Config;
 import me.yamayaki.musicbot.audio.source.spotify.SpotifySourceManager;
 
 import java.util.concurrent.Future;
@@ -39,6 +40,10 @@ public class LavaManager {
 
         audioPlayerManager.getConfiguration().setOpusEncodingQuality(AudioConfiguration.OPUS_QUALITY_MAX);
         audioPlayerManager.getConfiguration().setResamplingQuality(AudioConfiguration.ResamplingQuality.HIGH);
+
+        if (Config.isDevBuild()) {
+            audioPlayerManager.enableGcMonitoring();
+        }
 
         return audioPlayerManager;
     }

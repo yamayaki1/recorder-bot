@@ -11,6 +11,7 @@ import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
 import org.javacord.api.interaction.SlashCommandOption;
 import org.javacord.api.interaction.SlashCommandOptionChoice;
+import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,8 +56,7 @@ public class SkipCommand implements Command {
     }
 
     @Override
-    public void execute(SlashCommandInteraction interaction) {
-        var interUpdater = interaction.respondLater(true).join();
+    public void execute(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
         int amount = interaction.getArgumentDecimalValueByName("amount")
                 .orElse(1.0).intValue();
 
@@ -69,7 +69,7 @@ public class SkipCommand implements Command {
             String message = max_amount - 1 > 1
                     ? "Es können maximal " + max_amount + " Lieder übersprungen werden."
                     : "Es kann maximal ein Lied übersprungen werden.";
-            interUpdater.setContent(message).update();
+            updater.setContent(message).update();
             return;
         }
 
@@ -77,6 +77,6 @@ public class SkipCommand implements Command {
                 .getAudioManager(interaction.getServer().orElseThrow())
                 .skipTrack(amount);
 
-        interUpdater.setContent(amount > 1 ? amount + " Lieder übersprungen." : "Ein Lied übersprungen.").update();
+        updater.setContent(amount > 1 ? amount + " Lieder übersprungen." : "Ein Lied übersprungen.").update();
     }
 }

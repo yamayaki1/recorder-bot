@@ -9,6 +9,7 @@ import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
 import org.javacord.api.interaction.SlashCommandOption;
+import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 
 import java.util.Arrays;
 
@@ -28,14 +29,12 @@ public class PlayerChannelCommand implements Command {
     }
 
     @Override
-    public void execute(SlashCommandInteraction interaction) {
-        var interUpdater = interaction.respondLater(true).join();
-
+    public void execute(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
         boolean success = MusicBot.instance().getAudioManager(interaction.getServer().orElseThrow())
                 .getPlayerControl()
                 .setPlayerChannel(interaction.getArgumentChannelValueByName("channel").get());
 
         String content = success ? "Kanal erfolgreich gesetzt." : "Beim setzen des Kanals ist ein Fehler aufgetreten!";
-        interUpdater.setContent(content).update();
+        updater.setContent(content).update();
     }
 }

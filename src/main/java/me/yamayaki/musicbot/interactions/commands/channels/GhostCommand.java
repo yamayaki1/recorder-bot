@@ -9,6 +9,7 @@ import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
+import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 
 public class GhostCommand implements Command {
     @Override
@@ -23,8 +24,7 @@ public class GhostCommand implements Command {
     }
 
     @Override
-    public void execute(SlashCommandInteraction interaction) {
-        var interUpdater = interaction.respondLater(true).join();
+    public void execute(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
         var userChannel = interaction.getUser().getConnectedVoiceChannel(interaction.getServer().orElseThrow());
 
         userChannel.ifPresentOrElse(voiceChannel -> {
@@ -34,11 +34,11 @@ public class GhostCommand implements Command {
 
             channelInfoOpt.ifPresentOrElse(channelInfo -> {
                 ChannelUtilities.disableGhostChannel(channelInfo, voiceChannel);
-                interUpdater.setContent("Der Ghost-Kanal wurde gelöscht.").update();
+                updater.setContent("Der Ghost-Kanal wurde gelöscht.").update();
             }, () -> {
                 ChannelUtilities.activateGhostChannel(voiceChannel);
-                interUpdater.setContent("Der Ghost-Kanal wurde erstellt.").update();
+                updater.setContent("Der Ghost-Kanal wurde erstellt.").update();
             });
-        }, () -> interUpdater.setContent("Du befindest dich ein keinen Voice-Kanal!").update());
+        }, () -> updater.setContent("Du befindest dich ein keinen Voice-Kanal!").update());
     }
 }

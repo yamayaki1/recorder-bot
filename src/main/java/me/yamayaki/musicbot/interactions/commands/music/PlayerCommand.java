@@ -13,6 +13,7 @@ import org.javacord.api.interaction.SlashCommandInteraction;
 import org.javacord.api.interaction.SlashCommandOption;
 import org.javacord.api.interaction.SlashCommandOptionChoiceBuilder;
 import org.javacord.api.interaction.SlashCommandOptionType;
+import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 
 import java.util.List;
 
@@ -45,23 +46,21 @@ public class PlayerCommand implements Command {
     }
 
     @Override
-    public void execute(SlashCommandInteraction interaction) {
-        var interUpdater = interaction.respondLater(true).join();
-
+    public void execute(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
         switch (interaction.getArgumentStringValueByName("action").orElse("")) {
             case CMD_PAUSE -> {
                 MusicBot.instance()
                         .getAudioManager(interaction.getServer().orElseThrow())
                         .setPaused(true);
 
-                interUpdater.setContent("Aktuelles Lied pausiert.").update();
+                updater.setContent("Aktuelles Lied pausiert.").update();
             }
             case CMD_RESUME -> {
                 MusicBot.instance()
                         .getAudioManager(interaction.getServer().orElseThrow())
                         .startPlaying();
 
-                interUpdater.setContent("Lied fortgesetzt.").update();
+                updater.setContent("Lied fortgesetzt.").update();
             }
             case CMD_LOOP -> {
                 boolean repeat = MusicBot.instance()
@@ -69,14 +68,14 @@ public class PlayerCommand implements Command {
                         .getPlaylist()
                         .toggleRepeat();
 
-                interUpdater.setContent(repeat ? "Wiederholen eingeschaltet." : "Wiederholen ausgeschaltet.").update();
+                updater.setContent(repeat ? "Wiederholen eingeschaltet." : "Wiederholen ausgeschaltet.").update();
             }
             case CMD_CURRENT -> {
                 var trackManager = MusicBot.instance()
                         .getAudioManager(interaction.getServer().orElseThrow());
 
                 if (trackManager.hasFinished() || trackManager.getPlaylist().current() == null) {
-                    interUpdater.setContent("Es spielt aktuell kein Lied.").update();
+                    updater.setContent("Es spielt aktuell kein Lied.").update();
                     return;
                 }
 
@@ -91,7 +90,7 @@ public class PlayerCommand implements Command {
                         .addField("Künstler", audioTrack.getInfo().author)
                         .setTimestampToNow();
 
-                interUpdater.addEmbed(replyEmbed).update();
+                updater.addEmbed(replyEmbed).update();
             }
             case CMD_VOLUME -> {
                 int volume = interaction.getArgumentDecimalValueByName("volume").orElse(50.0).intValue();
@@ -100,9 +99,9 @@ public class PlayerCommand implements Command {
                         .getAudioManager(interaction.getServer().orElseThrow())
                         .setVolume(volume);
 
-                interUpdater.setContent("Lautstärke angepasst.").update();
+                updater.setContent("Lautstärke angepasst.").update();
             }
-            default -> interUpdater.setContent("Unbekannte Aktion").update();
+            default -> updater.setContent("Unbekannte Aktion").update();
         }
     }
 }

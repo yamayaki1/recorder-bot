@@ -10,6 +10,7 @@ import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
 import org.javacord.api.interaction.SlashCommandOption;
+import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 
 import java.util.Optional;
 
@@ -29,14 +30,12 @@ public class PlayCommand implements Command {
     }
 
     @Override
-    public void execute(SlashCommandInteraction interaction) {
-        var interUpdater = interaction.respondLater(true).join();
-
+    public void execute(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
         Optional<ServerVoiceChannel> userChannel = interaction.getUser()
                 .getConnectedVoiceChannel(interaction.getServer().orElseThrow());
 
         if (userChannel.isEmpty()) {
-            interUpdater.setContent("Beim Beitreten des Sprachkanals ist ein Fehler aufgetreten. Befindest du dich in einem Kanal?").update();
+            updater.setContent("Beim Beitreten des Sprachkanals ist ein Fehler aufgetreten. Befindest du dich in einem Kanal?").update();
             return;
         }
 
@@ -64,7 +63,7 @@ public class PlayCommand implements Command {
                 message = "Beim Laden der Lieder ist ein Fehler aufgetreten.";
             }
 
-            interUpdater.setContent(message).update();
+            updater.setContent(message).update();
         });
     }
 }
