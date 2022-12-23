@@ -4,7 +4,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.ServerAudioManager;
-import me.yamayaki.musicbot.interactions.Command;
+import me.yamayaki.musicbot.interactions.ApplicationInteraction;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandBuilder;
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class SkipCommand implements Command {
+public class SkipCommand implements ApplicationInteraction {
     @Override
     public String getName() {
         return "skip";
@@ -56,7 +56,7 @@ public class SkipCommand implements Command {
     }
 
     @Override
-    public void execute(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
+    public void executeCommand(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
         int amount = interaction.getArgumentDecimalValueByName("amount")
                 .orElse(1.0).intValue();
 

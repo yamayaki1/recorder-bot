@@ -63,7 +63,7 @@ public class MusicBot {
 
         discordApi = new DiscordApiBuilder()
                 .setToken(CONFIG.getSetting("discord.token"))
-                .setIntents(Intent.GUILD_VOICE_STATES)
+                .setIntents(Intent.GUILD_VOICE_STATES, Intent.DIRECT_MESSAGES)
                 .login().join();
 
         LOGGER.info("discord login successful, continuing ... ");
@@ -75,14 +75,7 @@ public class MusicBot {
         this.runTasks();
     }
 
-    protected void runTasks() {
-        LOGGER.info("starting tasks and commandline listener ...");
-
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new BackgroundTasks(this), 0L, 2L, TimeUnit.SECONDS);
-        Runtime.getRuntime().addShutdownHook(new ShutdownHandler(this));
-    }
-
-    public void updateBotInfo() {
+    private void updateBotInfo() {
         discordApi.updateStatus(UserStatus.ONLINE);
 
         if (Config.isDevBuild()) {
@@ -90,6 +83,13 @@ public class MusicBot {
         } else {
             discordApi.updateActivity(ActivityType.PLAYING, "Recorder | " + Config.getVersion());
         }
+    }
+
+    private void runTasks() {
+        LOGGER.info("starting tasks and commandline listener ...");
+
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(new BackgroundTasks(this), 0L, 2L, TimeUnit.SECONDS);
+        Runtime.getRuntime().addShutdownHook(new ShutdownHandler(this));
     }
 
     public ServerAudioManager getAudioManager(Server server) {

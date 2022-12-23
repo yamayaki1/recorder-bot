@@ -1,7 +1,7 @@
 package me.yamayaki.musicbot.interactions.commands.utilities;
 
 import me.yamayaki.musicbot.Config;
-import me.yamayaki.musicbot.interactions.Command;
+import me.yamayaki.musicbot.interactions.ApplicationInteraction;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.interaction.SlashCommand;
@@ -9,7 +9,7 @@ import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
 import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 
-public class AboutCommand implements Command {
+public class AboutCommand implements ApplicationInteraction {
     @Override
     public String getName() {
         return "about";
@@ -22,7 +22,7 @@ public class AboutCommand implements Command {
     }
 
     @Override
-    public void execute(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
+    public void executeCommand(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
         EmbedBuilder embedBuilder = new EmbedBuilder()
                 .setTitle("Über diesen Bot").setUrl("https://github.com/yamayaki1/recorder-bot")
 

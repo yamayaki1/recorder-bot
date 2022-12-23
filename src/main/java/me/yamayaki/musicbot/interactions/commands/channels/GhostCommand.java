@@ -1,7 +1,7 @@
 package me.yamayaki.musicbot.interactions.commands.channels;
 
 import me.yamayaki.musicbot.MusicBot;
-import me.yamayaki.musicbot.interactions.Command;
+import me.yamayaki.musicbot.interactions.ApplicationInteraction;
 import me.yamayaki.musicbot.storage.database.specs.impl.ChannelSpecs;
 import me.yamayaki.musicbot.utilities.ChannelUtilities;
 import org.javacord.api.DiscordApi;
@@ -11,7 +11,7 @@ import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
 import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 
-public class GhostCommand implements Command {
+public class GhostCommand implements ApplicationInteraction {
     @Override
     public String getName() {
         return "ghost";
@@ -24,7 +24,7 @@ public class GhostCommand implements Command {
     }
 
     @Override
-    public void execute(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
+    public void executeCommand(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
         var userChannel = interaction.getUser().getConnectedVoiceChannel(interaction.getServer().orElseThrow());
 
         userChannel.ifPresentOrElse(voiceChannel -> {

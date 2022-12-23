@@ -1,14 +1,14 @@
 package me.yamayaki.musicbot.interactions.commands.music;
 
 import me.yamayaki.musicbot.MusicBot;
-import me.yamayaki.musicbot.interactions.Command;
+import me.yamayaki.musicbot.interactions.ApplicationInteraction;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.interaction.SlashCommand;
 import org.javacord.api.interaction.SlashCommandBuilder;
 import org.javacord.api.interaction.SlashCommandInteraction;
 import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 
-public class ClearCommand implements Command {
+public class ClearCommand implements ApplicationInteraction {
     @Override
     public String getName() {
         return "clear";
@@ -21,7 +21,7 @@ public class ClearCommand implements Command {
     }
 
     @Override
-    public void execute(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
+    public void executeCommand(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
         MusicBot.instance()
                 .getAudioManager(interaction.getServer().orElseThrow())
                 .getPlaylist()

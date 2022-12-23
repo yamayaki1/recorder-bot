@@ -1,7 +1,7 @@
 package me.yamayaki.musicbot.interactions.commands.channels;
 
 import me.yamayaki.musicbot.MusicBot;
-import me.yamayaki.musicbot.interactions.Command;
+import me.yamayaki.musicbot.interactions.ApplicationInteraction;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ChannelType;
 import org.javacord.api.entity.permission.PermissionType;
@@ -13,7 +13,7 @@ import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 
 import java.util.Arrays;
 
-public class PlayerChannelCommand implements Command {
+public class PlayerChannelCommand implements ApplicationInteraction {
     @Override
     public String getName() {
         return "playerchannel";
@@ -29,7 +29,7 @@ public class PlayerChannelCommand implements Command {
     }
 
     @Override
-    public void execute(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
+    public void executeCommand(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
         boolean success = MusicBot.instance().getAudioManager(interaction.getServer().orElseThrow())
                 .getPlayerControl()
                 .setPlayerChannel(interaction.getArgumentChannelValueByName("channel").get());

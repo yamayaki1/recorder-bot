@@ -3,7 +3,7 @@ package me.yamayaki.musicbot.interactions.commands.music;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import me.yamayaki.musicbot.MusicBot;
-import me.yamayaki.musicbot.interactions.Command;
+import me.yamayaki.musicbot.interactions.ApplicationInteraction;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.interaction.SlashCommand;
@@ -13,7 +13,7 @@ import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 
 import java.util.List;
 
-public class PlaylistCommand implements Command {
+public class PlaylistCommand implements ApplicationInteraction {
     @Override
     public String getName() {
         return "playlist";
@@ -26,7 +26,7 @@ public class PlaylistCommand implements Command {
     }
 
     @Override
-    public void execute(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
+    public void executeCommand(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
         EmbedBuilder embedBuilder = new EmbedBuilder().setTitle("Playlist");
 
         List<AudioTrack> tracks = MusicBot.instance()

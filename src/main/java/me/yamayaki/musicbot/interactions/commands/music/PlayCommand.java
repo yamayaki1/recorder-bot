@@ -2,7 +2,7 @@ package me.yamayaki.musicbot.interactions.commands.music;
 
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.ServerAudioManager;
-import me.yamayaki.musicbot.interactions.Command;
+import me.yamayaki.musicbot.interactions.ApplicationInteraction;
 import me.yamayaki.musicbot.utilities.CommonUtils;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
@@ -14,7 +14,7 @@ import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 
 import java.util.Optional;
 
-public class PlayCommand implements Command {
+public class PlayCommand implements ApplicationInteraction {
     @Override
     public String getName() {
         return "play";
@@ -30,7 +30,7 @@ public class PlayCommand implements Command {
     }
 
     @Override
-    public void execute(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
+    public void executeCommand(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
         Optional<ServerVoiceChannel> userChannel = interaction.getUser()
                 .getConnectedVoiceChannel(interaction.getServer().orElseThrow());
 

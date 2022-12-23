@@ -3,7 +3,7 @@ package me.yamayaki.musicbot.interactions.commands.music;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.source.spotify.SpotifyTrack;
-import me.yamayaki.musicbot.interactions.Command;
+import me.yamayaki.musicbot.interactions.ApplicationInteraction;
 import me.yamayaki.musicbot.utilities.CommonUtils;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -17,7 +17,7 @@ import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 
 import java.util.List;
 
-public class PlayerCommand implements Command {
+public class PlayerCommand implements ApplicationInteraction {
     private final String CMD_PAUSE = "pause";
     private final String CMD_RESUME = "resume";
     private final String CMD_LOOP = "loop";
@@ -46,7 +46,7 @@ public class PlayerCommand implements Command {
     }
 
     @Override
-    public void execute(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
+    public void executeCommand(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
         switch (interaction.getArgumentStringValueByName("action").orElse("")) {
             case CMD_PAUSE -> {
                 MusicBot.instance()
