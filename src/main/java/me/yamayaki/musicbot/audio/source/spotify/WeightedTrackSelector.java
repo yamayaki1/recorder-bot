@@ -21,17 +21,17 @@ public class WeightedTrackSelector {
 
     private AudioTrack selectedTrack = null;
 
-    public WeightedTrackSelector(SpotifyTrack spotifyTrack, List<AudioTrack> youtubeTracks) {
-        this.spotifyTrack = spotifyTrack;
-        this.youtubeTracks = youtubeTracks;
-    }
-
     public static Pair<AudioTrack, Boolean> getWeightedTrack(SpotifyTrack spotifyTrack, List<AudioTrack> youtubeTracks) {
         WeightedTrackSelector weightedTrackSelector = new WeightedTrackSelector(spotifyTrack, youtubeTracks);
         weightedTrackSelector.runPreFilter();
         weightedTrackSelector.runSelector();
 
         return new Pair<>(weightedTrackSelector.getSelectedTrack(), weightedTrackSelector.isPerfectMatch());
+    }
+
+    private WeightedTrackSelector(SpotifyTrack spotifyTrack, List<AudioTrack> youtubeTracks) {
+        this.spotifyTrack = spotifyTrack;
+        this.youtubeTracks = youtubeTracks;
     }
 
     private Boolean isPerfectMatch() {
@@ -51,8 +51,8 @@ public class WeightedTrackSelector {
 
             //when both, the authors and the titles match, we can early exit and speed up this process quite a lot
             if (
-                    (youtubeTrack.getInfo().author.equalsIgnoreCase(spotifyTrack.getArtist()) && youtubeTrack.getInfo().title.equalsIgnoreCase(spotifyTrack.getName()))
-                            || (youtubeTrack.getInfo().author.equalsIgnoreCase(spotifyTrack.getArtist() + " - Topic") && youtubeTrack.getInfo().title.equalsIgnoreCase(spotifyTrack.getName()))
+                    (youtubeTrack.getInfo().author.equalsIgnoreCase(spotifyTrack.artist()) && youtubeTrack.getInfo().title.equalsIgnoreCase(spotifyTrack.name()))
+                            || (youtubeTrack.getInfo().author.equalsIgnoreCase(spotifyTrack.artist() + " - Topic") && youtubeTrack.getInfo().title.equalsIgnoreCase(spotifyTrack.name()))
             ) {
                 this.titleExactExists = true;
                 this.authorExactExists = true;
@@ -60,7 +60,7 @@ public class WeightedTrackSelector {
                 this.highestScore = 5000;
                 this.selectedTrack = youtubeTrack;
 
-                MusicBot.LOGGER.debug("perfect match: {} ({}) - {} ({})", youtubeTrack.getInfo().title, spotifyTrack.getName(), youtubeTrack.getInfo().author, spotifyTrack.getArtist());
+                MusicBot.LOGGER.debug("perfect match: {} ({}) - {} ({})", youtubeTrack.getInfo().title, spotifyTrack.name(), youtubeTrack.getInfo().author, spotifyTrack.artist());
                 continue;
             }
 
@@ -68,7 +68,7 @@ public class WeightedTrackSelector {
              * when there is a video with the same author as the spotify track,
              * we can eliminate all the videos, that don't have the same uploader.
              */
-            if (youtubeTrack.getInfo().author.equalsIgnoreCase(spotifyTrack.getArtist())) {
+            if (youtubeTrack.getInfo().author.equalsIgnoreCase(spotifyTrack.artist())) {
                 this.authorExactExists = true;
             }
 
@@ -76,7 +76,7 @@ public class WeightedTrackSelector {
              * when there is a video with a similar author as the spotify track,
              * we can eliminate all the videos, that don't have a similar author.
              */
-            if (!this.authorExactExists && youtubeTrack.getInfo().author.contains(spotifyTrack.getArtist())) {
+            if (!this.authorExactExists && youtubeTrack.getInfo().author.contains(spotifyTrack.artist())) {
                 this.authorExists = true;
             }
 
@@ -84,7 +84,7 @@ public class WeightedTrackSelector {
              * when there is a video with the exact title as the spotify track,
              * we can eliminate all the videos, than don't contain the exact title.
              */
-            if (youtubeTrack.getInfo().title.equalsIgnoreCase(spotifyTrack.getName())) {
+            if (youtubeTrack.getInfo().title.equalsIgnoreCase(spotifyTrack.name())) {
                 this.titleExactExists = true;
             }
 
@@ -92,7 +92,7 @@ public class WeightedTrackSelector {
              * when there is a video with a similar title as the spotify track,
              * we can eliminate all the videos, than don't contain a similar title.
              */
-            if (!this.titleExactExists && youtubeTrack.getInfo().title.contains(spotifyTrack.getName())) {
+            if (!this.titleExactExists && youtubeTrack.getInfo().title.contains(spotifyTrack.name())) {
                 this.titleExists = true;
             }
         }
@@ -114,13 +114,13 @@ public class WeightedTrackSelector {
                 this.highestScore = score.get();
             }
 
-            MusicBot.LOGGER.debug("{}: {} ({}) - {} ({})", score, youtubeTrack.getInfo().title, spotifyTrack.getName(), youtubeTrack.getInfo().author, spotifyTrack.getArtist());
+            MusicBot.LOGGER.debug("{}: {} ({}) - {} ({})", score, youtubeTrack.getInfo().title, spotifyTrack.name(), youtubeTrack.getInfo().author, spotifyTrack.artist());
         }
     }
 
     private void checkAuthor(String ytAuthor, AtomicReference<Integer> score) {
         if (this.authorExactExists) {
-            if (ytAuthor.equalsIgnoreCase(this.spotifyTrack.getArtist())) {
+            if (ytAuthor.equalsIgnoreCase(this.spotifyTrack.artist())) {
                 score.set(score.get() + 20);
             } else {
                 score.set(score.get() - 20);
@@ -130,7 +130,7 @@ public class WeightedTrackSelector {
         }
 
         if (this.authorExists) {
-            if (ytAuthor.contains(this.spotifyTrack.getArtist())) {
+            if (ytAuthor.contains(this.spotifyTrack.artist())) {
                 score.set(score.get() + 20);
             } else {
                 score.set(score.get() - 20);
@@ -144,7 +144,7 @@ public class WeightedTrackSelector {
 
     private void checkTitle(String ytTitle, AtomicReference<Integer> score) {
         if (this.titleExactExists) {
-            if (ytTitle.equalsIgnoreCase(this.spotifyTrack.getName())) {
+            if (ytTitle.equalsIgnoreCase(this.spotifyTrack.name())) {
                 score.set(score.get() + 20);
             } else {
                 score.set(score.get() - 20);
@@ -154,7 +154,7 @@ public class WeightedTrackSelector {
         }
 
         if (this.titleExists) {
-            if (ytTitle.contains(this.spotifyTrack.getName())) {
+            if (ytTitle.contains(this.spotifyTrack.name())) {
                 score.set(score.get() + 20);
             } else {
                 score.set(score.get() - 20);

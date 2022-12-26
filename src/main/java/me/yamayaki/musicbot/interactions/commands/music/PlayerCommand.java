@@ -85,7 +85,7 @@ public class PlayerCommand implements ApplicationInteraction {
                 SpotifyTrack spotifyData = audioTrack.getUserData(SpotifyTrack.class);
 
                 EmbedBuilder replyEmbed = new EmbedBuilder()
-                        .setImage(spotifyData != null ? spotifyData.getImage() : CommonUtils.getThumbnail(audioTrack.getIdentifier()))
+                        .setImage(spotifyData != null ? spotifyData.image() : CommonUtils.getThumbnail(audioTrack.getIdentifier()))
                         .addField("Titel", audioTrack.getInfo().title)
                         .addField("Künstler", audioTrack.getInfo().author)
                         .setTimestampToNow();

@@ -66,7 +66,7 @@ public class SpotifyAccess {
                         .market(CountryCode.US)
                         .build().execute();
 
-                return new SpotifyTrack(track);
+                return SpotifyTrack.of(track);
             });
 
             return new SpotifyTrack[]{spotifyTrack};

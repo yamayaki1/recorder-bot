@@ -129,7 +129,7 @@ public class PlayerControl {
         if (currentTrack != null) {
             SpotifyTrack spotifyData = currentTrack.getUserData(SpotifyTrack.class);
 
-            embedBuilder.setThumbnail(spotifyData != null ? spotifyData.getImage() : CommonUtils.getThumbnail(currentTrack.getIdentifier()))
+            embedBuilder.setThumbnail(spotifyData != null ? spotifyData.image() : CommonUtils.getThumbnail(currentTrack.getIdentifier()))
                     .addField("Aktuelles Lied" + (this.audioManager.isPaused() ? " (pausiert)" : ""), currentTrack.getInfo().title + "\n" + currentTrack.getInfo().author.replaceAll("- Topic", ""));
         } else {
             embedBuilder.addField("Aktuelles Lied", "Aktuell Spielt kein Lied!");

@@ -74,12 +74,12 @@ public class SpotifySourceManager implements AudioSourceManager {
     }
 
     private AudioTrack fromYouTube(SpotifyTrack spotifyTrack) throws Exception {
-        String ytId = MusicBot.DATABASE.getDatabase(CacheSpecs.YOUTUBE_CACHE).getOrPut(spotifyTrack.getIdentifier(), spotTrack -> {
+        String ytId = MusicBot.DATABASE.getDatabase(CacheSpecs.YOUTUBE_CACHE).getOrPut(spotifyTrack.identifier(), spotTrack -> {
             final AudioReference reference = new AudioReference(
                     "ytmsearch:" +
-                            spotifyTrack.getName().replaceAll("-", "") +
+                            spotifyTrack.name().replaceAll("-", "") +
                             " - " +
-                            spotifyTrack.getArtist(),
+                            spotifyTrack.artist(),
                     ""
             );
 
