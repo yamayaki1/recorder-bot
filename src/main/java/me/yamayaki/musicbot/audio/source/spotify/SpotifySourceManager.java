@@ -10,6 +10,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import com.sedmelluq.discord.lavaplayer.track.BasicAudioPlaylist;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.player.LavaManager;
+import me.yamayaki.musicbot.entities.SpotifyTrack;
 import me.yamayaki.musicbot.storage.database.specs.impl.CacheSpecs;
 
 import java.io.DataInput;

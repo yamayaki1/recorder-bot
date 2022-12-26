@@ -3,6 +3,7 @@ package me.yamayaki.musicbot.audio.source.spotify;
 import com.neovisionaries.i18n.CountryCode;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import me.yamayaki.musicbot.MusicBot;
+import me.yamayaki.musicbot.entities.SpotifyTrack;
 import me.yamayaki.musicbot.storage.database.specs.impl.CacheSpecs;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.SpotifyApi;

@@ -1,4 +1,4 @@
-package me.yamayaki.musicbot.audio.source.spotify;
+package me.yamayaki.musicbot.entities;
 
 import se.michaelthelin.spotify.model_objects.specification.Image;
 import se.michaelthelin.spotify.model_objects.specification.Track;

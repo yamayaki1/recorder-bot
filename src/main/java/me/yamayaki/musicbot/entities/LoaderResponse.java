@@ -1,4 +1,4 @@
-package me.yamayaki.musicbot.audio.entities;
+package me.yamayaki.musicbot.entities;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioItem;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
@@ -17,5 +17,12 @@ public record LoaderResponse(@Nullable AudioItem audioItem) {
     public int getCount() {
         return this.audioItem instanceof AudioPlaylist playlist ? playlist.getTracks().size() :
                 this.audioItem instanceof AudioTrack ? 1 : 0;
+    }
+
+    @Override
+    public String toString() {
+        return "LoaderResponse{" +
+                "audioItem=" + audioItem +
+                '}';
     }
 }

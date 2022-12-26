@@ -2,7 +2,7 @@ package me.yamayaki.musicbot.audio;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.MusicBot;
-import me.yamayaki.musicbot.audio.source.spotify.SpotifyTrack;
+import me.yamayaki.musicbot.entities.SpotifyTrack;
 import me.yamayaki.musicbot.storage.database.specs.impl.ChannelSpecs;
 import me.yamayaki.musicbot.utilities.CommonUtils;
 import me.yamayaki.musicbot.utilities.Pair;

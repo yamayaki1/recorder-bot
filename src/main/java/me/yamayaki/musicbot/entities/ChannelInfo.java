@@ -1,7 +1,8 @@
-package me.yamayaki.musicbot.utilities;
+package me.yamayaki.musicbot.entities;
 
 import org.javacord.api.entity.permission.Permissions;
 
+import java.util.Arrays;
 import java.util.Map;
 
 public class ChannelInfo {
@@ -30,5 +31,16 @@ public class ChannelInfo {
             this.userPermissions[i] = new long[]{set.getKey(), set.getValue().getAllowedBitmask(), set.getValue().getDeniedBitmask()};
             i++;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "ChannelInfo{" +
+                "newChannel=" + newChannel +
+                ", name='" + name + '\'' +
+                ", userLimit=" + userLimit +
+                ", rolePermissions=" + Arrays.toString(rolePermissions) +
+                ", userPermissions=" + Arrays.toString(userPermissions) +
+                '}';
     }
 }

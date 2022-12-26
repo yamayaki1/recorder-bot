@@ -1,4 +1,4 @@
-package me.yamayaki.musicbot.audio.entities;
+package me.yamayaki.musicbot.entities;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
@@ -9,6 +9,9 @@ public record TrackInfo(String uri, long position) {
 
     @Override
     public String toString() {
-        return "TrackInfo{" + "uri='" + uri + '\'' + ", position=" + position + '}';
+        return "TrackInfo{" +
+                "uri='" + uri + '\'' +
+                ", position=" + position +
+                '}';
     }
 }

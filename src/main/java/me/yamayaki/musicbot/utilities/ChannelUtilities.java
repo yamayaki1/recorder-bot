@@ -1,6 +1,7 @@
 package me.yamayaki.musicbot.utilities;
 
 import me.yamayaki.musicbot.MusicBot;
+import me.yamayaki.musicbot.entities.ChannelInfo;
 import me.yamayaki.musicbot.storage.database.specs.impl.ChannelSpecs;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
