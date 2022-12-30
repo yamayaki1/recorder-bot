@@ -1,69 +1,77 @@
 package me.yamayaki.musicbot.utilities;
 
 import me.yamayaki.musicbot.MusicBot;
-import me.yamayaki.musicbot.entities.ChannelInfo;
+import me.yamayaki.musicbot.entities.ChannelCopy;
 import me.yamayaki.musicbot.storage.database.specs.impl.ChannelSpecs;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
+import org.javacord.api.entity.channel.ServerVoiceChannelUpdater;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.permission.Permissions;
 import org.javacord.api.entity.permission.PermissionsBuilder;
+import org.javacord.api.entity.permission.Role;
+import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.User;
+
+import java.util.concurrent.CompletableFuture;
 
 public class ChannelUtilities {
-    public static void activateGhostChannel(ServerVoiceChannel voiceChannel) {
-        var server = voiceChannel.getServer();
-        var rolePermissions = voiceChannel.getOverwrittenRolePermissions();
-        var userPermissions = voiceChannel.getOverwrittenUserPermissions();
+    public static void activateGhostChannel(ServerVoiceChannel originalChannel) {
+        Server server = originalChannel.getServer();
+        ChannelCopy channelCopy = ChannelCopy.of(originalChannel);
 
-        //create fake channel
-        var channelBuilder = server.createVoiceChannelBuilder()
-                .setName(voiceChannel.getName())
-                .setUserlimit(voiceChannel.getUserLimit().orElse(0))
-                .setCategory(voiceChannel.getCategory().orElse(null));
-        rolePermissions.forEach((roleId, permission) -> channelBuilder.addPermissionOverwrite(server.getRoleById(roleId).orElse(null), permission));
-
-        var newChannel = channelBuilder.create().join();
-        newChannel.createUpdater().setRawPosition(voiceChannel.getRawPosition()).update().join();
+        //create channel copy
+        ServerVoiceChannel copiedChannel = channelCopy.newFrom(server);
+        channelCopy.setAssociatedChannel(copiedChannel.getId());
 
         //save original channel-data
         MusicBot.DATABASE
                 .getDatabase(ChannelSpecs.CHANNEL_SETTINGS)
-                .putValue(voiceChannel.getId(), new ChannelInfo(newChannel.getId(), rolePermissions, userPermissions, voiceChannel.getName(), voiceChannel.getUserLimit().orElse(0)));
+                .putValue(originalChannel.getId(), channelCopy);
 
         //update original channel
-        var originalUpdater = voiceChannel.createUpdater();
-        rolePermissions.forEach((roleId, permission) -> originalUpdater.removePermissionOverwrite(server.getRoleById(roleId).orElse(null)));
-        originalUpdater.addPermissionOverwrite(server.getEveryoneRole(), new PermissionsBuilder().setDenied(PermissionType.VIEW_CHANNEL).build());
-        voiceChannel.getConnectedUsers().forEach(user -> originalUpdater.addPermissionOverwrite(user, new PermissionsBuilder().setAllowed(PermissionType.MOVE_MEMBERS, PermissionType.SPEAK).build()));
-
-        originalUpdater.update().join();
+        setCurrentPrivate(originalChannel).join();
     }
 
-    public static void disableGhostChannel(ChannelInfo channelInfo, ServerVoiceChannel voiceChannel) {
-        var server = voiceChannel.getServer();
+    public static void disableGhostChannel(ChannelCopy channelCopy, ServerVoiceChannel voiceChannel) {
+        voiceChannel.getServer()
+                .getVoiceChannelById(channelCopy.getAssociatedChannel())
+                .ifPresent(ServerChannel::delete);
 
-        var fakeChannelOpt = server
-                .getVoiceChannelById(channelInfo.newChannel);
-        fakeChannelOpt.ifPresent(ServerChannel::delete);
-
-        //update original channel
-        var originalUpdater = voiceChannel.createUpdater();
-        voiceChannel.getOverwrittenUserPermissions().forEach((userId, permissions) -> originalUpdater.removePermissionOverwrite(server.getMemberById(userId).orElse(null)));
-
-        for (int i = 0; i < channelInfo.userPermissions.length; i++) {
-            long[] data = channelInfo.userPermissions[i];
-            originalUpdater.addPermissionOverwrite(server.getMemberById(data[0]).orElse(null), Permissions.fromBitmask(data[1], data[2]));
-        }
-
-        for (int i = 0; i < channelInfo.rolePermissions.length; i++) {
-            long[] data = channelInfo.rolePermissions[i];
-            originalUpdater.addPermissionOverwrite(server.getRoleById(data[0]).orElse(null), Permissions.fromBitmask(data[1], data[2]));
-        }
-
-        originalUpdater.update().join();
+        channelCopy.into(voiceChannel, true).join();
 
         MusicBot.DATABASE
                 .getDatabase(ChannelSpecs.CHANNEL_SETTINGS)
                 .deleteValue(voiceChannel.getId());
+    }
+
+    private static CompletableFuture<Void> setCurrentPrivate(ServerVoiceChannel serverVoiceChannel) {
+        ServerVoiceChannelUpdater voiceChannelUpdater = serverVoiceChannel.createUpdater();
+
+        //remove existing permission overwrites
+        serverVoiceChannel.getOverwrittenRolePermissions().forEach((roleId, permissions)-> {
+            Role role = serverVoiceChannel.getServer().getRoleById(roleId).orElse(null);
+            voiceChannelUpdater.removePermissionOverwrite(role);
+        });
+
+        serverVoiceChannel.getOverwrittenUserPermissions().forEach((userId, permissions)-> {
+            User user = serverVoiceChannel.getServer().getMemberById(userId).orElse(null);
+            voiceChannelUpdater.removePermissionOverwrite(user);
+        });
+
+        //deny everyone from seeing channel
+        Role everyoneRole = serverVoiceChannel.getServer().getEveryoneRole();
+        voiceChannelUpdater.addPermissionOverwrite(everyoneRole, new PermissionsBuilder().setDenied(PermissionType.VIEW_CHANNEL).build());
+
+        //allow currently connected users to interact with this channel
+        serverVoiceChannel.getConnectedUsers().forEach(user -> {
+            Permissions allowed = new PermissionsBuilder()
+                    .setAllowed(PermissionType.MOVE_MEMBERS, PermissionType.SPEAK)
+                    .build();
+
+            voiceChannelUpdater.addPermissionOverwrite(user, allowed);
+        });
+
+        return voiceChannelUpdater.update();
     }
 }

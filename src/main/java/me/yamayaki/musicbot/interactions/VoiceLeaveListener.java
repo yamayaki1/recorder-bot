@@ -2,7 +2,7 @@ package me.yamayaki.musicbot.interactions;
 
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.storage.database.specs.impl.ChannelSpecs;
-import me.yamayaki.musicbot.entities.ChannelInfo;
+import me.yamayaki.musicbot.entities.ChannelCopy;
 import me.yamayaki.musicbot.utilities.ChannelUtilities;
 import org.javacord.api.event.channel.server.voice.ServerVoiceChannelMemberLeaveEvent;
 import org.javacord.api.listener.channel.server.voice.ServerVoiceChannelMemberLeaveListener;
@@ -31,7 +31,7 @@ public class VoiceLeaveListener implements ServerVoiceChannelMemberLeaveListener
 
         long channelId = event.getChannel().getId();
 
-        Optional<ChannelInfo> channelInfo = MusicBot.DATABASE
+        Optional<ChannelCopy> channelInfo = MusicBot.DATABASE
                 .getDatabase(ChannelSpecs.CHANNEL_SETTINGS)
                 .getValue(channelId);
 
