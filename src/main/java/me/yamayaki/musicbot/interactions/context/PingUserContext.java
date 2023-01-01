@@ -16,7 +16,7 @@ public class PingUserContext implements ApplicationInteraction {
 
     @Override
     public boolean isExperimental() {
-        return true;
+        return false;
     }
 
     @Override
@@ -30,7 +30,19 @@ public class PingUserContext implements ApplicationInteraction {
     @Override
     public void executeContext(UserContextMenuInteraction interaction, InteractionOriginalResponseUpdater response) {
         interaction.getTarget().openPrivateChannel().thenAccept(privateChannel -> {
-            privateChannel.sendMessage("Du wurdest von " + interaction.getUser().getName() + " gepingt!").join();
+            StringBuilder builder = new StringBuilder("Du wurdest von ");
+            builder.append(interaction.getUser().getDiscriminatedName());
+
+            interaction.getServer().ifPresent(server -> {
+                builder.append(" in ");
+                builder.append(server.getName());
+            });
+
+            builder.append(" angepingt!");
+
+            privateChannel.sendMessage(builder.toString()).join();
         }).join();
+
+        response.setContent("Der Benutzer wurde erfolgreich angepingt!");
     }
 }
