@@ -43,6 +43,6 @@ public class PingUserContext implements ApplicationInteraction {
             privateChannel.sendMessage(builder.toString()).join();
         }).join();
 
-        response.setContent("Der Benutzer wurde erfolgreich angepingt!");
+        response.setContent("Der Benutzer wurde erfolgreich angepingt!").update();
     }
 }
