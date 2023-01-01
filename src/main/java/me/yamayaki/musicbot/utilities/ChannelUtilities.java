@@ -49,12 +49,12 @@ public class ChannelUtilities {
         ServerVoiceChannelUpdater voiceChannelUpdater = serverVoiceChannel.createUpdater();
 
         //remove existing permission overwrites
-        serverVoiceChannel.getOverwrittenRolePermissions().forEach((roleId, permissions)-> {
+        serverVoiceChannel.getOverwrittenRolePermissions().forEach((roleId, permissions) -> {
             Role role = serverVoiceChannel.getServer().getRoleById(roleId).orElse(null);
             voiceChannelUpdater.removePermissionOverwrite(role);
         });
 
-        serverVoiceChannel.getOverwrittenUserPermissions().forEach((userId, permissions)-> {
+        serverVoiceChannel.getOverwrittenUserPermissions().forEach((userId, permissions) -> {
             User user = serverVoiceChannel.getServer().getMemberById(userId).orElse(null);
             voiceChannelUpdater.removePermissionOverwrite(user);
         });

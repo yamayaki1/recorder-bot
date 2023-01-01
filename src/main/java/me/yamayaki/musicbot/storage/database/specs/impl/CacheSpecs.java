@@ -1,7 +1,7 @@
 package me.yamayaki.musicbot.storage.database.specs.impl;
 
-import me.yamayaki.musicbot.entities.TrackInfo;
 import me.yamayaki.musicbot.entities.SpotifyTrack;
+import me.yamayaki.musicbot.entities.TrackInfo;
 import me.yamayaki.musicbot.storage.database.specs.DatabaseSpec;
 
 public class CacheSpecs {

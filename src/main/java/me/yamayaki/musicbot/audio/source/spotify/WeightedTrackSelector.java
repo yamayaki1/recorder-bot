@@ -22,17 +22,17 @@ public class WeightedTrackSelector {
 
     private AudioTrack selectedTrack = null;
 
+    private WeightedTrackSelector(SpotifyTrack spotifyTrack, List<AudioTrack> youtubeTracks) {
+        this.spotifyTrack = spotifyTrack;
+        this.youtubeTracks = youtubeTracks;
+    }
+
     public static Pair<AudioTrack, Boolean> getWeightedTrack(SpotifyTrack spotifyTrack, List<AudioTrack> youtubeTracks) {
         WeightedTrackSelector weightedTrackSelector = new WeightedTrackSelector(spotifyTrack, youtubeTracks);
         weightedTrackSelector.runPreFilter();
         weightedTrackSelector.runSelector();
 
         return new Pair<>(weightedTrackSelector.getSelectedTrack(), weightedTrackSelector.isPerfectMatch());
-    }
-
-    private WeightedTrackSelector(SpotifyTrack spotifyTrack, List<AudioTrack> youtubeTracks) {
-        this.spotifyTrack = spotifyTrack;
-        this.youtubeTracks = youtubeTracks;
     }
 
     private Boolean isPerfectMatch() {

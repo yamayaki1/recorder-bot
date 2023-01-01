@@ -3,10 +3,7 @@ package me.yamayaki.musicbot.entities;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannelBuilder;
 import org.javacord.api.entity.channel.ServerVoiceChannelUpdater;
-import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.permission.Permissions;
-import org.javacord.api.entity.permission.PermissionsBuilder;
-import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 
@@ -42,6 +39,18 @@ public class ChannelCopy {
         return cInfo;
     }
 
+    private static long[][] copyPermissions(Map<Long, Permissions> permissionsMap) {
+        long[][] permissions = new long[permissionsMap.size()][3];
+
+        int index = 0;
+        for (Map.Entry<Long, Permissions> mapEntry : permissionsMap.entrySet()) {
+            permissions[index] = new long[]{mapEntry.getKey(), mapEntry.getValue().getAllowedBitmask(), mapEntry.getValue().getDeniedBitmask()};
+            index++;
+        }
+
+        return permissions;
+    }
+
     public CompletableFuture<Void> into(ServerVoiceChannel voiceChannel, boolean removeExistingPerms) {
         ServerVoiceChannelUpdater voiceUpdater = voiceChannel.createUpdater();
         Server server = voiceChannel.getServer();
@@ -49,7 +58,7 @@ public class ChannelCopy {
         voiceUpdater.setName(this.name);
         voiceUpdater.setUserLimit(this.userLimit);
 
-        if(removeExistingPerms) {
+        if (removeExistingPerms) {
             voiceChannel.getOverwrittenUserPermissions().forEach((userId, permissions) -> {
                 User user = server.getMemberById(userId).orElse(null);
                 voiceUpdater.removePermissionOverwrite(user);
@@ -87,23 +96,11 @@ public class ChannelCopy {
         return voiceChannel;
     }
 
-    public void setAssociatedChannel(long channelId) {
-        this.associatedChannel = channelId;
-    }
-
     public long getAssociatedChannel() {
         return this.associatedChannel;
     }
 
-    private static long[][] copyPermissions(Map<Long, Permissions> permissionsMap) {
-        long[][] permissions = new long[permissionsMap.size()][3];
-
-        int index = 0;
-        for (Map.Entry<Long, Permissions> mapEntry : permissionsMap.entrySet()) {
-            permissions[index] = new long[]{mapEntry.getKey(), mapEntry.getValue().getAllowedBitmask(), mapEntry.getValue().getDeniedBitmask()};
-            index++;
-        }
-
-        return permissions;
+    public void setAssociatedChannel(long channelId) {
+        this.associatedChannel = channelId;
     }
 }

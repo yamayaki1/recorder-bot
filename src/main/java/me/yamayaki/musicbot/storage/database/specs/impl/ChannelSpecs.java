@@ -1,7 +1,7 @@
 package me.yamayaki.musicbot.storage.database.specs.impl;
 
-import me.yamayaki.musicbot.storage.database.specs.DatabaseSpec;
 import me.yamayaki.musicbot.entities.ChannelCopy;
+import me.yamayaki.musicbot.storage.database.specs.DatabaseSpec;
 import me.yamayaki.musicbot.utilities.Pair;
 
 public class ChannelSpecs {

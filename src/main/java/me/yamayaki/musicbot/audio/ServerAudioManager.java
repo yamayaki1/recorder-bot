@@ -6,10 +6,10 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import me.yamayaki.musicbot.MusicBot;
-import me.yamayaki.musicbot.entities.LoaderResponse;
 import me.yamayaki.musicbot.audio.player.LavaAudioSource;
 import me.yamayaki.musicbot.audio.player.LavaManager;
 import me.yamayaki.musicbot.audio.player.LoadResultHandler;
+import me.yamayaki.musicbot.entities.LoaderResponse;
 import org.javacord.api.entity.server.Server;
 
 import java.util.function.Consumer;

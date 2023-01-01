@@ -58,7 +58,7 @@ public class InteractionListener implements SlashCommandCreateListener, ButtonCl
         final Set<ApplicationCommandBuilder<?, ?, ?>> builderSet = new HashSet<>();
 
         for (ApplicationInteraction clazz : commands) {
-            if(!clazz.isExperimental() || (clazz.isExperimental() && Config.isDevBuild())) {
+            if (!clazz.isExperimental() || (clazz.isExperimental() && Config.isDevBuild())) {
                 this.interactions.put(clazz.getName(), clazz);
                 builderSet.add(clazz.register(discordApi));
             }
@@ -130,7 +130,7 @@ public class InteractionListener implements SlashCommandCreateListener, ButtonCl
     private void printInteractionUsed(Interaction interaction) {
         StringBuilder builder = new StringBuilder(interaction.getUser().getDiscriminatedName() + " using '/");
 
-        interaction.asSlashCommandInteraction().ifPresent(action-> {
+        interaction.asSlashCommandInteraction().ifPresent(action -> {
             builder.append(action.getCommandName());
             for (SlashCommandInteractionOption argument : action.getArguments()) {
                 builder.append(" ").append(argument.getName()).append(":").append(argument.getStringRepresentationValue().orElse(""));
@@ -138,8 +138,8 @@ public class InteractionListener implements SlashCommandCreateListener, ButtonCl
             builder.append("'");
         });
 
-        interaction.asUserContextMenuInteraction().ifPresent(action-> {
-            builder.append(action.getCommandName()).append("'");;
+        interaction.asUserContextMenuInteraction().ifPresent(action -> {
+            builder.append(action.getCommandName()).append("'");
             builder.append(" on ").append(action.getTarget().getDiscriminatedName());
         });
 
