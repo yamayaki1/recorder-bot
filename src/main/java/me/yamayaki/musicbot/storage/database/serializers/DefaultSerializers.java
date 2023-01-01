@@ -4,8 +4,8 @@ import me.yamayaki.musicbot.entities.ChannelCopy;
 import me.yamayaki.musicbot.entities.ChannelMessagePair;
 import me.yamayaki.musicbot.entities.SpotifyTrack;
 import me.yamayaki.musicbot.entities.TrackInfo;
+import me.yamayaki.musicbot.storage.database.serializers.impl.JSONSerializer;
 import me.yamayaki.musicbot.storage.database.serializers.impl.LongSerializer;
-import me.yamayaki.musicbot.storage.database.serializers.impl.ObjectSerializer;
 import me.yamayaki.musicbot.storage.database.serializers.impl.StringSerializer;
 import me.yamayaki.musicbot.storage.database.serializers.impl.entities.ChannelMessagePairSerializer;
 
@@ -18,9 +18,9 @@ public class DefaultSerializers {
 
         serializers.put(ChannelMessagePair.class, new ChannelMessagePairSerializer());
 
-        serializers.put(ChannelCopy.class, new ObjectSerializer<>(ChannelCopy.class));
-        serializers.put(SpotifyTrack.class, new ObjectSerializer<>(SpotifyTrack.class));
-        serializers.put(TrackInfo[].class, new ObjectSerializer<>(TrackInfo[].class));
+        serializers.put(ChannelCopy.class, new JSONSerializer<>(ChannelCopy.class));
+        serializers.put(SpotifyTrack.class, new JSONSerializer<>(SpotifyTrack.class));
+        serializers.put(TrackInfo[].class, new JSONSerializer<>(TrackInfo[].class));
 
         serializers.put(Long.class, new LongSerializer());
         serializers.put(String.class, new StringSerializer());

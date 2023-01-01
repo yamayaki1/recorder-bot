@@ -6,10 +6,10 @@ import me.yamayaki.musicbot.utilities.CommonUtils;
 
 import java.io.IOException;
 
-public class ObjectSerializer<T> implements Serializer<T> {
+public class JSONSerializer<T> implements Serializer<T> {
     private final Class<T> clazz;
 
-    public ObjectSerializer(Class<T> clazz) {
+    public JSONSerializer(Class<T> clazz) {
         this.clazz = clazz;
     }
 
