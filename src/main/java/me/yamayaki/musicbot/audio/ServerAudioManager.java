@@ -6,6 +6,7 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import me.yamayaki.musicbot.MusicBot;
+import me.yamayaki.musicbot.audio.equalizer.DefaultEqualizers;
 import me.yamayaki.musicbot.audio.player.LavaAudioSource;
 import me.yamayaki.musicbot.audio.player.LavaManager;
 import me.yamayaki.musicbot.audio.player.LoadResultHandler;
@@ -22,6 +23,7 @@ public class ServerAudioManager extends AudioEventAdapter {
     private final PlayerControl playerControl;
 
     private boolean skipping = false;
+    private boolean hasEqualizer = false;
 
     private long lastActiveTime = System.currentTimeMillis();
 
@@ -93,6 +95,16 @@ public class ServerAudioManager extends AudioEventAdapter {
         int vol = Math.max(0, Math.min(volume, 100));
         this.audioSource.getAudioPlayer()
                 .setVolume(vol);
+    }
+
+    public void toggleBassboost() {
+        if(this.hasEqualizer) {
+            this.audioSource.setEqualizer(DefaultEqualizers.NONE);
+        } else {
+            this.audioSource.setEqualizer(DefaultEqualizers.BASS_BOOST);
+        }
+
+        this.hasEqualizer = !this.hasEqualizer;
     }
 
     public void fixAudioSource() {

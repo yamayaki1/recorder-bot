@@ -1,11 +1,11 @@
 package me.yamayaki.musicbot.audio.player;
 
-import com.sedmelluq.discord.lavaplayer.filter.equalizer.EqualizerFactory;
 import com.sedmelluq.discord.lavaplayer.player.AudioConfiguration;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
+import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import me.yamayaki.musicbot.Config;
 import me.yamayaki.musicbot.audio.source.spotify.SpotifySourceManager;
@@ -16,15 +16,11 @@ public class LavaManager {
     public static final SpotifySourceManager spotifySource;
     public static final YoutubeAudioSourceManager youtubeSource;
 
-    public static final EqualizerFactory equalizerFactory;
-
     private static final AudioPlayerManager audioPlayerManager;
 
     static {
         spotifySource = new SpotifySourceManager();
         youtubeSource = new YoutubeAudioSourceManager();
-
-        equalizerFactory = new EqualizerFactory();
 
         audioPlayerManager = createPlayerManager();
     }
@@ -32,6 +28,7 @@ public class LavaManager {
     private static void registerSources(final AudioPlayerManager audioPlayerManager) {
         audioPlayerManager.registerSourceManager(spotifySource);
         audioPlayerManager.registerSourceManager(youtubeSource);
+        audioPlayerManager.registerSourceManager(new HttpAudioSourceManager());
     }
 
     private static AudioPlayerManager createPlayerManager() {
@@ -40,6 +37,7 @@ public class LavaManager {
 
         audioPlayerManager.getConfiguration().setOpusEncodingQuality(AudioConfiguration.OPUS_QUALITY_MAX);
         audioPlayerManager.getConfiguration().setResamplingQuality(AudioConfiguration.ResamplingQuality.HIGH);
+        audioPlayerManager.getConfiguration().setFilterHotSwapEnabled(true);
 
         if (Config.isDevBuild()) {
             audioPlayerManager.enableGcMonitoring();
@@ -51,6 +49,7 @@ public class LavaManager {
     public static AudioPlayer getPlayer(final AudioEventAdapter audioEventHandler) {
         AudioPlayer audioPlayer = audioPlayerManager.createPlayer();
         audioPlayer.addListener(audioEventHandler);
+        audioPlayer.setFrameBufferDuration(500);
 
         return audioPlayer;
     }

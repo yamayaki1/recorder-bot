@@ -1,6 +1,7 @@
 package me.yamayaki.musicbot.audio;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import me.yamayaki.musicbot.Config;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.entities.ChannelMessagePair;
 import me.yamayaki.musicbot.entities.SpotifyTrack;
@@ -10,6 +11,7 @@ import org.javacord.api.entity.Deletable;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.message.component.ActionRow;
 import org.javacord.api.entity.message.component.Button;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -110,14 +112,16 @@ public class PlayerControl {
                 .applyChanges().join();
     }
 
-    private ActionRow getComponents() {
-        return ActionRow.of(
+    private ActionRow[] getComponents() {
+        return new ActionRow[]{ActionRow.of(
                 Button.danger("stop", "", "⏹️"),
                 Button.primary("pause", "", "⏯️"),
-                Button.primary("skip", "", "⏭️"),
+                Button.primary("skip", "", "⏭️")
+        ), ActionRow.of(
                 Button.primary("vol_down", "", "🔈"),
-                Button.primary("vol_up", "", "🔊")
-        );
+                Button.primary("vol_up", "", "🔊"),
+                Button.primary("bass_toggle", "", "\uD83C\uDD71")
+        )};
     }
 
     private EmbedBuilder getEmbed() {
@@ -155,6 +159,8 @@ public class PlayerControl {
             return;
         }
 
+        event.getButtonInteraction().acknowledge().join();
+
         switch (event.getButtonInteraction().getCustomId()) {
             case "stop" -> {
                 this.audioManager.getPlaylist().clear();
@@ -164,9 +170,17 @@ public class PlayerControl {
             case "skip" -> this.audioManager.skipTrack(1);
             case "vol_down" -> this.audioManager.setVolume(this.audioManager.getVolume() - 15);
             case "vol_up" -> this.audioManager.setVolume(this.audioManager.getVolume() + 15);
+            case "bass_toggle" -> {
+                if(Config.isDevBuild()) {
+                    this.audioManager.toggleBassboost();
+                } else {
+                    event.getButtonInteraction().createFollowupMessageBuilder()
+                            .setFlags(MessageFlag.EPHEMERAL)
+                            .setContent("Dieser Bot befindet sich nicht im Entwicklungsmodus! Es können daher auch keine Features in Entwicklung verwendet werden.")
+                            .send();
+                }
+            }
         }
-
-        event.getButtonInteraction().acknowledge();
     }
 
     public void shutdown() {
