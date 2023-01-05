@@ -8,6 +8,7 @@ import org.javacord.api.interaction.callback.InteractionOriginalResponseUpdater;
 
 public interface ApplicationInteraction {
     String getName();
+
     ApplicationCommandBuilder<?, ?, ?> register(DiscordApi api);
 
     default boolean isExperimental() {

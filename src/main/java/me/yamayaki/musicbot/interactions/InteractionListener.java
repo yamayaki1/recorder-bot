@@ -4,6 +4,7 @@ import me.yamayaki.musicbot.Config;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.interactions.commands.channels.GhostCommand;
 import me.yamayaki.musicbot.interactions.commands.channels.PlayerChannelCommand;
+import me.yamayaki.musicbot.interactions.commands.debug.ShutdownCommand;
 import me.yamayaki.musicbot.interactions.commands.music.ClearCommand;
 import me.yamayaki.musicbot.interactions.commands.music.PlayCommand;
 import me.yamayaki.musicbot.interactions.commands.music.PlayerCommand;
@@ -39,6 +40,8 @@ public class InteractionListener implements SlashCommandCreateListener, ButtonCl
         registerInteractions(discordApi,
                 new GhostCommand(),
                 new PlayerChannelCommand(),
+
+                new ShutdownCommand(),
 
                 new ClearCommand(),
                 new PlayCommand(),

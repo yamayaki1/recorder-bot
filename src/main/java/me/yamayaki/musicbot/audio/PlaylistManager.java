@@ -94,7 +94,7 @@ public class PlaylistManager {
 
         for (TrackInfo trackInfo : response.get()) {
             try {
-                LavaManager.loadTrack(trackInfo.uri(), new LoadResultHandler(this, trackInfo.position(), null)).get();
+                LavaManager.loadTrack(trackInfo.uri(), new LoadResultHandler(this, trackInfo, null)).get();
             } catch (Exception e) {
                 MusicBot.LOGGER.error("couldn't load track {}: {}", trackInfo, e);
             }

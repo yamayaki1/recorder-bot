@@ -7,6 +7,7 @@ import me.yamayaki.musicbot.entities.ChannelMessagePair;
 import me.yamayaki.musicbot.entities.SpotifyTrack;
 import me.yamayaki.musicbot.storage.database.specs.impl.ChannelSpecs;
 import me.yamayaki.musicbot.utilities.CommonUtils;
+import me.yamayaki.musicbot.utilities.RefreshableHolder;
 import org.javacord.api.entity.Deletable;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
@@ -19,16 +20,23 @@ import org.javacord.api.event.interaction.ButtonClickEvent;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 public class PlayerControl {
     private final ServerAudioManager audioManager;
-    private final Holder controllerMessage = new Holder();
+    private final RefreshableHolder<Message> controllerMessage;
 
     private boolean isDirty = true;
 
     public PlayerControl(ServerAudioManager audioManager) {
         this.audioManager = audioManager;
+        this.controllerMessage = new RefreshableHolder<>((message) -> {
+            if (message != null) {
+                return message.getLatestInstance().join();
+            }
+
+            return null;
+        });
+
         this.loadData();
     }
 
@@ -47,7 +55,7 @@ public class PlayerControl {
         }
 
         try {
-            this.controllerMessage.setMessage(
+            this.controllerMessage.setHoldable(
                     textChannel.get().getMessageById(pair.get().message()).join().getLatestInstance().join()
             );
         } catch (Exception e) {
@@ -56,14 +64,11 @@ public class PlayerControl {
     }
 
     private void saveData() {
-        if (!this.controllerMessage.isSet()) {
-            this.deleteData();
-            return;
-        }
-
-        MusicBot.LOGGER.info("saving playerchannel for server {}", this.audioManager.getServer().getName());
-        MusicBot.DATABASE.getDatabase(ChannelSpecs.SERVER_PLAYERCHANNEL)
-                .putValue(this.audioManager.getServer().getId(), ChannelMessagePair.of(this.controllerMessage.getMessage()));
+        this.controllerMessage.ifSetOrElse(message -> {
+            MusicBot.LOGGER.info("saving playerchannel for server {}", this.audioManager.getServer().getName());
+            MusicBot.DATABASE.getDatabase(ChannelSpecs.SERVER_PLAYERCHANNEL)
+                    .putValue(this.audioManager.getServer().getId(), ChannelMessagePair.of(message));
+        }, this::deleteData);
     }
 
     private void deleteData() {
@@ -87,7 +92,7 @@ public class PlayerControl {
             return false;
         }
 
-        this.controllerMessage.setMessage(message);
+        this.controllerMessage.setHoldable(message);
         this.saveData();
         this.setDirty();
 
@@ -99,17 +104,19 @@ public class PlayerControl {
     }
 
     public void updateMessage() {
-        if (!this.controllerMessage.isSet() || !this.isDirty) {
+        if (!this.isDirty) {
             return;
         }
 
-        this.isDirty = false;
+        this.controllerMessage.ifSet(message -> {
+            this.isDirty = false;
 
-        this.controllerMessage.getMessage().createUpdater()
-                .setContent("")
-                .setEmbed(this.getEmbed())
-                .addComponents(this.getComponents())
-                .applyChanges().join();
+            message.createUpdater()
+                    .setContent("")
+                    .setEmbed(this.getEmbed())
+                    .addComponents(this.getComponents())
+                    .applyChanges().join();
+        });
     }
 
     private ActionRow[] getComponents() {
@@ -136,7 +143,7 @@ public class PlayerControl {
             embedBuilder.setThumbnail(spotifyData != null ? spotifyData.image() : CommonUtils.getThumbnail(currentTrack.getIdentifier()))
                     .addField("Aktuelles Lied" + (this.audioManager.isPaused() ? " (pausiert)" : ""), currentTrack.getInfo().title + "\n" + currentTrack.getInfo().author.replaceAll("- Topic", ""));
         } else {
-            embedBuilder.addField("Aktuelles Lied", "Aktuell Spielt kein Lied!");
+            embedBuilder.addField("Aktuelles Lied", "Aktuell spielt kein Lied!");
         }
 
         if (nextTrack != null) {
@@ -155,7 +162,7 @@ public class PlayerControl {
     }
 
     public void onButtonClick(ButtonClickEvent event) {
-        if (!event.getButtonInteraction().getMessage().equals(this.controllerMessage.getMessage())) {
+        if (!event.getButtonInteraction().getMessage().equals(this.controllerMessage.getHoldable())) {
             return;
         }
 
@@ -171,7 +178,7 @@ public class PlayerControl {
             case "vol_down" -> this.audioManager.setVolume(this.audioManager.getVolume() - 15);
             case "vol_up" -> this.audioManager.setVolume(this.audioManager.getVolume() + 15);
             case "bass_toggle" -> {
-                if(Config.isDevBuild()) {
+                if (Config.isDevBuild()) {
                     this.audioManager.toggleBassboost();
                 } else {
                     event.getButtonInteraction().createFollowupMessageBuilder()
@@ -188,47 +195,5 @@ public class PlayerControl {
         this.controllerMessage.ifSet(message -> {
             message.createUpdater().removeAllComponents().applyChanges();
         });
-    }
-
-    public static class Holder {
-        private Message message;
-
-        public Holder() {
-            this.message = null;
-        }
-
-        public void ifSet(Consumer<Message> consumer) {
-            this.update();
-            if (this.message != null) {
-                consumer.accept(this.message);
-            }
-        }
-
-        public boolean isSet() {
-            this.update();
-            return this.message != null;
-        }
-
-        public Message getMessage() {
-            this.update();
-            return this.message;
-        }
-
-        public void setMessage(Message message) {
-            this.message = message;
-        }
-
-        public void update() {
-            if (this.message == null) {
-                return;
-            }
-
-            try {
-                this.message = this.message.getLatestInstance().join();
-            } catch (Exception e) {
-                this.message = null;
-                MusicBot.LOGGER.error(e);
-            }
-        }
     }
 }

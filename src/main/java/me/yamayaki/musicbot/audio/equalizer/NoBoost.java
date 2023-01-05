@@ -6,7 +6,7 @@ public class NoBoost implements DefaultEqualizers.EQFilter {
     @Override
     public void applyBands(EqualizerFactory equalizerFactory) {
         for (int i = 0; i < 15; i++) {
-            equalizerFactory.setGain(i, 0);
+            equalizerFactory.setGain(i, 0f);
         }
     }
 }

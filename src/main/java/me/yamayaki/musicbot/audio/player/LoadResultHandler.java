@@ -7,24 +7,28 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.audio.PlaylistManager;
 import me.yamayaki.musicbot.entities.LoaderResponse;
+import me.yamayaki.musicbot.entities.TrackInfo;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
 public class LoadResultHandler implements AudioLoadResultHandler {
     private final PlaylistManager playlistManager;
-    private final long position;
+    private final @Nullable TrackInfo trackInfo;
     private final @Nullable Consumer<LoaderResponse> consumer;
 
-    public LoadResultHandler(PlaylistManager playlistManager, long position, @Nullable Consumer<LoaderResponse> consumer) {
+    public LoadResultHandler(PlaylistManager playlistManager, @Nullable TrackInfo trackInfo, @Nullable Consumer<LoaderResponse> consumer) {
         this.playlistManager = playlistManager;
-        this.position = position;
+        this.trackInfo = trackInfo;
         this.consumer = consumer;
     }
 
     @Override
     public void trackLoaded(AudioTrack track) {
-        track.setPosition(this.position);
+        if (this.trackInfo != null) {
+            track.setPosition(this.trackInfo.position());
+            track.setUserData(this.trackInfo.userData());
+        }
 
         this.playlistManager.add(track);
 

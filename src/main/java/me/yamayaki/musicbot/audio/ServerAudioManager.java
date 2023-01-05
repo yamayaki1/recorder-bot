@@ -42,7 +42,7 @@ public class ServerAudioManager extends AudioEventAdapter {
 
     public void tryLoadItems(String song, Consumer<LoaderResponse> consumer) {
         try {
-            LavaManager.loadTrack(song, new LoadResultHandler(this.getPlaylist(), 0L, consumer)).get();
+            LavaManager.loadTrack(song, new LoadResultHandler(this.getPlaylist(), null, consumer)).get();
             this.startPlaying();
             this.playerControl.setDirty();
         } catch (Exception ignored) {
@@ -98,7 +98,7 @@ public class ServerAudioManager extends AudioEventAdapter {
     }
 
     public void toggleBassboost() {
-        if(this.hasEqualizer) {
+        if (this.hasEqualizer) {
             this.audioSource.setEqualizer(DefaultEqualizers.NONE);
         } else {
             this.audioSource.setEqualizer(DefaultEqualizers.BASS_BOOST);
