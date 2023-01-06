@@ -14,7 +14,6 @@ import me.yamayaki.musicbot.interactions.commands.utilities.AboutCommand;
 import me.yamayaki.musicbot.interactions.commands.utilities.ShutdownCommand;
 import me.yamayaki.musicbot.interactions.context.PingUserContext;
 import me.yamayaki.musicbot.utilities.Threads;
-import org.javacord.api.DiscordApi;
 import org.javacord.api.event.interaction.ApplicationCommandEvent;
 import org.javacord.api.event.interaction.ButtonClickEvent;
 import org.javacord.api.event.interaction.SlashCommandCreateEvent;
@@ -36,8 +35,8 @@ import java.util.concurrent.TimeUnit;
 public class InteractionListener implements SlashCommandCreateListener, ButtonClickListener, UserContextMenuCommandListener {
     private final HashMap<String, ApplicationInteraction> interactions = new HashMap<>();
 
-    public InteractionListener(DiscordApi discordApi) {
-        registerInteractions(discordApi,
+    public InteractionListener() {
+        registerInteractions(
                 new GhostCommand(),
                 new PlayerChannelCommand(),
 
@@ -55,18 +54,18 @@ public class InteractionListener implements SlashCommandCreateListener, ButtonCl
         );
     }
 
-    private void registerInteractions(DiscordApi discordApi, ApplicationInteraction... commands) {
+    private void registerInteractions(ApplicationInteraction... commands) {
         MusicBot.LOGGER.info("registering {} interactions, this may take a while ...", Arrays.stream(commands).count());
         final Set<ApplicationCommandBuilder<?, ?, ?>> builderSet = new HashSet<>();
 
         for (ApplicationInteraction clazz : commands) {
             if (!clazz.isExperimental() || (clazz.isExperimental() && Config.isDevBuild())) {
                 this.interactions.put(clazz.getName(), clazz);
-                builderSet.add(clazz.register(discordApi));
+                builderSet.add(clazz.register(MusicBot.API));
             }
         }
 
-        discordApi.bulkOverwriteGlobalApplicationCommands(builderSet).join();
+        MusicBot.API.bulkOverwriteGlobalApplicationCommands(builderSet).join();
     }
 
     private void runInteraction(ApplicationCommandEvent interactionEvent) {

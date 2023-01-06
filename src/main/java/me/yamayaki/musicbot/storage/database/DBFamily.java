@@ -112,6 +112,7 @@ public class DBFamily<K, V> {
         }
     }
 
+    //TODO: might want to rewrite that, always commits even though transaction is empty
     public void commit() {
         this.ensureTransaction();
         this.dbInstance.getLock()

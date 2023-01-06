@@ -16,7 +16,6 @@ import java.util.List;
 public class PlayerCommand implements ApplicationInteraction {
     private final String CMD_PAUSE = "pause";
     private final String CMD_RESUME = "resume";
-    private final String CMD_LOOP = "loop";
     private final String CMD_VOLUME = "volume";
 
     @Override
@@ -31,8 +30,7 @@ public class PlayerCommand implements ApplicationInteraction {
                 .addOption(SlashCommandOption.createSubcommand("action", "Aktion", List.of(
                         SlashCommandOption.createWithChoices(SlashCommandOptionType.STRING, "action", "Aktion", true,
                                 new SlashCommandOptionChoiceBuilder().setName("Pausieren").setValue(CMD_PAUSE),
-                                new SlashCommandOptionChoiceBuilder().setName("Fortsetzen").setValue(CMD_RESUME),
-                                new SlashCommandOptionChoiceBuilder().setName("Wiederholen").setValue(CMD_LOOP)
+                                new SlashCommandOptionChoiceBuilder().setName("Fortsetzen").setValue(CMD_RESUME)
                         )
                 ))).addOption(SlashCommandOption.createSubcommand("volume", "Lautstärke", List.of(
                         SlashCommandOption.createDecimalOption(CMD_VOLUME, "Lautstärke", true)
@@ -55,14 +53,6 @@ public class PlayerCommand implements ApplicationInteraction {
                         .startPlaying();
 
                 updater.setContent("Lied fortgesetzt.").update();
-            }
-            case CMD_LOOP -> {
-                boolean repeat = MusicBot.instance()
-                        .getAudioManager(interaction.getServer().orElseThrow())
-                        .getPlaylist()
-                        .toggleRepeat();
-
-                updater.setContent(repeat ? "Wiederholen eingeschaltet." : "Wiederholen ausgeschaltet.").update();
             }
             case CMD_VOLUME -> {
                 int volume = interaction.getArgumentDecimalValueByName("volume").orElse(50.0).intValue();

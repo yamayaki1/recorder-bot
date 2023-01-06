@@ -75,7 +75,7 @@ public class SkipCommand implements ApplicationInteraction {
 
         MusicBot.instance()
                 .getAudioManager(interaction.getServer().orElseThrow())
-                .skipTrack(amount);
+                .nextTrack(amount);
 
         updater.setContent(amount > 1 ? amount + " Lieder übersprungen." : "Ein Lied übersprungen.").update();
     }

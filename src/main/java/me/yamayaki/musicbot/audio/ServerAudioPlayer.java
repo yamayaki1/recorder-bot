@@ -49,7 +49,25 @@ public class ServerAudioPlayer extends AudioEventAdapter {
         }
     }
 
-    public void skipTrack(int count) {
+    public void previousTrack(int count) {
+        this.skipping = true;
+
+        for (int i = 0; i < Math.max(count, 1); i++) {
+            this.audioSource.getAudioPlayer().stopTrack();
+
+            this.setPaused(false);
+
+            if (this.audioSource.hasFinished() && this.playlist.previous(false) != null) {
+                this.audioSource.getAudioPlayer()
+                        .playTrack(this.playlist.previous(true));
+            }
+        }
+
+        this.skipping = false;
+        this.fixAudioSource();
+    }
+
+    public void nextTrack(int count) {
         this.skipping = true;
 
         for (int i = 0; i < Math.max(count, 1); i++) {
@@ -63,9 +81,9 @@ public class ServerAudioPlayer extends AudioEventAdapter {
     public void startPlaying() {
         this.setPaused(false);
 
-        if (this.audioSource.hasFinished() && this.playlist.hasNext()) {
+        if (this.audioSource.hasFinished() && this.playlist.next(false) != null) {
             this.audioSource.getAudioPlayer()
-                    .playTrack(this.playlist.next());
+                    .playTrack(this.playlist.next(true));
         }
 
         this.fixAudioSource();
@@ -92,7 +110,7 @@ public class ServerAudioPlayer extends AudioEventAdapter {
     }
 
     public void setVolume(int volume) {
-        int vol = Math.max(0, Math.min(volume, 100));
+        int vol = Math.max(0, Math.min(volume, 150));
         this.audioSource.getAudioPlayer()
                 .setVolume(vol);
     }
@@ -108,6 +126,10 @@ public class ServerAudioPlayer extends AudioEventAdapter {
     }
 
     public void fixAudioSource() {
+        if (skipping) {
+            return;
+        }
+
         this.server.getAudioConnection().ifPresent(audioConnection -> {
             audioConnection.setAudioSource(this.audioSource);
             MusicBot.LOGGER.debug("Setting audio source for connection in {}", this.server.getId());
@@ -120,7 +142,7 @@ public class ServerAudioPlayer extends AudioEventAdapter {
 
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-        if (!(this.getPlaylist().hasNext() || endReason.mayStartNext) || this.skipping) {
+        if (!(this.getPlaylist().next(false) != null || endReason.mayStartNext) || this.skipping) {
             return;
         }
 

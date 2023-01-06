@@ -15,6 +15,8 @@ public class Config {
     private static final Properties internalValues = new Properties();
     private static final Properties userDefined = new Properties();
 
+    private static boolean readOnly = false;
+
     static {
         try (InputStream inputStream = Config.class.getResourceAsStream("/recorderbot.properties")) {
             assert inputStream != null;
@@ -23,19 +25,17 @@ public class Config {
         }
     }
 
-    private final String[] availableSettings = new String[]{
-            "discord.token",
-            "spotify.id",
-            "spotify.secret"
-    };
+    private final String[] availableSettings;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public Config(File file) {
+    public Config(File file, String[] availableSettings) {
         if (!file.exists()) {
             file.mkdirs();
         }
 
         final File settingsFile = new File(file, "settings.properties");
+
+        this.availableSettings = availableSettings;
 
         this.load(settingsFile);
         this.write(settingsFile);
@@ -72,7 +72,9 @@ public class Config {
     private void load(File settingsFile) {
         try (InputStream inputStream = new FileInputStream(settingsFile)) {
             userDefined.load(inputStream);
-        } catch (Exception ignored) {
+        } catch (Exception error) {
+            MusicBot.LOGGER.error("error while loading settings, falling back to read-only mode.", error);
+            readOnly = true;
         }
 
         for (String availableSetting : availableSettings) {
@@ -81,6 +83,11 @@ public class Config {
     }
 
     private void write(File settingsFile) {
+        if (readOnly) {
+            MusicBot.LOGGER.error("not writing changes to settings file, as we're currently in read-only mode.");
+            return;
+        }
+
         try (FileWriter fileWriter = new FileWriter(settingsFile)) {
             userDefined.store(fileWriter, "");
         } catch (Exception ignored) {

@@ -24,20 +24,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class MusicBot {
-    public static final Logger LOGGER = LogManager.getLogger(MusicBot.class);
-    public static final Config CONFIG = new Config(new File(".", "config/"));
-    public static final DBInstance DATABASE = new DBInstance(new File(".", "database/"), new DatabaseSpec[]{
-            CacheSpecs.SPOTIFY_CACHE,
-            CacheSpecs.YOUTUBE_CACHE,
-            CacheSpecs.PLAYLIST_CACHE,
-
-            ChannelSpecs.CHANNEL_SETTINGS,
-            ChannelSpecs.SERVER_PLAYERCHANNEL
-    });
+    public static Logger LOGGER;
+    public static Config CONFIG;
+    public static DBInstance DATABASE;
+    public static DiscordApi API;
     private static MusicBot instance = null;
+    //TODO: might want to use something else, instead of a hashmap
     private final ConcurrentHashMap<Server, ServerAudioPlayer> serverAudioManagers = new ConcurrentHashMap<>();
-
-    private DiscordApi discordApi;
 
     public static void main(String[] args) {
         MusicBot bot = new MusicBot();
@@ -55,33 +48,50 @@ public class MusicBot {
     protected void launch() {
         instance = this;
 
+        LOGGER = LogManager.getLogger(MusicBot.class);
+
+        CONFIG = new Config(new File(".", "config/"), new String[]{
+                "discord.token",
+                "spotify.id",
+                "spotify.secret"
+        });
+
+        DATABASE = new DBInstance(new File(".", "database/"), new DatabaseSpec[]{
+                CacheSpecs.SPOTIFY_CACHE,
+                CacheSpecs.YOUTUBE_CACHE,
+                CacheSpecs.PLAYLIST_CACHE,
+
+                ChannelSpecs.CHANNEL_SETTINGS,
+                ChannelSpecs.SERVER_PLAYERCHANNEL
+        });
+
         //report version
         LOGGER.info("starting music-bot ({}) ...", Config.getVersion());
 
         //init api-builder
         LOGGER.info("initializing discord-api ({}) ...", Config.getDiscordVersion());
 
-        discordApi = new DiscordApiBuilder()
+        API = new DiscordApiBuilder()
                 .setToken(CONFIG.getSetting("discord.token"))
                 .setIntents(Intent.GUILD_VOICE_STATES, Intent.DIRECT_MESSAGES)
                 .login().join();
 
         LOGGER.info("discord login successful, continuing ... ");
-        discordApi.setMessageCacheSize(0, 0);
-        discordApi.addListener(new InteractionListener(this.discordApi));
-        discordApi.addListener(new VoiceLeaveListener());
+        API.setMessageCacheSize(0, 0);
+        API.addListener(new InteractionListener());
+        API.addListener(new VoiceLeaveListener());
 
         this.updateBotInfo();
         this.runTasks();
     }
 
     private void updateBotInfo() {
-        discordApi.updateStatus(UserStatus.ONLINE);
+        API.updateStatus(UserStatus.ONLINE);
 
         if (Config.isDevBuild()) {
-            discordApi.updateActivity(ActivityType.PLAYING, Config.getBranch() + "@" + Config.getVersion());
+            API.updateActivity(ActivityType.PLAYING, Config.getBranch() + "@" + Config.getVersion());
         } else {
-            discordApi.updateActivity(ActivityType.PLAYING, "Recorder | " + Config.getVersion());
+            API.updateActivity(ActivityType.PLAYING, "Recorder | " + Config.getVersion());
         }
     }
 
@@ -114,7 +124,7 @@ public class MusicBot {
             }
 
             DATABASE.close();
-            this.discordApi.disconnect().join();
+            API.disconnect().join();
         } catch (Exception e) {
             MusicBot.LOGGER.error(e);
         }

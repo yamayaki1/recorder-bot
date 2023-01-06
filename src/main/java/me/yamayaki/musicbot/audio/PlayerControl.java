@@ -13,11 +13,13 @@ import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageFlag;
+import org.javacord.api.entity.message.MessageUpdater;
 import org.javacord.api.entity.message.component.ActionRow;
 import org.javacord.api.entity.message.component.Button;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.event.interaction.ButtonClickEvent;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -111,43 +113,52 @@ public class PlayerControl {
         this.controllerMessage.ifSet(message -> {
             this.isDirty = false;
 
-            message.createUpdater()
+            MessageUpdater updater = message.createUpdater()
                     .setContent("")
                     .setEmbed(this.getEmbed())
-                    .addComponents(this.getComponents())
-                    .applyChanges().join();
+                    .addComponents(this.getComponents());
+
+            if (Config.isDevBuild()) {
+                updater.addEmbed(this.getDebugEmbed());
+            }
+
+            updater.applyChanges().exceptionally(throwable -> {
+                MusicBot.LOGGER.fatal(throwable);
+                return null;
+            });
         });
     }
 
     private ActionRow[] getComponents() {
         return new ActionRow[]{ActionRow.of(
-                Button.danger("stop", "", "⏹️"),
-                Button.primary("pause", "", "⏯️"),
-                Button.primary("skip", "", "⏭️")
+                Button.primary("previous", "Vorheriges", "⏮️"),
+                Button.primary("pause", "Pause", "⏯️"),
+                Button.primary("stop", "Stop", "⏹️"),
+                Button.primary("next", "Nächstes", "⏭️")
         ), ActionRow.of(
-                Button.primary("vol_down", "", "🔈"),
-                Button.primary("vol_up", "", "🔊"),
-                Button.primary("bass_toggle", "", "\uD83C\uDD71")
+                Button.primary("vol_down", "Leise", "🔈"),
+                Button.primary("vol_up", "Lauter", "🔊"),
+                Button.primary("bass_toggle", "Bass-Boost", "\uD83C\uDD71")
         )};
     }
 
     private EmbedBuilder getEmbed() {
         AudioTrack currentTrack = this.audioManager.getPlayingTrack();
-        AudioTrack nextTrack = this.audioManager.getPlaylist().peekNext();
+        AudioTrack nextTrack = this.audioManager.getPlaylist().next(false);
 
         EmbedBuilder embedBuilder = new EmbedBuilder();
 
         if (currentTrack != null) {
             SpotifyTrack spotifyData = currentTrack.getUserData(SpotifyTrack.class);
 
-            embedBuilder.setThumbnail(spotifyData != null ? spotifyData.image() : CommonUtils.getThumbnail(currentTrack.getIdentifier()))
-                    .addField("Aktuelles Lied" + (this.audioManager.isPaused() ? " (pausiert)" : ""), currentTrack.getInfo().title + "\n" + currentTrack.getInfo().author.replaceAll("- Topic", ""));
+            embedBuilder.setImage(spotifyData != null ? spotifyData.image() : CommonUtils.getThumbnail(currentTrack.getIdentifier()))
+                    .addField("Aktuelles Lied" + (this.audioManager.isPaused() ? " (pausiert)" : ""), currentTrack.getInfo().title + "\n" + currentTrack.getInfo().author.replaceAll("- Topic", ""), true);
         } else {
-            embedBuilder.addField("Aktuelles Lied", "Aktuell spielt kein Lied!");
+            embedBuilder.addField("Aktuelles Lied", "Aktuell spielt kein Lied!", true);
         }
 
         if (nextTrack != null) {
-            embedBuilder.addField("Nächstes Lied", nextTrack.getInfo().title + "\n" + nextTrack.getInfo().author.replaceAll("- Topic", ""));
+            embedBuilder.addField("Nächstes Lied", nextTrack.getInfo().title + "\n" + nextTrack.getInfo().author.replaceAll("- Topic", ""), true);
         }
 
         List<AudioTrack> list = this.audioManager.getPlaylist().getTracks(false);
@@ -157,6 +168,18 @@ public class PlayerControl {
             embedBuilder.addField("Warteschlange", "Keine Lieder");
         }
 
+        embedBuilder.setTimestampToNow();
+        return embedBuilder;
+    }
+
+    private EmbedBuilder getDebugEmbed() {
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+        embedBuilder.setTitle("-- Debug-Informationen --");
+
+        String embedContent = "playlist.all: " + Arrays.toString(this.audioManager.getPlaylist().__dEntireList().stream().map(audioTrack -> audioTrack.getIdentifier() + "\n").toArray()) + "\n" +
+                "player.volume: " + this.audioManager.getVolume() + "\n";
+
+        embedBuilder.setDescription(embedContent);
         embedBuilder.setTimestampToNow();
         return embedBuilder;
     }
@@ -173,10 +196,11 @@ public class PlayerControl {
                 this.audioManager.getPlaylist().clear();
                 this.audioManager.stopTrack();
             }
+            case "previous" -> this.audioManager.previousTrack(1);
             case "pause" -> this.audioManager.setPaused(!this.audioManager.isPaused());
-            case "skip" -> this.audioManager.skipTrack(1);
-            case "vol_down" -> this.audioManager.setVolume(this.audioManager.getVolume() - 15);
-            case "vol_up" -> this.audioManager.setVolume(this.audioManager.getVolume() + 15);
+            case "next" -> this.audioManager.nextTrack(1);
+            case "vol_down" -> this.audioManager.setVolume(this.audioManager.getVolume() - 10);
+            case "vol_up" -> this.audioManager.setVolume(this.audioManager.getVolume() + 10);
             case "bass_toggle" -> {
                 if (Config.isDevBuild()) {
                     this.audioManager.toggleBassboost();

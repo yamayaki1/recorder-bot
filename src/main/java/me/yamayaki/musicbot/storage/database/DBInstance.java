@@ -23,6 +23,7 @@ public class DBInstance {
 
     private final HashMap<DatabaseSpec<?, ?>, DBFamily<?, ?>> databases = new HashMap<>();
 
+    //TODO: gross, might want to rewrite that
     public DBInstance(File file, DatabaseSpec<?, ?>[] specs) {
         if (file.mkdirs() && !file.isDirectory()) {
             throw new RuntimeException("Couldn't create directory: " + file);

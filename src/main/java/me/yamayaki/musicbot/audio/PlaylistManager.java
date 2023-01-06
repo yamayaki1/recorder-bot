@@ -9,26 +9,58 @@ import me.yamayaki.musicbot.storage.database.specs.impl.CacheSpecs;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class PlaylistManager {
     private final Long serverID;
-    private final Queue<AudioTrack> trackList;
 
-    private AudioTrack currentTrack = null;
-
-    private boolean loop = false;
+    private final List<AudioTrack> scheduledTracks;
+    private int selectedTrack;
 
     public PlaylistManager(Long serverID) {
         this.serverID = serverID;
-        this.trackList = new LinkedBlockingQueue<>();
+
+        this.scheduledTracks = new ArrayList<>();
+        this.selectedTrack = -1;
 
         this.restore();
     }
 
+    public AudioTrack previous(boolean select) {
+        final int position = Math.max(this.selectedTrack - 1, 0);
+
+        if (position > this.scheduledTracks.size() - 1) {
+            return null;
+        }
+
+        if (select) {
+            this.selectedTrack--;
+        }
+
+        return this.scheduledTracks.get(position).makeClone();
+    }
+
     public AudioTrack current() {
-        return this.currentTrack;
+        final int position = Math.max(this.selectedTrack, 0);
+
+        if (position > this.scheduledTracks.size() - 1) {
+            return null;
+        }
+
+        return this.scheduledTracks.get(position).makeClone();
+    }
+
+    public AudioTrack next(boolean select) {
+        final int position = Math.max(this.selectedTrack + 1, 0);
+
+        if (position > this.scheduledTracks.size() - 1) {
+            return null;
+        }
+
+        if (select) {
+            this.selectedTrack++;
+        }
+
+        return this.scheduledTracks.get(position).makeClone();
     }
 
     public void add(AudioTrack track) {
@@ -36,51 +68,26 @@ public class PlaylistManager {
             return;
         }
 
-        this.trackList.add(track);
+        this.scheduledTracks.add(track);
     }
 
     public List<AudioTrack> getTracks(boolean inclCurrent) {
-        final ArrayList<AudioTrack> list = new ArrayList<>(this.trackList);
+        final int from = Math.max(0, inclCurrent ? this.selectedTrack : this.selectedTrack + 1);
+        final int to = this.scheduledTracks.size();
 
-        if (inclCurrent && this.currentTrack != null) {
-            list.add(this.currentTrack);
-        }
+        MusicBot.LOGGER.debug("({}): {}, {}", this.scheduledTracks.size(), from, to);
 
-        return list;
+        return List.copyOf(this.scheduledTracks)
+                .subList(from, to);
     }
 
     public void clear() {
-        this.trackList.clear();
+        this.selectedTrack = -1;
+        this.scheduledTracks.clear();
     }
 
-    public boolean hasNext() {
-        return this.trackList.size() > 0 || (this.currentTrack != null && this.loop);
-    }
-
-    public AudioTrack next() {
-        if (!this.hasNext()) {
-            return null;
-        }
-
-        if (this.loop && this.currentTrack != null) {
-            this.trackList.add(this.currentTrack.makeClone());
-        }
-
-        this.currentTrack = this.trackList.poll();
-        return this.currentTrack;
-    }
-
-    public AudioTrack peekNext() {
-        if (!this.hasNext()) {
-            return null;
-        }
-
-        return this.trackList.peek();
-    }
-
-    public boolean toggleRepeat() {
-        this.loop = !this.loop;
-        return this.loop;
+    public List<AudioTrack> __dEntireList() {
+        return scheduledTracks;
     }
 
     public void restore() {

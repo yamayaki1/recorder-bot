@@ -9,9 +9,10 @@ import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
-import se.michaelthelin.spotify.model_objects.specification.Album;
-import se.michaelthelin.spotify.model_objects.specification.Playlist;
+import se.michaelthelin.spotify.model_objects.specification.Paging;
+import se.michaelthelin.spotify.model_objects.specification.PlaylistTrack;
 import se.michaelthelin.spotify.model_objects.specification.Track;
+import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
 import se.michaelthelin.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 
 import java.io.IOException;
@@ -76,15 +77,16 @@ public class SpotifyAccess {
         }
     }
 
+    //TODO: fix paging (https://github.com/spotify-web-api-java/spotify-web-api-java/issues/234#issuecomment-922890827)
     public static SpotifyTrack[] getByAlbum(String albumId) {
         try {
-            final Album album = getAPI()
-                    .getAlbum(albumId)
+            final Paging<TrackSimplified> album = getAPI()
+                    .getAlbumsTracks(albumId)
                     .build().execute();
 
-            SpotifyTrack[] tracks = new SpotifyTrack[album.getTracks().getItems().length];
-            for (int i = 0; i < album.getTracks().getItems().length; i++) {
-                tracks[i] = getByTrack(album.getTracks().getItems()[i].getId())[0];
+            SpotifyTrack[] tracks = new SpotifyTrack[album.getItems().length];
+            for (int i = 0; i < album.getItems().length; i++) {
+                tracks[i] = getByTrack(album.getItems()[i].getId())[0];
             }
 
             return tracks;
@@ -93,15 +95,16 @@ public class SpotifyAccess {
         }
     }
 
+    //TODO: fix paging (https://github.com/spotify-web-api-java/spotify-web-api-java/issues/234#issuecomment-922890827)
     public static SpotifyTrack[] getByPlaylist(String playlistId) {
         try {
-            final Playlist playlist = getAPI()
-                    .getPlaylist(playlistId)
+            final Paging<PlaylistTrack> playlist = getAPI()
+                    .getPlaylistsItems(playlistId)
                     .build().execute();
 
-            SpotifyTrack[] tracks = new SpotifyTrack[playlist.getTracks().getItems().length];
-            for (int i = 0; i < playlist.getTracks().getItems().length; i++) {
-                tracks[i] = getByTrack(playlist.getTracks().getItems()[i].getTrack().getId())[0];
+            SpotifyTrack[] tracks = new SpotifyTrack[playlist.getItems().length];
+            for (int i = 0; i < playlist.getItems().length; i++) {
+                tracks[i] = getByTrack(playlist.getItems()[i].getTrack().getId())[0];
             }
 
             return tracks;
