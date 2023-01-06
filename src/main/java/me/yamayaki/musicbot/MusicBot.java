@@ -1,6 +1,6 @@
 package me.yamayaki.musicbot;
 
-import me.yamayaki.musicbot.audio.ServerAudioManager;
+import me.yamayaki.musicbot.audio.ServerAudioPlayer;
 import me.yamayaki.musicbot.interactions.InteractionListener;
 import me.yamayaki.musicbot.interactions.VoiceLeaveListener;
 import me.yamayaki.musicbot.storage.database.DBInstance;
@@ -35,7 +35,7 @@ public class MusicBot {
             ChannelSpecs.SERVER_PLAYERCHANNEL
     });
     private static MusicBot instance = null;
-    private final ConcurrentHashMap<Server, ServerAudioManager> serverAudioManagers = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Server, ServerAudioPlayer> serverAudioManagers = new ConcurrentHashMap<>();
 
     private DiscordApi discordApi;
 
@@ -92,8 +92,8 @@ public class MusicBot {
         Runtime.getRuntime().addShutdownHook(new ShutdownHandler(this));
     }
 
-    public ServerAudioManager getAudioManager(Server server) {
-        return this.serverAudioManagers.computeIfAbsent(server, ServerAudioManager::new);
+    public ServerAudioPlayer getAudioManager(Server server) {
+        return this.serverAudioManagers.computeIfAbsent(server, ServerAudioPlayer::new);
     }
 
     public void removeAudioManager(Server server) {
@@ -101,7 +101,7 @@ public class MusicBot {
         this.serverAudioManagers.remove(server);
     }
 
-    public ConcurrentHashMap<Server, ServerAudioManager> getAllAudioManagers() {
+    public ConcurrentHashMap<Server, ServerAudioPlayer> getAllAudioManagers() {
         return this.serverAudioManagers;
     }
 
@@ -109,8 +109,8 @@ public class MusicBot {
         MusicBot.LOGGER.info("shutting down ...");
         try {
             // shutdown audiomanagers
-            for (ServerAudioManager serverAudioManager : this.serverAudioManagers.values()) {
-                serverAudioManager.shutdown(true);
+            for (ServerAudioPlayer serverAudioPlayer : this.serverAudioManagers.values()) {
+                serverAudioPlayer.shutdown(true);
             }
 
             DATABASE.close();

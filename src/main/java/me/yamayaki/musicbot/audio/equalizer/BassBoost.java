@@ -3,7 +3,7 @@ package me.yamayaki.musicbot.audio.equalizer;
 import com.sedmelluq.discord.lavaplayer.filter.equalizer.EqualizerFactory;
 
 public class BassBoost implements DefaultEqualizers.EQFilter {
-    public static final float[] BASS_BOOST = {
+    private static final float[] BASS_BOOST = {
             0.2f,
             0.15f,
             0.1f,

@@ -1,7 +1,7 @@
 package me.yamayaki.musicbot.interactions.commands.music;
 
 import me.yamayaki.musicbot.MusicBot;
-import me.yamayaki.musicbot.audio.ServerAudioManager;
+import me.yamayaki.musicbot.audio.ServerAudioPlayer;
 import me.yamayaki.musicbot.interactions.ApplicationInteraction;
 import me.yamayaki.musicbot.utilities.CommonUtils;
 import org.javacord.api.DiscordApi;
@@ -25,7 +25,7 @@ public class PlayCommand implements ApplicationInteraction {
         return SlashCommand.with(getName(), "Fügt Musik der Playlist hinzu")
                 .setEnabledInDms(false)
                 .addOption(
-                        SlashCommandOption.createStringOption("query", "Spielt Musik von YouTube, Spotify, Twitch und ähnlichen Diensten ab.", true)
+                        SlashCommandOption.createStringOption("query", "Spielt Musik von YouTube oder Twitch ab.", true)
                 );
     }
 
@@ -50,10 +50,10 @@ public class PlayCommand implements ApplicationInteraction {
             song = "ytmsearch:" + song;
         }
 
-        ServerAudioManager serverAudioManager = MusicBot.instance()
+        ServerAudioPlayer serverAudioPlayer = MusicBot.instance()
                 .getAudioManager(interaction.getServer().orElseThrow());
 
-        serverAudioManager.tryLoadItems(song, playerResponse -> {
+        serverAudioPlayer.tryLoadItems(song, playerResponse -> {
             String message;
             if (playerResponse.isSuccess()) {
                 message = playerResponse.getCount() > 1

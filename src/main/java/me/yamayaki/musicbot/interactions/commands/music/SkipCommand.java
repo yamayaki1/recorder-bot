@@ -3,7 +3,7 @@ package me.yamayaki.musicbot.interactions.commands.music;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import me.yamayaki.musicbot.MusicBot;
-import me.yamayaki.musicbot.audio.ServerAudioManager;
+import me.yamayaki.musicbot.audio.ServerAudioPlayer;
 import me.yamayaki.musicbot.interactions.ApplicationInteraction;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.interaction.SlashCommand;
@@ -60,7 +60,7 @@ public class SkipCommand implements ApplicationInteraction {
         int amount = interaction.getArgumentDecimalValueByName("amount")
                 .orElse(1.0).intValue();
 
-        ServerAudioManager manager = MusicBot.instance()
+        ServerAudioPlayer manager = MusicBot.instance()
                 .getAudioManager(interaction.getServer().orElseThrow());
 
         int max_amount = manager.getPlaylist().getTracks(false).size() + 1;

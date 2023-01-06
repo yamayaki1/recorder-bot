@@ -32,7 +32,7 @@ public class PlayerChannelCommand implements ApplicationInteraction {
     public void executeCommand(SlashCommandInteraction interaction, InteractionOriginalResponseUpdater updater) {
         boolean success = MusicBot.instance().getAudioManager(interaction.getServer().orElseThrow())
                 .getPlayerControl()
-                .setPlayerChannel(interaction.getArgumentChannelValueByName("channel").get());
+                .setPlayerChannel(interaction.getArgumentChannelValueByName("channel").orElseThrow());
 
         String content = success ? "Kanal erfolgreich gesetzt." : "Beim setzen des Kanals ist ein Fehler aufgetreten!";
         updater.setContent(content).update();

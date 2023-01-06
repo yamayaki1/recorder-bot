@@ -15,7 +15,7 @@ import org.javacord.api.entity.server.Server;
 
 import java.util.function.Consumer;
 
-public class ServerAudioManager extends AudioEventAdapter {
+public class ServerAudioPlayer extends AudioEventAdapter {
     private final Server server;
 
     private final LavaAudioSource audioSource;
@@ -27,7 +27,7 @@ public class ServerAudioManager extends AudioEventAdapter {
 
     private long lastActiveTime = System.currentTimeMillis();
 
-    public ServerAudioManager(Server server) {
+    public ServerAudioPlayer(Server server) {
         this.server = server;
         this.audioSource = new LavaAudioSource(server.getApi(), this);
         this.playlist = new PlaylistManager(this.server.getId());
@@ -120,13 +120,11 @@ public class ServerAudioManager extends AudioEventAdapter {
 
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-        if (!(this.getPlaylist().hasNext() || endReason.mayStartNext)) {
+        if (!(this.getPlaylist().hasNext() || endReason.mayStartNext) || this.skipping) {
             return;
         }
 
-        if (!this.skipping) {
-            this.startPlaying();
-        }
+        this.startPlaying();
     }
 
     @Override

@@ -1,4 +1,4 @@
-package me.yamayaki.musicbot.interactions.commands.debug;
+package me.yamayaki.musicbot.interactions.commands.utilities;
 
 import me.yamayaki.musicbot.interactions.ApplicationInteraction;
 import org.javacord.api.DiscordApi;

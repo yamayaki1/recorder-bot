@@ -22,12 +22,12 @@ import java.util.List;
 import java.util.Optional;
 
 public class PlayerControl {
-    private final ServerAudioManager audioManager;
+    private final ServerAudioPlayer audioManager;
     private final RefreshableHolder<Message> controllerMessage;
 
     private boolean isDirty = true;
 
-    public PlayerControl(ServerAudioManager audioManager) {
+    public PlayerControl(ServerAudioPlayer audioManager) {
         this.audioManager = audioManager;
         this.controllerMessage = new RefreshableHolder<>((message) -> {
             if (message != null) {

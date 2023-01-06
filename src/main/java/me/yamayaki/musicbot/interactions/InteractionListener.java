@@ -4,14 +4,14 @@ import me.yamayaki.musicbot.Config;
 import me.yamayaki.musicbot.MusicBot;
 import me.yamayaki.musicbot.interactions.commands.channels.GhostCommand;
 import me.yamayaki.musicbot.interactions.commands.channels.PlayerChannelCommand;
-import me.yamayaki.musicbot.interactions.commands.debug.ShutdownCommand;
 import me.yamayaki.musicbot.interactions.commands.music.ClearCommand;
 import me.yamayaki.musicbot.interactions.commands.music.PlayCommand;
 import me.yamayaki.musicbot.interactions.commands.music.PlayerCommand;
 import me.yamayaki.musicbot.interactions.commands.music.PlaylistCommand;
 import me.yamayaki.musicbot.interactions.commands.music.SkipCommand;
+import me.yamayaki.musicbot.interactions.commands.music.SongCommand;
 import me.yamayaki.musicbot.interactions.commands.utilities.AboutCommand;
-import me.yamayaki.musicbot.interactions.commands.utilities.PingCommand;
+import me.yamayaki.musicbot.interactions.commands.utilities.ShutdownCommand;
 import me.yamayaki.musicbot.interactions.context.PingUserContext;
 import me.yamayaki.musicbot.utilities.Threads;
 import org.javacord.api.DiscordApi;
@@ -41,16 +41,15 @@ public class InteractionListener implements SlashCommandCreateListener, ButtonCl
                 new GhostCommand(),
                 new PlayerChannelCommand(),
 
-                new ShutdownCommand(),
-
                 new ClearCommand(),
                 new PlayCommand(),
                 new PlayerCommand(),
                 new PlaylistCommand(),
                 new SkipCommand(),
+                new SongCommand(),
 
                 new AboutCommand(),
-                new PingCommand(),
+                new ShutdownCommand(),
 
                 new PingUserContext()
         );
